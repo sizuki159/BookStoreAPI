@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.string('password', 180).notNullable()
       table.double('money').defaultTo(0)
       table.string('remember_me_token').nullable()
+      table.integer('user_level_id').unsigned().references('id').inTable('user_levels').onDelete('SET NULL')
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL

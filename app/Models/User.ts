@@ -27,6 +27,9 @@ export default class User extends BaseModel {
   })
   public money: number
 
+  @column()
+  public userLevelId: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
