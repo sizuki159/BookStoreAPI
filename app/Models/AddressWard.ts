@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import AddressDistrict from './AddressDistrict'
 
 export default class AddressWard extends BaseModel {
   @column({ isPrimary: true })
@@ -16,4 +17,12 @@ export default class AddressWard extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  //#region Relationship
+  @belongsTo(() => AddressDistrict, {
+    foreignKey: 'districtId',
+    localKey: 'districtId'
+  })
+  public district: BelongsTo<typeof AddressDistrict>
+  //#endregion
 }

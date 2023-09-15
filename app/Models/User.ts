@@ -13,14 +13,20 @@ export default class User extends BaseModel {
   public id: number
 
   @column({
-    columnName: 'username'
+    columnName: 'email'
   })
-  public username: string
+  public email: string
+
+  @column()
+  public phoneNumber: string
 
   @column({
     columnName: 'password'
   })
   public password: string
+
+  @column()
+  public fullname: string
 
   @column({
     columnName: 'money'

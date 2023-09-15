@@ -10,6 +10,9 @@ export default class UserLevel extends BaseModel {
   })
   public levelName: string
 
+  @column()
+  public discount: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

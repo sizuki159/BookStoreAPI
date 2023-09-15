@@ -11,5 +11,6 @@ export default class extends BaseSeeder {
     await this.runSeeder(await import('../AddressProvinceSeeder'))
     await this.runSeeder(await import('../AddressDistrictSeeder'))
     await this.runSeeder(await import('../AddressWardsSeeder'))
+    await this.runSeeder(await import('../UserLevelSeeder'))
   }
 }

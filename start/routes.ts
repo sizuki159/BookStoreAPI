@@ -20,6 +20,19 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
+//#region Address
+Route.group(() => {
+  Route.group(() => {
+    Route.get('/', 'AddressController.getProvince')
+    Route.get('/:provinceId', 'AddressController.getDistrictWithProvinceId')
+  }).prefix('province')
+
+  Route.get('/district/:districtId', 'AddressController.getWardsWithDistrictId')
+}).prefix('address')
+//#endregion
+
 Route.group(() => {
   Route.post('register', 'AuthController.register')
+  Route.post('login', 'AuthController.login')
 }).prefix('auth')
+

@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, HasMany, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import AddressDistrict from './AddressDistrict'
 
 export default class AddressProvine extends BaseModel {
   @column({
@@ -16,4 +17,12 @@ export default class AddressProvine extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  //#region Relationship
+  @hasMany(() => AddressDistrict, {
+    foreignKey: 'provinceId',
+    localKey: 'provinceId'
+  })
+  public districts: HasMany<typeof AddressDistrict>
+  //#endregion
 }

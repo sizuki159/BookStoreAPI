@@ -3,16 +3,19 @@ import User from 'App/Models/User'
 
 export default class AuthController {
     public async register ({request, response}: HttpContextContract) {
-        const {username, email, phone, fullname, password} = request.body()
-        await User.create({
-            username: 'trung',
-            password: '123'
+        const {email, phone, fullname, password} = request.body()
+        const user = await User.create({
+            email,
+            phoneNumber: phone,
+            fullname,
+            password
         })
-        return email
+        return user
     }
 
-    public async login({request, response}: HttpContextContract) {
-        const {username, password} = request.body()
-        return username
+    public async login({auth, request, response}: HttpContextContract) {        
+        const {email, password} = request.body()
+        const token = await auth.use('api').attempt(email, password)
+        return token
     }
 }

@@ -6,11 +6,13 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.string('username', 255).notNullable().unique()
+      table.string('email', 255).notNullable().unique()
+      table.string('phone_number', 10).nullable().unique()
       table.string('password', 180).notNullable()
+      table.string('fullname').notNullable()
       table.double('money').defaultTo(0)
       table.string('remember_me_token').nullable()
-      table.integer('user_level_id').unsigned().references('id').inTable('user_levels').onDelete('SET NULL')
+      table.integer('user_level_id').unsigned().references('id').inTable('user_levels').onDelete('SET NULL').defaultTo(1)
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL
