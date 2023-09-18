@@ -22,6 +22,15 @@ export default class ApiToken extends BaseModel {
   @column()
   public token: string
 
+  @column()
+  public refreshToken: string
+
+  @column()
+  public isUsed: boolean
+
+  @column()
+  public isRevoked: boolean
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

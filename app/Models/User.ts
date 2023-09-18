@@ -1,6 +1,12 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, beforeSave, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
+import UserLevel from './UserLevel'
+import UserRole from './UserRole'
+
+import { string } from '@ioc:Adonis/Core/Helpers'
+import ApiToken from './ApiToken'
+
 
 export default class User extends BaseModel {
 
@@ -21,7 +27,8 @@ export default class User extends BaseModel {
   public phoneNumber: string
 
   @column({
-    columnName: 'password'
+    columnName: 'password',
+    serializeAs: null
   })
   public password: string
 
@@ -36,6 +43,9 @@ export default class User extends BaseModel {
   @column()
   public userLevelId: number
 
+  @column()
+  public userRoleId: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
@@ -48,5 +58,24 @@ export default class User extends BaseModel {
       user.password = await Hash.make(user.password)
     }
   }
+
+  //#region Relationship
+  @belongsTo(() => UserLevel)
+  public userLevel: BelongsTo<typeof UserLevel>
+
+  @belongsTo(() => UserRole)
+  public userRole: BelongsTo<typeof UserRole>
+
+  //#endregion
+
+  //#region Function
+  public static async generateRefreshToken(tokenHash: string) {
+    const apiToken = await ApiToken.findByOrFail('token', tokenHash)
+    const refreshToken = string.generateRandom(64)
+    apiToken.refreshToken = refreshToken
+    await apiToken.save()
+    return refreshToken
+  }
+  //#endregion
 
 }

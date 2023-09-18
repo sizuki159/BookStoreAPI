@@ -23,7 +23,7 @@ import Route from '@ioc:Adonis/Core/Route'
 //#region Address
 Route.group(() => {
   Route.group(() => {
-    Route.get('/', 'AddressController.getProvince')
+    Route.get('/', 'AddressController.getProvince').middleware('auth')
     Route.get('/:provinceId', 'AddressController.getDistrictWithProvinceId')
   }).prefix('province')
 

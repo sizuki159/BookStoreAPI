@@ -13,6 +13,7 @@ export default class extends BaseSchema {
       table.double('money').defaultTo(0)
       table.string('remember_me_token').nullable()
       table.integer('user_level_id').unsigned().references('id').inTable('user_levels').onDelete('SET NULL').defaultTo(1)
+      table.integer('user_role_id').unsigned().references('id').inTable('user_roles').onDelete('SET NULL').defaultTo(1)
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL

@@ -10,12 +10,17 @@ export default class extends BaseSchema {
       table.string('name').notNullable()
       table.string('type').notNullable()
       table.string('token', 64).notNullable().unique()
+      table.string('refresh_token', 64).notNullable().unique()
+      table.boolean('is_used').notNullable().defaultTo(false)
+      table.boolean('is_revoked').notNullable().defaultTo(false)
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL
        */
       table.timestamp('expires_at', { useTz: true }).nullable().defaultTo(this.now())
+      table.timestamp('refresh_expires_at').nullable().defaultTo(this.now())
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now())
     })
   }
 
