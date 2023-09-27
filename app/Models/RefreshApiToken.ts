@@ -1,14 +1,24 @@
-import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
-import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 
-export default class ParentCategory extends compose(BaseModel, SoftDeletes) {
+export default class RefreshApiToken extends BaseModel {
   @column({ isPrimary: true })
   public id: number
+  
+  @column()
+  public apiTokenId: number
 
   @column()
-  public name: string
+  public refreshToken: string
+
+  @column()
+  public isUsed: boolean
+
+  @column()
+  public isRevoked: boolean
+
+  @column.dateTime({autoCreate: true})
+  public expiresAt: DateTime
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

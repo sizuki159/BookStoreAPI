@@ -12,8 +12,10 @@ export default class AuthController {
             password
         })
 
+        const token = await auth.use('api').generate(user, {expiresIn: '7d'})
         return response.created({
-            message: 'Đăng ký thành công!'
+            "jwtToken": token.token,
+            "userInfo": user,
         })
     }
 
@@ -21,7 +23,7 @@ export default class AuthController {
         const {email, password} = request.body()
 
         try {
-            const token = await auth.use('api').attempt(email, password)
+            const token = await auth.use('api').attempt(email, password, {expiresIn: '7d'})
             const user = await User.findByOrFail('email', email)
 
             const refreshToken = await User.generateRefreshToken(token.tokenHash)
@@ -36,6 +38,12 @@ export default class AuthController {
             // return response.json(ex.message)
             return response.unauthorized()
         }
+    }
+
+    public async refreshToken({auth, request, response}: HttpContextContract) {
+        const {jwtToken, refreshToken} = request.body()
+        
+        return {jwtToken, refreshToken}
     }
 
 }

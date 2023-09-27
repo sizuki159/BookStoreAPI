@@ -6,6 +6,7 @@ import UserRole from './UserRole'
 
 import { string } from '@ioc:Adonis/Core/Helpers'
 import ApiToken from './ApiToken'
+import RefreshApiToken from './RefreshApiToken'
 
 
 export default class User extends BaseModel {
@@ -46,10 +47,10 @@ export default class User extends BaseModel {
   @column()
   public userRoleId: number
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({ autoCreate: true, serializeAs: null })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null })
   public updatedAt: DateTime
 
   @beforeSave()
@@ -72,8 +73,10 @@ export default class User extends BaseModel {
   public static async generateRefreshToken(tokenHash: string) {
     const apiToken = await ApiToken.findByOrFail('token', tokenHash)
     const refreshToken = string.generateRandom(64)
-    apiToken.refreshToken = refreshToken
-    await apiToken.save()
+    await RefreshApiToken.create({
+      apiTokenId: apiToken.id,
+      refreshToken,
+    })
     return refreshToken
   }
   //#endregion

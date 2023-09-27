@@ -20,6 +20,11 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
+
+Route.group(() => {
+  Route.get('', 'TestsController.index')
+}).prefix('test')
+
 //#region Address
 Route.group(() => {
   Route.group(() => {
@@ -31,8 +36,16 @@ Route.group(() => {
 }).prefix('address')
 //#endregion
 
+
+Route.group(() => {
+  Route.get('', 'ParentCategoryController.getAll')
+  Route.post('', 'ParentCategoryController.create')
+  Route.put('', 'ParentCategoryController.update')
+}).prefix('parent_controller')
+
 Route.group(() => {
   Route.post('register', 'AuthController.register')
   Route.post('login', 'AuthController.login')
+  Route.post('refresh_token', 'AuthController.refreshToken')
 }).prefix('auth')
 
