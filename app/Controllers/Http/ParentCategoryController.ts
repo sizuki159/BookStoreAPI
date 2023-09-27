@@ -6,6 +6,16 @@ export default class ParentCategoryController {
         return response.json(await ParentCategory.all())
     }
 
+    public async getDetail({params, response}: HttpContextContract) {
+        const pcategory_id = params.pcategory_id
+        const pCategory = await ParentCategory.find(pcategory_id)
+        if(!pCategory) {
+            return response.notFound()
+        }
+        await pCategory.load('childrenCategory')
+        return response.json(pCategory)
+    }
+
     public async create({request, response}: HttpContextContract) {
         const {name} = request.body()
         await ParentCategory.create({name})
@@ -20,6 +30,16 @@ export default class ParentCategoryController {
         }
         pCategory.name = name
         await pCategory.save()
+        return response.ok('')
+    }
+
+    public async delete({request, response}: HttpContextContract) {
+        const {pcategory_id} = request.body()
+        const pCategory = await ParentCategory.find(pcategory_id)
+        if(!pCategory) {
+            return response.notFound()
+        }
+        await pCategory.delete()
         return response.ok('')
     }
 }

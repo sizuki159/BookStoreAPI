@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import ApiToken from './ApiToken'
 
 export default class RefreshApiToken extends BaseModel {
   @column({ isPrimary: true })
@@ -25,4 +26,9 @@ export default class RefreshApiToken extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  //#region Relationship
+  @belongsTo(() => ApiToken)
+  public apiToken: BelongsTo<typeof ApiToken>
+  //#endregion
 }

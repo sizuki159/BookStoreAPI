@@ -22,13 +22,13 @@ import Route from '@ioc:Adonis/Core/Route'
 
 
 Route.group(() => {
-  Route.get('', 'TestsController.index')
+  Route.get('', 'TestsController.index').middleware('auth')
 }).prefix('test')
 
 //#region Address
 Route.group(() => {
   Route.group(() => {
-    Route.get('/', 'AddressController.getProvince').middleware('auth')
+    Route.get('/', 'AddressController.getProvince')
     Route.get('/:provinceId', 'AddressController.getDistrictWithProvinceId')
   }).prefix('province')
 
@@ -39,9 +39,18 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get('', 'ParentCategoryController.getAll')
+  Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
   Route.post('', 'ParentCategoryController.create')
   Route.put('', 'ParentCategoryController.update')
+  Route.delete('', 'ParentCategoryController.delete')
 }).prefix('parent_controller')
+
+Route.group(() => {
+  Route.get('', 'ChildCategoryController.getAll')
+  Route.post('', 'ChildCategoryController.create')
+  Route.put('', 'ChildCategoryController.update')
+  Route.delete('', 'ChildCategoryController.delete')
+}).prefix('child_controller')
 
 Route.group(() => {
   Route.post('register', 'AuthController.register')

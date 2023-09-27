@@ -1,7 +1,10 @@
+import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
+import ParentCategory from './ParentCategory'
 
-export default class ChildCategory extends BaseModel {
+export default class ChildCategory extends compose(BaseModel, SoftDeletes) {
   @column({ isPrimary: true })
   public id: number
 
@@ -16,4 +19,9 @@ export default class ChildCategory extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  //#region Relationship
+  @belongsTo(() => ParentCategory)
+  public parentCategory: BelongsTo<typeof ParentCategory>
+  //#endregion
 }
