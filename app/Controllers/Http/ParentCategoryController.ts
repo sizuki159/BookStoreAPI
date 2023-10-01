@@ -33,8 +33,8 @@ export default class ParentCategoryController {
         return response.ok('')
     }
 
-    public async delete({request, response}: HttpContextContract) {
-        const {pcategory_id} = request.body()
+    public async delete({params, response}: HttpContextContract) {
+        const pcategory_id = params.pcategory_id
         const pCategory = await ParentCategory.find(pcategory_id)
         if(!pCategory) {
             return response.notFound()

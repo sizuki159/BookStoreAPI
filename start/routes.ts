@@ -42,14 +42,14 @@ Route.group(() => {
   Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
   Route.post('', 'ParentCategoryController.create')
   Route.put('', 'ParentCategoryController.update')
-  Route.delete('', 'ParentCategoryController.delete')
+  Route.delete('/:pcategory_id', 'ParentCategoryController.delete')
 }).prefix('parent_controller')
 
 Route.group(() => {
   Route.get('', 'ChildCategoryController.getAll')
   Route.post('', 'ChildCategoryController.create')
   Route.put('', 'ChildCategoryController.update')
-  Route.delete('', 'ChildCategoryController.delete')
+  Route.delete('/:ccategory_id', 'ChildCategoryController.delete')
 }).prefix('child_controller')
 
 Route.group(() => {
