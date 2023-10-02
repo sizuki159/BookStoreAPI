@@ -25,6 +25,8 @@ Route.group(() => {
   Route.get('', 'TestsController.index').middleware('auth')
 }).prefix('test')
 
+
+
 //#region Address
 Route.group(() => {
   Route.group(() => {
@@ -36,7 +38,13 @@ Route.group(() => {
 }).prefix('address')
 //#endregion
 
+//#region Book Language
+Route.group(() => {
+  Route.get('', 'BookLanguageController.getAll')
+}).prefix('book/language')
+//#endregion
 
+//#region Parent Category
 Route.group(() => {
   Route.get('', 'ParentCategoryController.getAll')
   Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
@@ -44,17 +52,23 @@ Route.group(() => {
   Route.put('', 'ParentCategoryController.update')
   Route.delete('/:pcategory_id', 'ParentCategoryController.delete')
 }).prefix('parent_controller')
+//#endregion
 
+//#region Child Category
 Route.group(() => {
   Route.get('', 'ChildCategoryController.getAll')
   Route.post('', 'ChildCategoryController.create')
   Route.put('', 'ChildCategoryController.update')
   Route.delete('/:ccategory_id', 'ChildCategoryController.delete')
 }).prefix('child_controller')
+//#endregion
 
+//#region Auth
 Route.group(() => {
   Route.post('register', 'AuthController.register')
   Route.post('login', 'AuthController.login')
   Route.post('refresh_token', 'AuthController.refreshToken')
 }).prefix('auth')
+//#endregion
 
+ 
