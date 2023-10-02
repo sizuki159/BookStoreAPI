@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import { string } from '@ioc:Adonis/Core/Helpers'
 
 export default class extends BaseSchema {
   protected tableName = 'api_tokens'
@@ -10,7 +11,7 @@ export default class extends BaseSchema {
       table.string('name').notNullable()
       table.string('type').notNullable()
       table.string('token', 64).notNullable().unique()
-      table.string('jwt').notNullable().unique()
+      table.string('jwt').notNullable().unique().defaultTo(string.generateRandom(128))
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL
