@@ -15,22 +15,28 @@ export default class AuthController {
             password
         })
         await user.refresh()
-
-        const token = await auth.use('api').generate(user, {expiresIn: '20s'})
-        const apiToken = await ApiToken.findBy('token', token.tokenHash)
-        if(apiToken) {
-            apiToken.jwt = token.token
-            await apiToken.save()
-        }
-        const refreshToken = await User.generateRefreshToken(token.tokenHash)
-        await user.load('userLevel')
-        await user.load('userRole')
-        
         return response.created({
-            "jwtToken": token.token,
-            "refreshToken": refreshToken,
-            "userInfo": user,
+            message: 'Đăng ký thành công!',
+            data: user
         })
+
+        // await user.refresh()
+
+        // const token = await auth.use('api').generate(user, {expiresIn: '20s'})
+        // const apiToken = await ApiToken.findBy('token', token.tokenHash)
+        // if(apiToken) {
+        //     apiToken.jwt = token.token
+        //     await apiToken.save()
+        // }
+        // const refreshToken = await User.generateRefreshToken(token.tokenHash)
+        // await user.load('userLevel')
+        // await user.load('userRole')
+        
+        // return response.created({
+        //     "jwtToken": token.token,
+        //     "refreshToken": refreshToken,
+        //     "userInfo": user,
+        // })
     }
 
     public async login({auth, request, response}: HttpContextContract) {
@@ -56,7 +62,6 @@ export default class AuthController {
                 "userInfo": user,
             }
         } catch(ex) {
-            // return response.json(ex.message)
             return response.unauthorized()
         }
     }

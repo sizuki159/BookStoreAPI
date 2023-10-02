@@ -21,47 +21,6 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 
-Route.group(() => {
-  Route.get('', 'TestsController.index').middleware('auth')
-}).prefix('test')
-
-
-
-//#region Address
-Route.group(() => {
-  Route.group(() => {
-    Route.get('/', 'AddressController.getProvince')
-    Route.get('/:provinceId', 'AddressController.getDistrictWithProvinceId')
-  }).prefix('province')
-
-  Route.get('/district/:districtId', 'AddressController.getWardsWithDistrictId')
-}).prefix('address')
-//#endregion
-
-//#region Book Language
-Route.group(() => {
-  Route.get('', 'BookLanguageController.getAll')
-}).prefix('book/language')
-//#endregion
-
-//#region Parent Category
-Route.group(() => {
-  Route.get('', 'ParentCategoryController.getAll')
-  Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
-  Route.post('', 'ParentCategoryController.create')
-  Route.put('', 'ParentCategoryController.update')
-  Route.delete('/:pcategory_id', 'ParentCategoryController.delete')
-}).prefix('parent_controller')
-//#endregion
-
-//#region Child Category
-Route.group(() => {
-  Route.get('', 'ChildCategoryController.getAll')
-  Route.post('', 'ChildCategoryController.create')
-  Route.put('', 'ChildCategoryController.update')
-  Route.delete('/:ccategory_id', 'ChildCategoryController.delete')
-}).prefix('child_controller')
-//#endregion
 
 //#region Auth
 Route.group(() => {
@@ -71,4 +30,81 @@ Route.group(() => {
 }).prefix('auth')
 //#endregion
 
- 
+//#region Administrator
+
+Route.group(() => {
+  //#region Book Language
+  Route.group(() => {
+    Route.get('', 'BookLanguageController.getAll')
+    Route.get('/trashed', 'BookLanguageController.getAllWithTrashed')
+    Route.post('', 'BookLanguageController.add')
+    Route.put('', 'BookLanguageController.update')
+    Route.delete('/delete/:language_id', 'BookLanguageController.delete')
+    Route.delete('/destroy/:language_id', 'BookLanguageController.destroy')
+    Route.patch('/restore/:language_id', 'BookLanguageController.restore')
+  }).prefix('book_language')
+  //#endregion
+
+  //#region Parent Category
+  Route.group(() => {
+    Route.get('', 'ParentCategoryController.getAll')
+    Route.get('/trashed', 'ParentCategoryController.getAllWithTrashed')
+    Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
+    Route.post('', 'ParentCategoryController.create')
+    Route.put('', 'ParentCategoryController.update')
+    Route.delete('/delete/:pcategory_id', 'ParentCategoryController.delete')
+    Route.delete('/destroy/:pcategory_id', 'ParentCategoryController.destroy')
+    Route.patch('/restore/:pcategory_id', 'ParentCategoryController.restore')
+  }).prefix('parent_category')
+  //#endregion
+
+
+  //#region Child Category
+  Route.group(() => {
+    Route.get('', 'ChildCategoryController.getAll')
+    Route.get('/trashed', 'ChildCategoryController.getAllWithTrashed')
+    Route.post('', 'ChildCategoryController.create')
+    Route.put('', 'ChildCategoryController.update')
+    Route.delete('/delete/:ccategory_id', 'ChildCategoryController.delete')
+    Route.delete('/destroy/:ccategory_id', 'ChildCategoryController.destroy')
+    Route.patch('/restore/:ccategory_id', 'ChildCategoryController.restore')
+  }).prefix('child_category')
+  //#endregion
+
+}).prefix('admin')
+
+//#endregion
+
+Route.group(() => {
+  
+}).prefix('user').middleware('auth')
+
+
+Route.group(() => {
+  //#region Address
+  Route.group(() => {
+    Route.group(() => {
+      Route.get('/', 'AddressController.getProvince')
+      Route.get('/:provinceId', 'AddressController.getDistrictWithProvinceId')
+    }).prefix('province')
+
+    Route.get('/district/:districtId', 'AddressController.getWardsWithDistrictId')
+  }).prefix('address')
+  //#endregion
+}).prefix('api')
+
+
+
+
+
+
+
+
+
+
+
+
+Route.group(() => {
+  Route.get('', 'TestsController.index').middleware('auth')
+}).prefix('test')
+
