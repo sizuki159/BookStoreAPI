@@ -19,9 +19,7 @@ export default class ParentCategoryController {
             })
         }
         await pCategory.load('childrenCategory')
-        return response.json({
-            
-        })
+        return response.json(pCategory)
     }
 
     public async create({request, response}: HttpContextContract) {
