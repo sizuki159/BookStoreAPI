@@ -76,7 +76,16 @@ Route.group(() => {
 //#endregion
 
 Route.group(() => {
-  
+
+  Route.group(() => {
+
+    Route.group(() => {
+      Route.get('', 'UserAddressController.getAll')
+      Route.post('', 'UserAddressController.store')
+    }).prefix('address')
+
+  }).prefix('info')
+
 }).prefix('user').middleware('auth')
 
 

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, beforeSave, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, beforeSave, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
 import UserLevel from './UserLevel'
 import UserRole from './UserRole'
@@ -7,6 +7,7 @@ import UserRole from './UserRole'
 import { string } from '@ioc:Adonis/Core/Helpers'
 import ApiToken from './ApiToken'
 import RefreshApiToken from './RefreshApiToken'
+import UserAddress from './UserAddress'
 
 
 export default class User extends BaseModel {
@@ -66,6 +67,9 @@ export default class User extends BaseModel {
 
   @belongsTo(() => UserRole)
   public userRole: BelongsTo<typeof UserRole>
+
+  @hasMany(() => UserAddress)
+  public addresses: HasMany<typeof UserAddress>
 
   //#endregion
 

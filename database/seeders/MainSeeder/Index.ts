@@ -17,5 +17,6 @@ export default class extends BaseSeeder {
     await this.runSeeder(await import('../ChildCategorySeeder'))
     await this.runSeeder(await import('../BookFormSeeder'))
     await this.runSeeder(await import('../BookLanguageSeeder'))
+    await this.runSeeder(await import('../UserSeeder'))
   }
 }

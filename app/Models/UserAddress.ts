@@ -8,8 +8,8 @@ export default class UserAddress extends BaseModel {
   @column()
   public userId: number
 
-  @column()
-  public default: boolean
+  @column({columnName: 'default'})
+  public isDefault: boolean
 
   @column()
   public street: string

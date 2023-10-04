@@ -43,7 +43,7 @@ export default class AuthController {
         const {email, password} = request.body()
 
         try {
-            const token = await auth.use('api').attempt(email, password, {expiresIn: '20s'})
+            const token = await auth.use('api').attempt(email, password, {expiresIn: '7d'})
             const user = await User.findByOrFail('email', email)
 
             const apiToken = await ApiToken.findBy('token', token.tokenHash)
@@ -126,7 +126,7 @@ export default class AuthController {
                 })
             }
 
-            const tokenReAuth = await auth.use('api').loginViaId(refreshApiToken.apiToken.userId, {expiresIn: '20s'})
+            const tokenReAuth = await auth.use('api').loginViaId(refreshApiToken.apiToken.userId, {expiresIn: '7d'})
 
             refreshApiToken.isUsed = true
             await refreshApiToken.save()
