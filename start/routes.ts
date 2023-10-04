@@ -33,43 +33,65 @@ Route.group(() => {
 //#region Administrator
 
 Route.group(() => {
-  //#region Book Language
-  Route.group(() => {
-    Route.get('', 'BookLanguageController.getAll')
-    Route.get('/trashed', 'BookLanguageController.getAllWithTrashed')
-    Route.post('', 'BookLanguageController.add')
-    Route.put('', 'BookLanguageController.update')
-    Route.delete('/delete/:language_id', 'BookLanguageController.delete')
-    Route.delete('/destroy/:language_id', 'BookLanguageController.destroy')
-    Route.patch('/restore/:language_id', 'BookLanguageController.restore')
-  }).prefix('book_language')
-  //#endregion
 
-  //#region Parent Category
   Route.group(() => {
-    Route.get('', 'ParentCategoryController.getAll')
-    Route.get('/trashed', 'ParentCategoryController.getAllWithTrashed')
-    Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
-    Route.post('', 'ParentCategoryController.create')
-    Route.put('', 'ParentCategoryController.update')
-    Route.delete('/delete/:pcategory_id', 'ParentCategoryController.delete')
-    Route.delete('/destroy/:pcategory_id', 'ParentCategoryController.destroy')
-    Route.patch('/restore/:pcategory_id', 'ParentCategoryController.restore')
-  }).prefix('parent_category')
-  //#endregion
+    //#region Book Language
+    Route.group(() => {
+      Route.get('', 'BookLanguageController.getAll')
+      Route.get('/trashed', 'BookLanguageController.getAllWithTrashed')
+      Route.post('', 'BookLanguageController.add')
+      Route.put('', 'BookLanguageController.update')
+      Route.delete('/delete/:language_id', 'BookLanguageController.delete')
+      Route.delete('/destroy/:language_id', 'BookLanguageController.destroy')
+      Route.patch('/restore/:language_id', 'BookLanguageController.restore')
+    }).prefix('language')
+    //#endregion
 
+    //#region Book Form
+    Route.group(() => {
+      Route.get('', 'BookFormController.getAll')
+      Route.get('/trashed', 'BookFormController.getAllWithTrashed')
+      Route.post('', 'BookFormController.add')
+      Route.put('', 'BookFormController.update')
+      Route.delete('/delete/:book_form_id', 'BookFormController.delete')
+      Route.delete('/destroy/:book_form_id', 'BookFormController.destroy')
+      Route.patch('/restore/:book_form_id', 'BookFormController.restore')
+    }).prefix('form')
+    //#endregion
 
-  //#region Child Category
+    
+  }).prefix('book')
+  
   Route.group(() => {
-    Route.get('', 'ChildCategoryController.getAll')
-    Route.get('/trashed', 'ChildCategoryController.getAllWithTrashed')
-    Route.post('', 'ChildCategoryController.create')
-    Route.put('', 'ChildCategoryController.update')
-    Route.delete('/delete/:ccategory_id', 'ChildCategoryController.delete')
-    Route.delete('/destroy/:ccategory_id', 'ChildCategoryController.destroy')
-    Route.patch('/restore/:ccategory_id', 'ChildCategoryController.restore')
-  }).prefix('child_category')
-  //#endregion
+    //#region Parent Category
+    Route.group(() => {
+      Route.get('', 'ParentCategoryController.getAll')
+      Route.get('/trashed', 'ParentCategoryController.getAllWithTrashed')
+      Route.get('/:pcategory_id', 'ParentCategoryController.getDetail')
+      Route.post('', 'ParentCategoryController.create')
+      Route.put('', 'ParentCategoryController.update')
+      Route.delete('/delete/:pcategory_id', 'ParentCategoryController.delete')
+      Route.delete('/destroy/:pcategory_id', 'ParentCategoryController.destroy')
+      Route.patch('/restore/:pcategory_id', 'ParentCategoryController.restore')
+    }).prefix('parent')
+    //#endregion
+  
+  
+    //#region Child Category
+    Route.group(() => {
+      Route.get('', 'ChildCategoryController.getAll')
+      Route.get('/trashed', 'ChildCategoryController.getAllWithTrashed')
+      Route.post('', 'ChildCategoryController.create')
+      Route.put('', 'ChildCategoryController.update')
+      Route.delete('/delete/:ccategory_id', 'ChildCategoryController.delete')
+      Route.delete('/destroy/:ccategory_id', 'ChildCategoryController.destroy')
+      Route.patch('/restore/:ccategory_id', 'ChildCategoryController.restore')
+    }).prefix('child')
+    //#endregion
+
+  }).prefix('category')
+  
+  
 
 }).prefix('admin')
 
