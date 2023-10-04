@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import AddressDistrict from './AddressDistrict'
+import UserAddress from './UserAddress'
 
 export default class AddressWard extends BaseModel {
   @column({ isPrimary: true })
@@ -24,5 +25,8 @@ export default class AddressWard extends BaseModel {
     localKey: 'districtId'
   })
   public district: BelongsTo<typeof AddressDistrict>
+
+  @hasMany(() => UserAddress)
+  public userAddresses: HasMany<typeof UserAddress>
   //#endregion
 }

@@ -6,9 +6,11 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
+      table.string('recipient_name').notNullable()
+      table.string('recipient_phone').notNullable()
+      table.string('street').notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.boolean('default')
-      table.string('street')
       table.integer('wards_id').unsigned().references('wards_id').inTable('address_wards').onDelete('CASCADE')
       
       /**
