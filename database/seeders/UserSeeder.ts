@@ -1,4 +1,6 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import Levels from 'App/Enums/Levels'
+import Roles from 'App/Enums/Roles'
 import User from 'App/Models/User'
 
 export default class extends BaseSeeder {
@@ -9,8 +11,8 @@ export default class extends BaseSeeder {
         email: 'admin@gmail.com',
         fullname: 'Quách Diệu Khánh',
         password: '12345',
-        userRoleId: 1,
-        userLevelId: 1,
+        userRoleId: Roles.ADMIN,
+        userLevelId: Levels.SILVER,
       }
     ])
   }

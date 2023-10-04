@@ -105,7 +105,7 @@ Route.group(() => {
   
   
 
-}).prefix('admin')
+}).prefix('admin').middleware(['auth', 'admin'])
 
 //#endregion
 

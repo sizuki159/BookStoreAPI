@@ -12,23 +12,25 @@ export default class BookAuthorController {
     }
 
     public async add({request, response}: HttpContextContract) {
-        const newAuthorSchema = schema.create({
-            author_name: schema.string([
-                rules.unique({
-                    table: 'book_authors',
-                    column: 'author_name'
-                })
-            ]),
-        })
-        const payload = await request.validate({
-            schema: newAuthorSchema,
-            messages: {
-                'author_name.unique': 'Tác giả này đã tồn tại.'
-            }
-        })
+        // const newAuthorSchema = schema.create({
+        //     author_name: schema.string([
+        //         rules.unique({
+        //             table: 'book_authors',
+        //             column: 'author_name'
+        //         })
+        //     ]),
+        // })
+        // const payload = await request.validate({
+        //     schema: newAuthorSchema,
+        //     messages: {
+        //         'author_name.unique': 'Tác giả này đã tồn tại.'
+        //     }
+        // })
+
+        const {author_name} = request.body()
 
         try {
-            const bookAuthor = await BookAuthor.create({authorName: payload.author_name})
+            const bookAuthor = await BookAuthor.create({authorName: author_name})
             return response.created(bookAuthor)
         } catch (ex) {
             return response.serviceUnavailable({
@@ -38,7 +40,7 @@ export default class BookAuthorController {
     }
 
     public async update({request, response}: HttpContextContract) {
-        const {book_author_id} = request.body()
+        const {book_author_id, author_name} = request.body()
         const bookAuthor = await BookAuthor.find(book_author_id)
         if(!bookAuthor) {
             return response.notFound({
@@ -46,23 +48,23 @@ export default class BookAuthorController {
             })
         }
 
-        const newAuthorSchema = schema.create({
-            author_name: schema.string([
-                rules.unique({
-                    table: 'book_authors',
-                    column: 'author_name',
-                    whereNot: {id: book_author_id}
-                })
-            ]),
-        })
-        const payload = await request.validate({
-            schema: newAuthorSchema,
-            messages: {
-                'author_name.unique': 'Tác giả này đã tồn tại.'
-            }
-        })
+        // const newAuthorSchema = schema.create({
+        //     author_name: schema.string([
+        //         rules.unique({
+        //             table: 'book_authors',
+        //             column: 'author_name',
+        //             whereNot: {id: book_author_id}
+        //         })
+        //     ]),
+        // })
+        // const payload = await request.validate({
+        //     schema: newAuthorSchema,
+        //     messages: {
+        //         'author_name.unique': 'Tác giả này đã tồn tại.'
+        //     }
+        // })
         
-        bookAuthor.authorName = payload.author_name
+        bookAuthor.authorName = author_name
         await bookAuthor.save()
         await bookAuthor.refresh()
         return response.ok(bookAuthor)
