@@ -1,11 +1,13 @@
+import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 
-export default class BookPublisher extends BaseModel {
+export default class BookPublisher extends compose(BaseModel, SoftDeletes) {
   @column({ isPrimary: true })
   public id: number
 
-  @column()
+  @column({columnName: 'publisher_name'})
   public name: string
 
   @column.dateTime({ autoCreate: true })

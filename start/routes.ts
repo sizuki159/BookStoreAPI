@@ -71,6 +71,18 @@ Route.group(() => {
     }).prefix('author')
     //#endregion
 
+    //#region Book Author
+    Route.group(() => {
+      Route.get('', 'BookPublisherController.getAll')
+      Route.get('/trashed', 'BookPublisherController.getAllWithTrashed')
+      Route.post('', 'BookPublisherController.add')
+      Route.put('', 'BookPublisherController.update')
+      Route.delete('/delete/:book_publisher_id', 'BookPublisherController.delete')
+      Route.delete('/destroy/:book_publisher_id', 'BookPublisherController.destroy')
+      Route.patch('/restore/:book_publisher_id', 'BookPublisherController.restore')
+    }).prefix('publisher')
+    //#endregion
+
     
   }).prefix('book')
   
@@ -105,8 +117,8 @@ Route.group(() => {
   
   
 
-}).prefix('admin').middleware(['auth', 'admin'])
-
+}).prefix('admin')
+// .middleware(['auth', 'admin'])
 //#endregion
 
 Route.group(() => {
