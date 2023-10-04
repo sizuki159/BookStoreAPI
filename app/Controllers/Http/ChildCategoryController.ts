@@ -76,10 +76,10 @@ export default class ChildCategoryController {
 
     public async restore({params, response}: HttpContextContract) {
         const ccategory_id = params.ccategory_id
-        const cCategory = await ChildCategory.withTrashed().where('id', ccategory_id).first()
+        const cCategory = await ChildCategory.onlyTrashed().where('id', ccategory_id).first()
         if(!cCategory) {
             return response.notFound({
-                message: 'Không tìm thấy thể loại sách con này!'
+                message: 'Không tìm thấy thể loại sách con này trong thùng rác!'
             })
         }
         await cCategory.restore()

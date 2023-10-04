@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BookLanguage from 'App/Models/BookLanguage'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
 
 export default class BookLanguageController {
     public async getAll({response}: HttpContextContract) {
@@ -11,9 +12,23 @@ export default class BookLanguageController {
     }
 
     public async add({request, response}: HttpContextContract) {
-        const {language_name} = request.body()
+        const newLanguageSchema = schema.create({
+            language_name: schema.string([
+                rules.unique({
+                    table: 'book_languages',
+                    column: 'language_name'
+                })
+            ]),
+        })
+        const payload = await request.validate({
+            schema: newLanguageSchema,
+            messages: {
+                'language_name.unique': 'Ngôn ngữ sách này đã tồn tại.'
+            }
+        })
+
         try {
-            const language = await BookLanguage.create({languageName: language_name})
+            const language = await BookLanguage.create({languageName: payload.language_name})
             return response.created(language)
         } catch (ex) {
             return response.serviceUnavailable({
@@ -23,7 +38,7 @@ export default class BookLanguageController {
     }
 
     public async update({request, response}: HttpContextContract) {
-        const {language_id, language_name} = request.body()
+        const {language_id} = request.body()
         const bookLanguage = await BookLanguage.find(language_id)
         if(!bookLanguage) {
             return response.notFound({
@@ -31,7 +46,23 @@ export default class BookLanguageController {
             })
         }
 
-        bookLanguage.languageName = language_name
+        const newLanguageSchema = schema.create({
+            language_name: schema.string([
+                rules.unique({
+                    table: 'book_languages',
+                    column: 'language_name',
+                    whereNot: {id: language_id}
+                })
+            ]),
+        })
+        const payload = await request.validate({
+            schema: newLanguageSchema,
+            messages: {
+                'language_name.unique': 'Ngôn ngữ sách này đã tồn tại.'
+            }
+        })
+
+        bookLanguage.languageName = payload.language_name
         await bookLanguage.save()
         await bookLanguage.refresh()
         return response.ok(bookLanguage)
@@ -68,10 +99,10 @@ export default class BookLanguageController {
 
     public async restore({params, response}: HttpContextContract) {
         const language_id = params.language_id
-        const bookLanguage =  await BookLanguage.withTrashed().where('id', language_id).first()
+        const bookLanguage =  await BookLanguage.onlyTrashed().where('id', language_id).first()
         if(!bookLanguage) {
             return response.notFound({
-                message: 'Không tìm thấy ngôn ngữ sách này!'
+                message: 'Không tìm thấy ngôn ngữ sách này trong thùng rác!'
             })
         }
         await bookLanguage.restore()

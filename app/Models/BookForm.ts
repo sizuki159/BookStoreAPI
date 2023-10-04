@@ -7,7 +7,7 @@ export default class BookForm extends compose(BaseModel, SoftDeletes) {
   @column({ isPrimary: true })
   public id: number
 
-  @column()
+  @column({columnName: 'form_name'})
   public name: string
 
   @column.dateTime({ autoCreate: true })

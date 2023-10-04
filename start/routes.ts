@@ -59,6 +59,18 @@ Route.group(() => {
     }).prefix('form')
     //#endregion
 
+    //#region Book Author
+    Route.group(() => {
+      Route.get('', 'BookAuthorController.getAll')
+      Route.get('/trashed', 'BookAuthorController.getAllWithTrashed')
+      Route.post('', 'BookAuthorController.add')
+      Route.put('', 'BookAuthorController.update')
+      Route.delete('/delete/:book_author_id', 'BookAuthorController.delete')
+      Route.delete('/destroy/:book_author_id', 'BookAuthorController.destroy')
+      Route.patch('/restore/:book_author_id', 'BookAuthorController.restore')
+    }).prefix('author')
+    //#endregion
+
     
   }).prefix('book')
   
