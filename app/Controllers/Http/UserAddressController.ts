@@ -138,4 +138,20 @@ export default class UserAddressController {
             message: 'Đã xóa vĩnh viễn address này!'
         })
     }
+
+    public async setDefault({ params, request, response }: HttpContextContract) {
+        const addressId = params.address_id
+        const address = await UserAddress.find(addressId)
+        if(!address) {
+            return response.notFound({
+                message: 'Not found this address!'
+            })
+        }
+        address.isDefault = true
+        await address.save()
+        return response.ok({
+            message: `Đã áp dụng địa chỉ id: ${addressId} là địa chỉ mặc định!`,
+            data: address
+        })
+    }
 }

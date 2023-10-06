@@ -132,6 +132,7 @@ Route.group(() => {
       Route.get('/notDefault', 'UserAddressController.getNotDefault')
       Route.put('/:address_id', 'UserAddressController.update')
       Route.delete('/destroy/:address_id', 'UserAddressController.destroy')
+      Route.put('/set_default/:address_id', 'UserAddressController.setDefault')
     }).prefix('address')
 
   }).prefix('info')
