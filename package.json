@@ -9,7 +9,9 @@
     "start": "pm2 start server.js",
     "env": "cp .env_deployment build/.env",
     "deploy": "pm2 delete all ; git pull ; npm i ; npm run build ; npm run env ; cd build ; npm ci --production ; npm start",
-    "test": "node ace test"
+    "test": "node ace test",
+    "create": "node ace make:controller",
+    "check-route": "node ace list:routes"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^5.9.5",
