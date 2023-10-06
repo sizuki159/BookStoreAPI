@@ -3,15 +3,15 @@ import User from 'App/Models/User'
 import UserAddress from 'App/Models/UserAddress'
 
 export default class UserAddressController {
-    public async getAll({auth, response}: HttpContextContract) {
+    public async getAll({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const address = await UserAddress.query()
-                                        .where('user_id', userAuth.id)
-                                        .preload('wards', wards =>{
-                                            wards.preload('district', district => {
-                                                district.preload('province')
-                                            })
-                                        })
+            .where('user_id', userAuth.id)
+            .preload('wards', wards => {
+                wards.preload('district', district => {
+                    district.preload('province')
+                })
+            })
         return address
 
         // const user = await User.findOrFail(userAuth.id)
@@ -35,15 +35,15 @@ export default class UserAddressController {
         //         "isDefault": address.isDefault == true ? true : false
         //     })
         // }        
-        
+
         // return response.json(addressFinal)
     }
 
-    public async store({auth, request, response}: HttpContextContract) {
+    public async store({ auth, request, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
 
-        const {recipient_name, recipient_phone, street, wards_id, address_default} = request.body()
+        const { recipient_name, recipient_phone, street, wards_id, address_default } = request.body()
 
         try {
             const address = await user.related('addresses').create({
@@ -53,10 +53,10 @@ export default class UserAddressController {
                 street: street,
                 isDefault: address_default
             })
-    
+
             return response.json(address)
-        } catch(ex) {
-            if(ex.code === 'ER_NO_REFERENCED_ROW_2') {
+        } catch (ex) {
+            if (ex.code === 'ER_NO_REFERENCED_ROW_2') {
                 return response.notFound({
                     message: 'Không tìm thấy Wards ID này!'
                 })
@@ -66,5 +66,76 @@ export default class UserAddressController {
                 message: 'Lỗi server!'
             })
         }
+    }
+
+    public async getDefault({ auth, request, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+        const user = await User.findOrFail(userAuth.id)
+        const defaultAddress = await UserAddress.query()
+            .where('user_id', user.id)
+            .where('default', true)
+            .preload('wards', wards => {
+                wards.preload('district', district => {
+                    district.preload('province')
+                })
+            })
+            .first();
+        console.log(defaultAddress)
+        if (!defaultAddress) {
+            return response.notFound({
+                message: 'Không tìm thấy address default!'
+            })
+        }
+        return response.json(defaultAddress)
+    }
+
+    public async getNotDefault({ auth, request, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+        const user = await User.findOrFail(userAuth.id)
+        const nonDefaultAddresses = await UserAddress
+            .query()
+            .where('user_id', user.id)
+            .where('default', false)
+            .preload('wards', wards => {
+                wards.preload('district', district => {
+                    district.preload('province')
+                })
+            })
+        return response.json(nonDefaultAddresses)
+    }
+
+    public async update({ params, request, response }: HttpContextContract) {
+        const { recipient_name, recipient_phone, street, wards_id, address_default } = request.body()
+
+        const addressEdit = await UserAddress.find(params.address_id)
+        if(!addressEdit) {
+            return response.notFound({
+                message: `Address with id: ${params.address_id} not found!`
+            })
+        }
+        addressEdit.recipientName = recipient_name
+        addressEdit.recipientPhone = recipient_phone
+        addressEdit.street = street
+        addressEdit.wardsId = wards_id
+        addressEdit.isDefault = address_default
+        await addressEdit.save()
+        return response.ok({
+            message: `Update address with id: ${params.address_id} success`,
+            data: addressEdit
+        })
+    }
+
+    public async destroy({ params, request, response }: HttpContextContract) {
+        const addressId = params.address_id
+        const address = await UserAddress.find(addressId)
+        if(!address) {
+            return response.notFound({
+                message: 'Not found this address!'
+            })
+        }
+        await address.delete()
+        return response.ok({
+            message: 'Đã xóa vĩnh viễn address này!'
+        })
     }
 }
