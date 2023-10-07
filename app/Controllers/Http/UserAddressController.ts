@@ -113,16 +113,23 @@ export default class UserAddressController {
                 message: `Address with id: ${params.address_id} not found!`
             })
         }
-        addressEdit.recipientName = recipient_name
-        addressEdit.recipientPhone = recipient_phone
-        addressEdit.street = street
-        addressEdit.wardsId = wards_id
-        addressEdit.isDefault = address_default
-        await addressEdit.save()
-        return response.ok({
-            message: `Update address with id: ${params.address_id} success`,
-            data: addressEdit
-        })
+        try {
+            addressEdit.recipientName = recipient_name
+            addressEdit.recipientPhone = recipient_phone
+            addressEdit.street = street
+            addressEdit.wardsId = wards_id
+            addressEdit.isDefault = address_default
+            await addressEdit.save()
+            return response.ok({
+                message: `Update address with id: ${params.address_id} success`,
+                data: addressEdit
+            })
+        }
+        catch(e) {
+            return response.badRequest({
+                message: `Update address with id: ${params.address_id} failed`,
+            }) 
+        }
     }
 
     public async destroy({ params, request, response }: HttpContextContract) {
@@ -131,6 +138,11 @@ export default class UserAddressController {
         if(!address) {
             return response.notFound({
                 message: 'Not found this address!'
+            })
+        }
+        if(address.isDefault === true) {
+            return response.badRequest({
+                message: 'Can not delete default address!'
             })
         }
         await address.delete()
