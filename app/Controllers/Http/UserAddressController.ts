@@ -9,10 +9,39 @@ export default class UserAddressController {
             .where('user_id', userAuth.id)
             .preload('wards', wards => {
                 wards.preload('district', district => {
-                    district.preload('province')
-                })
+                    district.preload('province', province => {
+                        province.select('province_id', 'name')
+                    }).select('district_id', 'province_id', 'name')
+                }).select('wards_id', 'district_id', 'name')
             })
-        return address
+
+        const addressListResponse: IAddress[] = []
+        address.map((item) => {
+            const addressResponse: IAddress = {
+                id: item.id,
+                recipient_name: item.recipientName,
+                recipient_phone: item.recipientPhone,
+                street: item.street,
+                user_id: item.userId,
+                is_default: item.isDefault,
+                ward: {
+                    wards_id: item.wards.wardsId,
+                    district_id: item.wards.districtId,
+                    name: item.wards.name,
+                },
+                district: {
+                    district_id: item.wards.district.districtId,
+                    province_id: item.wards.district.provinceId,
+                    name: item.wards.district.name,
+                },
+                province: {
+                    province_id: item.wards.district.province.provinceId,
+                    name: item.wards.district.province.name,
+                },
+            }
+            addressListResponse.push(addressResponse)
+        })
+        return addressListResponse
 
         // const user = await User.findOrFail(userAuth.id)
         // await user.load('addresses')
@@ -76,8 +105,10 @@ export default class UserAddressController {
             .where('default', true)
             .preload('wards', wards => {
                 wards.preload('district', district => {
-                    district.preload('province')
-                })
+                    district.preload('province', province => {
+                        province.select('province_id', 'name')
+                    }).select('district_id', 'province_id', 'name')
+                }).select('wards_id', 'district_id', 'name')
             })
             .first();
         console.log(defaultAddress)
@@ -108,7 +139,7 @@ export default class UserAddressController {
         const { recipient_name, recipient_phone, street, wards_id, address_default } = request.body()
 
         const addressEdit = await UserAddress.find(params.address_id)
-        if(!addressEdit) {
+        if (!addressEdit) {
             return response.notFound({
                 message: `Address with id: ${params.address_id} not found!`
             })
@@ -125,22 +156,22 @@ export default class UserAddressController {
                 data: addressEdit
             })
         }
-        catch(e) {
+        catch (e) {
             return response.badRequest({
                 message: `Update address with id: ${params.address_id} failed`,
-            }) 
+            })
         }
     }
 
     public async destroy({ params, request, response }: HttpContextContract) {
         const addressId = params.address_id
         const address = await UserAddress.find(addressId)
-        if(!address) {
+        if (!address) {
             return response.notFound({
                 message: 'Not found this address!'
             })
         }
-        if(address.isDefault === true) {
+        if (address.isDefault === true) {
             return response.badRequest({
                 message: 'Can not delete default address!'
             })
@@ -154,7 +185,7 @@ export default class UserAddressController {
     public async setDefault({ params, request, response }: HttpContextContract) {
         const addressId = params.address_id
         const address = await UserAddress.find(addressId)
-        if(!address) {
+        if (!address) {
             return response.notFound({
                 message: 'Not found this address!'
             })
