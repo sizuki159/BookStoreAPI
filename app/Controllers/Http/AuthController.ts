@@ -5,6 +5,7 @@ import RegisterValidator from 'App/Validators/RegisterValidator'
 import ApiToken from 'App/Models/ApiToken'
 import RefreshApiToken from 'App/Models/RefreshApiToken'
 import { DateTime } from 'luxon';
+import UserFilterFields from 'App/FilterFields/UserFilterFields'
 
 export default class AuthController {
     public async register ({auth, request, response}: HttpContextContract) {
@@ -58,7 +59,7 @@ export default class AuthController {
             return {
                 "jwtToken": token.token,
                 "refreshToken": refreshToken,
-                "userInfo": user,
+                "userInfo": user.serialize(UserFilterFields)
             }
         } catch(ex) {
             return response.unauthorized()
