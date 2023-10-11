@@ -124,15 +124,21 @@ Route.group(() => {
 Route.group(() => {
 
   Route.group(() => {
+    Route.get('', 'UserProfileController.getInfo')
+    Route.post('', 'UserProfileController.updateOrCreate')
+    Route.patch('/password', 'UserProfileController.changePassword')
+  }).prefix('profile')
+
+  Route.group(() => {
 
     Route.group(() => {
       Route.get('', 'UserAddressController.getAll')
       Route.post('', 'UserAddressController.store')
       Route.get('/default', 'UserAddressController.getDefault')
-      Route.get('/notDefault', 'UserAddressController.getNotDefault')
-      Route.put('/:address_id', 'UserAddressController.update')
-      Route.delete('/destroy/:address_id', 'UserAddressController.destroy')
-      Route.put('/set_default/:address_id', 'UserAddressController.setDefault')
+      Route.get('/not_default', 'UserAddressController.getNonDefault')
+      Route.put('/:user_address_id', 'UserAddressController.update')
+      Route.delete('/destroy/:user_address_id', 'UserAddressController.destroy')
+      Route.put('/set_default/:user_address_id', 'UserAddressController.setDefault')
     }).prefix('address')
 
   }).prefix('info')

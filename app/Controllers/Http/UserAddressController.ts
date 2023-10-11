@@ -1,71 +1,21 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import UserAddressFilterFields from 'App/FilterFields/UserAddressFilterFields'
 import User from 'App/Models/User'
 import UserAddress from 'App/Models/UserAddress'
 
+
 export default class UserAddressController {
+
     public async getAll({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
-        const address = await UserAddress.query()
+        const addresses = await UserAddress.query()
             .where('user_id', userAuth.id)
             .preload('wards', wards => {
                 wards.preload('district', district => {
-                    district.preload('province', province => {
-                        province.select('province_id', 'name')
-                    }).select('district_id', 'province_id', 'name')
-                }).select('wards_id', 'district_id', 'name')
+                    district.preload('province')
+                })
             })
-
-        const addressListResponse: IAddress[] = []
-        address.map((item) => {
-            const addressResponse: IAddress = {
-                id: item.id,
-                recipient_name: item.recipientName,
-                recipient_phone: item.recipientPhone,
-                street: item.street,
-                user_id: item.userId,
-                is_default: item.isDefault,
-                ward: {
-                    wards_id: item.wards.wardsId,
-                    district_id: item.wards.districtId,
-                    name: item.wards.name,
-                },
-                district: {
-                    district_id: item.wards.district.districtId,
-                    province_id: item.wards.district.provinceId,
-                    name: item.wards.district.name,
-                },
-                province: {
-                    province_id: item.wards.district.province.provinceId,
-                    name: item.wards.district.province.name,
-                },
-            }
-            addressListResponse.push(addressResponse)
-        })
-        return addressListResponse
-
-        // const user = await User.findOrFail(userAuth.id)
-        // await user.load('addresses')
-        // const addresses = user.addresses
-
-        // const addressFinal: any = []
-        // for (const address of addresses) {
-        //     await address.load('user')
-        //     await address.load('wards')
-        //     await address.wards.load('district')
-        //     await address.wards.district.load('province')
-
-        //     addressFinal.push({
-        //         "recipient_name": address.recipientName,
-        //         "recipient_phone": address.recipientPhone,
-        //         "street": address.street,
-        //         "wards": address.wards.name,
-        //         "district": address.wards.district.name,
-        //         "province": address.wards.district.province.name,
-        //         "isDefault": address.isDefault == true ? true : false
-        //     })
-        // }        
-
-        // return response.json(addressFinal)
+        return response.ok(addresses.map((address) => address.serialize(UserAddressFilterFields)))
     }
 
     public async store({ auth, request, response }: HttpContextContract) {
@@ -97,30 +47,26 @@ export default class UserAddressController {
         }
     }
 
-    public async getDefault({ auth, request, response }: HttpContextContract) {
+    public async getDefault({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
-        const user = await User.findOrFail(userAuth.id)
         const defaultAddress = await UserAddress.query()
-            .where('user_id', user.id)
+            .where('user_id', userAuth.id)
             .where('default', true)
             .preload('wards', wards => {
                 wards.preload('district', district => {
-                    district.preload('province', province => {
-                        province.select('province_id', 'name')
-                    }).select('district_id', 'province_id', 'name')
-                }).select('wards_id', 'district_id', 'name')
+                    district.preload('province')
+                })
             })
             .first();
-        console.log(defaultAddress)
         if (!defaultAddress) {
             return response.notFound({
-                message: 'Không tìm thấy address default!'
+                message: 'Không tìm thấy địa chỉ mặc định!'
             })
         }
-        return response.json(defaultAddress)
+        return response.json(defaultAddress.serialize(UserAddressFilterFields))
     }
 
-    public async getNotDefault({ auth, request, response }: HttpContextContract) {
+    public async getNonDefault({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
         const nonDefaultAddresses = await UserAddress
@@ -132,69 +78,74 @@ export default class UserAddressController {
                     district.preload('province')
                 })
             })
-        return response.json(nonDefaultAddresses)
+        return response.json(nonDefaultAddresses.map(nonDefaultAddress => nonDefaultAddress.serialize(UserAddressFilterFields)))
     }
 
-    public async update({ params, request, response }: HttpContextContract) {
+    public async update({ auth, params, request, response }: HttpContextContract) {
         const { recipient_name, recipient_phone, street, wards_id, address_default } = request.body()
 
-        const addressEdit = await UserAddress.find(params.address_id)
-        if (!addressEdit) {
-            return response.notFound({
-                message: `Address with id: ${params.address_id} not found!`
-            })
-        }
-        try {
-            addressEdit.recipientName = recipient_name
-            addressEdit.recipientPhone = recipient_phone
-            addressEdit.street = street
-            addressEdit.wardsId = wards_id
-            addressEdit.isDefault = address_default
-            await addressEdit.save()
-            return response.ok({
-                message: `Update address with id: ${params.address_id} success`,
-                data: addressEdit
-            })
-        }
-        catch (e) {
-            return response.badRequest({
-                message: `Update address with id: ${params.address_id} failed`,
-            })
-        }
-    }
+        const address = await UserAddress.query()
+                                        .where('id', params.user_address_id)
+                                        .where('user_id', auth.use('api').user!.id)
+                                        .first()
 
-    public async destroy({ params, request, response }: HttpContextContract) {
-        const addressId = params.address_id
-        const address = await UserAddress.find(addressId)
-        if (!address) {
+        if(!address) {
             return response.notFound({
-                message: 'Not found this address!'
+                message: 'Địa chỉ không tồn tại!'
             })
         }
-        if (address.isDefault === true) {
-            return response.badRequest({
-                message: 'Can not delete default address!'
-            })
-        }
-        await address.delete()
+        address.merge({
+            recipientName: recipient_name,
+            recipientPhone: recipient_phone,
+            street: street,
+            wardsId: wards_id,
+            isDefault: address_default
+        })
+        await address.save()
         return response.ok({
-            message: 'Đã xóa vĩnh viễn address này!'
+            message: 'Chỉnh sửa địa chỉ thành công!'
         })
     }
 
-    public async setDefault({ params, request, response }: HttpContextContract) {
-        const addressId = params.address_id
-        const address = await UserAddress.find(addressId)
-        if (!address) {
+    public async destroy({ auth, params, response }: HttpContextContract) {
+        const address = await UserAddress.query()
+                                        .where('id', params.user_address_id)
+                                        .where('user_id', auth.use('api').user!.id)
+                                        .first()
+
+        if(!address) {
             return response.notFound({
-                message: 'Not found this address!'
+                message: 'Địa chỉ không tồn tại!'
             })
         }
+
+        if(address.isDefault) {
+            return response.badRequest({
+                message: 'Không thể xóa địa chỉ mặc định!'
+            })
+        }
+
+        await address.delete()
+        return response.ok({
+            message: 'Xóa địa chỉ thành công!'
+        })
+    }
+
+    public async setDefault({ auth, params, response }: HttpContextContract) {
+        const address = await UserAddress.query()
+                                        .where('id', params.user_address_id)
+                                        .where('user_id', auth.use('api').user!.id)
+                                        .first()
+        if(!address) {
+            return response.notFound({
+                message: 'Địa chỉ không tồn tại!'
+            })
+        }
+
         address.isDefault = true
         await address.save()
         return response.ok({
-            message: `Đã áp dụng địa chỉ id: ${addressId} là địa chỉ mặc định!`,
-            data: address
+            message: 'Đã đặt địa chỉ này thành địa chỉ mặc định!'
         })
     }
 }

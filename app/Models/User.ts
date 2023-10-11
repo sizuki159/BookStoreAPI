@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, HasMany, beforeSave, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, HasOne, beforeSave, belongsTo, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
 import UserLevel from './UserLevel'
 import UserRole from './UserRole'
@@ -8,6 +8,7 @@ import { string } from '@ioc:Adonis/Core/Helpers'
 import ApiToken from './ApiToken'
 import RefreshApiToken from './RefreshApiToken'
 import UserAddress from './UserAddress'
+import UserProfile from './UserProfile'
 
 
 export default class User extends BaseModel {
@@ -25,17 +26,11 @@ export default class User extends BaseModel {
   })
   public email: string
 
-  @column()
-  public phoneNumber: string
-
   @column({
     columnName: 'password',
     serializeAs: null
   })
   public password: string
-
-  @column()
-  public fullname: string
 
   @column({
     columnName: 'money'
@@ -47,6 +42,9 @@ export default class User extends BaseModel {
 
   @column()
   public userRoleId: number
+
+  @column()
+  public isEmailVerified: boolean
 
   @column.dateTime({ autoCreate: true, serializeAs: null })
   public createdAt: DateTime
@@ -70,6 +68,9 @@ export default class User extends BaseModel {
 
   @hasMany(() => UserAddress)
   public addresses: HasMany<typeof UserAddress>
+
+  @hasOne(() => UserProfile)
+  public profile: HasOne<typeof UserProfile>
 
   //#endregion
 

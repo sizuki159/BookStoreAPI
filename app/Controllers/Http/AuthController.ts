@@ -53,9 +53,8 @@ export default class AuthController {
             }
 
             const refreshToken = await User.generateRefreshToken(token.tokenHash)
-            await user.load('userLevel')
-            await user.load('userRole')
-
+            await Promise.all([user.load('profile'), user.load('userLevel'), user.load('userRole')])
+            
             return {
                 "jwtToken": token.token,
                 "refreshToken": refreshToken,
