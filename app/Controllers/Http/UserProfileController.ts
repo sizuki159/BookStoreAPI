@@ -7,14 +7,18 @@ import Hash from '@ioc:Adonis/Core/Hash'
 
 
 export default class UserProfileController {
-    public async getInfo({auth}: HttpContextContract) {
+    public async getInfo({auth, response}: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
         await user.load('profile')
-        return user.profile.serialize({
-            fields: ['firstname', 'lastname', 'phone_number', 'gender']
+        if(user.profile) {
+            return user.profile.serialize({
+                fields: ['firstname', 'lastname', 'phone_number', 'gender']
+            })
+        }
+        return response.notFound({
+            message: 'Bạn chưa cập nhật thông tin cá nhân!'
         })
-
     }
 
     public async updateOrCreate({auth, request, response}: HttpContextContract) {
