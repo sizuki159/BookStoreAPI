@@ -7,17 +7,17 @@ const UserAddressFilterFields: CherryPick = {
     relations: {
         'wards': {
             fields: {
-                pick: ['name']
+                pick: ['wards_id','name']
             },
             relations: {
                 'district': {
                     fields: {
-                        pick: ['name']
+                        pick: ['district_id','name']
                     },
                     relations: {
                         'province': {
                             fields: {
-                                pick: ['name']
+                                pick: ['province_id','name']
                             }
                         }
                     }
