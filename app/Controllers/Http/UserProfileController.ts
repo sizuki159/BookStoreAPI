@@ -7,11 +7,11 @@ import Hash from '@ioc:Adonis/Core/Hash'
 
 
 export default class UserProfileController {
-    public async getInfo({auth, response}: HttpContextContract) {
+    public async getInfo({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
         await user.load('profile')
-        if(user.profile) {
+        if (user.profile) {
             return user.profile.serialize({
                 fields: ['firstname', 'lastname', 'phone_number', 'gender']
             })
@@ -21,23 +21,31 @@ export default class UserProfileController {
         })
     }
 
-    public async updateOrCreate({auth, request, response}: HttpContextContract) {
-        const {firstname, lastname, phone_number, gender} = request.body()
-        const userAuth = await auth.use('api').authenticate()
-        await UserProfile.updateOrCreate({
-            userId: userAuth.id
-        }, {
-            firstname,
-            lastname,
-            phoneNumber: phone_number,
-            gender
-        })
-        return response.created({
-            message: 'Chỉnh sửa thông tin thành công!'
-        })
+    public async updateOrCreate({ auth, request, response }: HttpContextContract) {
+        try {
+            const { firstname, lastname, phone_number, gender } = request.body()
+            const userAuth = await auth.use('api').authenticate()
+            const userProfile = await UserProfile.updateOrCreate({
+                userId: userAuth.id
+            }, {
+                firstname,
+                lastname,
+                phoneNumber: phone_number,
+                gender
+            })
+            const updatedData = userProfile.toJSON()
+            return response.created({
+                updated_profile: updatedData
+            })
+        }
+        catch (e) {
+            return response.badRequest({
+                message: 'Cập nhật thông tin thất bại!'
+            })
+        }
     }
 
-    public async changePassword({auth, request, response}: HttpContextContract) {
+    public async changePassword({ auth, request, response }: HttpContextContract) {
         const newPasswordSchema = schema.create({
             current_password: schema.string([
                 rules.minLength(5)
@@ -58,7 +66,7 @@ export default class UserProfileController {
         })
 
         const userAuth = await auth.use('api').authenticate()
-        if((await Hash.verify(userAuth.password!, payload.current_password))) {
+        if ((await Hash.verify(userAuth.password!, payload.current_password))) {
             const user = await User.findOrFail(userAuth.id)
             user.password = payload.new_password
             await user.save()
