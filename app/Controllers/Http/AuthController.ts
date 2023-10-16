@@ -62,7 +62,9 @@ export default class AuthController {
                 "userInfo": user.serialize(UserFilterFields)
             }
         } catch(ex) {
-            return response.unauthorized()
+            return response.badRequest({
+                message: 'Đăng nhập thất bại!'
+            })
         }
     }
 
