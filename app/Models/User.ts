@@ -1,3 +1,4 @@
+import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, HasMany, HasOne, beforeSave, belongsTo, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
@@ -9,9 +10,10 @@ import ApiToken from './ApiToken'
 import RefreshApiToken from './RefreshApiToken'
 import UserAddress from './UserAddress'
 import UserProfile from './UserProfile'
+import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 
 
-export default class User extends BaseModel {
+export default class User extends compose(BaseModel, SoftDeletes) {
 
   public static table = 'users'
 

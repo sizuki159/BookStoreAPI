@@ -46,7 +46,7 @@ export default class BookPublisherController {
             })
         }
 
-        const newAuthorSchema = schema.create({
+        const newPublisherSchema = schema.create({
             publisher_name: schema.string([
                 rules.unique({
                     table: 'book_publishers',
@@ -56,7 +56,7 @@ export default class BookPublisherController {
             ]),
         })
         const payload = await request.validate({
-            schema: newAuthorSchema,
+            schema: newPublisherSchema,
             messages: {
                 'publisher_name.unique': 'Nhà xuất bản này đã tồn tại.'
             }

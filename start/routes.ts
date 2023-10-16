@@ -20,8 +20,6 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-
-
 //#region Auth
 Route.group(() => {
   Route.post('register', 'AuthController.register')
@@ -71,7 +69,7 @@ Route.group(() => {
     }).prefix('author')
     //#endregion
 
-    //#region Book Author
+    //#region Book Publisher
     Route.group(() => {
       Route.get('', 'BookPublisherController.getAll')
       Route.get('/trashed', 'BookPublisherController.getAllWithTrashed')
@@ -83,6 +81,25 @@ Route.group(() => {
     }).prefix('publisher')
     //#endregion
 
+    //#region Book Provider
+    Route.group(() => {
+      Route.get('', 'BookProviderController.getAll')
+      Route.get('/trashed', 'BookProviderController.getAllWithTrashed')
+      Route.post('', 'BookProviderController.add')
+      Route.put('', 'BookProviderController.update')
+      Route.delete('/delete/:book_provider_id', 'BookProviderController.delete')
+      Route.delete('/destroy/:book_provider_id', 'BookProviderController.destroy')
+      Route.patch('/restore/:book_provider_id', 'BookProviderController.restore')
+    }).prefix('provider')
+    //#endregion
+
+
+    //#region Book Product
+    Route.group(() => {
+      Route.get('/', 'BookController.getListBook')
+      Route.post('/', 'BookController.add')
+    }).prefix('product')
+    //#endregion
     
   }).prefix('book')
   
@@ -117,8 +134,7 @@ Route.group(() => {
   
   
 
-}).prefix('admin')
-// .middleware(['auth', 'admin'])
+}).prefix('admin').namespace('App/Controllers/Http/Admin').middleware(['auth', 'admin'])
 //#endregion
 
 Route.group(() => {
@@ -143,8 +159,7 @@ Route.group(() => {
 
   }).prefix('info')
 
-}).prefix('user')
-.middleware('auth')
+}).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
 
 
 Route.group(() => {
@@ -158,20 +173,13 @@ Route.group(() => {
     Route.get('/district/:districtId', 'AddressController.getWardsWithDistrictId')
   }).prefix('address')
   //#endregion
-}).prefix('api')
+
+  //#region Book Product
+  Route.group(() => {
+    Route.get('/', 'BookController.getBookWithFilter')
+  }).prefix('book')
+  //#endregion
+}).prefix('api').namespace('App/Controllers/Http/API')
 
 
-
-
-
-
-
-
-
-
-
-
-Route.group(() => {
-  Route.get('', 'TestsController.index').middleware('auth')
-}).prefix('test')
 
