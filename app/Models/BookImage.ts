@@ -13,7 +13,7 @@ export default class BookImage extends BaseModel {
   public enable: 'on' | 'off'
 
   @column()
-  public bookId: number
+  public isbnCode: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

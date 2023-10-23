@@ -24,15 +24,26 @@ export default class BookValidator {
    *    ```
    */
   public schema = schema.create({
+    "isbn_code": schema.string([
+      rules.unique({table: 'books', column: 'isbn_code'})
+    ]),
     "ccategory_id": schema.number([
       rules.exists({table: 'child_categories', column: 'id'})
     ]),
     "name": schema.string(),
-    "price": schema.number(),
-    "quantity": schema.number(),
+    "price": schema.number([
+      rules.unsigned()
+    ]),
+    "quantity": schema.number([
+      rules.unsigned()
+    ]),
     "desc": schema.string.optional(),
-    "weight": schema.number.optional(),
-    "number_of_pages": schema.number.optional(),
+    "weight": schema.number.optional([
+      rules.unsigned()
+    ]),
+    "number_of_pages": schema.number.optional([
+      rules.unsigned()
+    ]),
     "publishing_year": schema.number.optional(),
     "author_id": schema.number.optional([
       rules.exists({table: 'book_authors', column: 'id'})
@@ -45,6 +56,9 @@ export default class BookValidator {
     ]),
     "book_form_id": schema.number.optional([
       rules.exists({table: 'book_forms', column: 'id'})
+    ]),
+    "provider_id": schema.number.optional([
+      rules.exists({table: 'book_providers', column: 'id'})
     ]),
   })
 
@@ -60,12 +74,18 @@ export default class BookValidator {
    *
    */
   public messages: CustomMessages = {
+    'isbn_code.unique': 'Mã số ISBN này đã tồn tại!',
     'ccategory_id.required': 'Cho biết sách này thuộc loại nào!',
     'ccategory_id.exists': 'Loại này không tồn tại trong dữ liệu!',
     'name.required': 'Thiếu tên sách!',
     'price.required': 'Thiếu giá tiền!',
+    'price.unsigned': 'Giá tiền phải trên 0d!',
+    'weight.unsigned': 'Cân nặng không được dưới 0',
+    'number_of_pages.unsigned': 'Số trang phải lớn hơn 0',
+    'quantity.unsigned': 'Số lượng phải trên 0!',
     'author_id.exists': 'Tác giả không tồn tại trong dữ liệu!',
     'publisher_id.exists': 'Nhà xuất bản không tồn tại trong dữ liệu!',
+    'provider_id.exists': 'Nhà cung cấp không tồn tại trong dữ liệu!',
     'language_id.exists': 'Ngôn ngữ sách không tồn tại trong dữ liệu!',
     'book_form_id.exists': 'Hình thức sách không tồn tại trong dữ liệu!',
   }

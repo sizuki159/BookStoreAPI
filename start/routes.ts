@@ -97,7 +97,17 @@ Route.group(() => {
     //#region Book Product
     Route.group(() => {
       Route.get('/', 'BookController.getListBook')
+      Route.get('/:isbn_code', 'BookController.getBookDetail')
       Route.post('/', 'BookController.add')
+      Route.put('/', 'BookController.edit')
+      Route.delete('/delete/:isbn_code', 'BookController.delete')
+      Route.delete('/destroy/:isbn_code', 'BookController.destroy')
+      Route.patch('/restore/:isbn_code', 'BookController.restore')
+
+      Route.group(() => {
+        Route.post('/:isbn_code', 'BookController.addImage')
+      }).prefix('image')
+
     }).prefix('product')
     //#endregion
     
@@ -176,7 +186,7 @@ Route.group(() => {
 
   //#region Book Product
   Route.group(() => {
-    Route.get('/', 'BookController.getBookWithFilter')
+    Route.get('/', 'BookAPIController.getBookWithFilter')
   }).prefix('book')
   //#endregion
 }).prefix('api').namespace('App/Controllers/Http/API')

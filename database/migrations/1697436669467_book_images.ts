@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('image_source')
       table.enu('enable', ['on', 'off']).defaultTo('on')
-      table.integer('book_id').unsigned().references('id').inTable('books').onDelete('CASCADE')
+      table.string('isbn_code').references('isbn_code').inTable('books').onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
