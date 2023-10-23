@@ -4,11 +4,14 @@ import BookValidator from 'App/Validators/BookValidator'
 import Application from '@ioc:Adonis/Core/Application'
 import AdminBookFilterFields from 'App/FilterFields/Admin/AdminBookFilterFields'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import Drive from '@ioc:Adonis/Core/Drive'
+import BookImage from 'App/Models/BookImage'
+import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class BookController {
 
     public async getListBook({request, response}: HttpContextContract) {
-        const {page, limit} = request.qs()
+        let {page, limit} = PageLimitUtils(request.qs())
         const books = await Book.query()
                         .preload('ccategory')
                         .preload('author')
@@ -18,6 +21,7 @@ export default class BookController {
                         .preload('publisher')
                         .preload('provider')
                         .paginate(page, limit)
+
         return response.json(books.serialize(AdminBookFilterFields))
     }
 
@@ -26,7 +30,7 @@ export default class BookController {
         const book = await Book.find(isbnCode)
         if(!book) {
             return response.notFound({
-                message: 'Không tìm thấy sách này!'
+                message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
             })
         }
 
@@ -39,6 +43,10 @@ export default class BookController {
             book.load('publisher'),
             book.load('provider'),
         ])
+
+        for(let image of book.images) {
+            image.imageSource = await Drive.use('s3').getSignedUrl(image.imageSource, {expiresIn: '60m'})
+        }
 
         return response.json(book.serialize(AdminBookFilterFields))
     }
@@ -75,11 +83,54 @@ export default class BookController {
             })
         }
 
-        const coverImage = request.files('cover_image', {
-            size: '1mb',
+        const images = request.files('cover_image', {
+            size: '10mb',
             extnames: ['jpg', 'png', 'gif'],
         })
-        return coverImage
+
+        try {
+            for(let image of images) {
+                const fileName = `${book.isbnCode}_${image.clientName}`
+                await image.moveToDisk(book.isbnCode, {name: fileName}, 's3')
+
+                await book.related('images').create({
+                    imageSource: image.fileName,
+                    enable: 'on'
+                })
+            }
+        } catch {
+            await book.related('images').query().delete()
+            return response.serviceUnavailable({
+                message: 'Có lỗi xảy ra!'
+            })
+        }
+        return response.ok({
+            message: 'Thêm ảnh thành công.'
+        })
+    }
+
+    public async deleteImage({params, response}: HttpContextContract) {
+
+        try {
+            const bookImageId = params.book_image_id
+    
+            const bookImage = await BookImage.find(bookImageId)
+            if(!bookImage) {
+                return response.notFound({
+                    message: 'Không tìm thấy ảnh này trong dữ liệu.'
+                })
+            }
+            
+            await bookImage.delete()
+            await Drive.use('s3').delete(bookImage.imageSource)
+            return response.ok({
+                message: 'Xóa ảnh thành công.'
+            })
+        } catch {
+            return response.serviceUnavailable({
+                message: 'Hệ thống bị lỗi.'
+            })
+        }
     }
 
     public async edit({request, response}: HttpContextContract) {

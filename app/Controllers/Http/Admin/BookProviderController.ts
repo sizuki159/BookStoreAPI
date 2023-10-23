@@ -1,14 +1,17 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BookProvider from 'App/Models/BookProvider'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class BookProviderController {
-    public async getAll({response}: HttpContextContract) {
-        return response.json(await BookProvider.all())
+    public async getAll({request, response}: HttpContextContract) {
+        const {page, limit} = PageLimitUtils(request.qs())
+        return response.json(await BookProvider.query().paginate(page, limit))
     }
 
-    public async getAllWithTrashed({response}: HttpContextContract) {
-        return response.json(await BookProvider.onlyTrashed().exec())
+    public async getAllWithTrashed({request, response}: HttpContextContract) {
+        const {page, limit} = PageLimitUtils(request.qs())
+        return response.json(await BookProvider.onlyTrashed().paginate(page, limit))
     }
 
     public async add({request, response}: HttpContextContract) {

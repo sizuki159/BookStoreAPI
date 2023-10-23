@@ -36,7 +36,9 @@ const AdminBookFilterFields: CherryPick = {
             }
         },
         'images': {
-            
+            fields: {
+                pick: ['id', 'image_source', 'enable', 'isbn_code']
+            }
         }
     }
 }

@@ -1,9 +1,10 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Book from 'App/Models/Book'
+import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class BookAPIController {
     public async getBookWithFilter({params, request, response}: HttpContextContract) {
-        let {search, min_price, max_price, order_by, page, limit} = request.qs()
+        let {search, min_price, max_price, order_by} = request.qs()
         let result: any = Book.query()
 
         // Full text search
@@ -30,15 +31,8 @@ export default class BookAPIController {
         }
 
         // Phân trang
-        if(page || limit) {
-            if(!page) {
-                page = 1
-            }
-            if(!limit) {
-                limit = 10
-            }
-            result = await result.paginate(page, limit)
-        }
+        const {page, limit} = PageLimitUtils(request.qs())
+        result = await result.paginate(page, limit)
 
         return result
     }

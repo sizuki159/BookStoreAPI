@@ -106,6 +106,7 @@ Route.group(() => {
 
       Route.group(() => {
         Route.post('/:isbn_code', 'BookController.addImage')
+        Route.delete('/:book_image_id', 'BookController.deleteImage')
       }).prefix('image')
 
     }).prefix('product')
