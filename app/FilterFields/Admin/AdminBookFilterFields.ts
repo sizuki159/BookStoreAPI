@@ -2,7 +2,7 @@ import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
 
 const AdminBookFilterFields: CherryPick = {
     fields: {
-        pick: ['id', 'name', 'price', 'quantity', 'desc', 'weight', 'number_of_pages', 'publishing_year']
+        pick: ['id', 'isbn_code','name', 'price', 'quantity', 'desc', 'weight', 'number_of_pages', 'publishing_year']
     },
     relations: {
         'ccategory': {

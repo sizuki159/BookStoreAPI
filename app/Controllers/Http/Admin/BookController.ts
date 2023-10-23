@@ -71,7 +71,7 @@ export default class BookController {
         const book = await Book.find(isbnCode)
         if(!book) {
             return response.notFound({
-                message: 'Không tìm thấy sách này!'
+                message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
             })
         }
 
