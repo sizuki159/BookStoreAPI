@@ -47,9 +47,6 @@ export default class extends BaseSeeder {
       {
         authorName: 'Hamlet Trương'
       },
-      {
-        authorName: 'Hamlet Trương'
-      },
     ])
   }
 }

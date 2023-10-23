@@ -7,27 +7,32 @@ const AdminBookFilterFields: CherryPick = {
     relations: {
         'ccategory': {
             fields: {
-                pick: ['name']
+                pick: ['id', 'name']
             }
         },
         'author': {
             fields: {
-                pick: ['author_name']
+                pick: ['id' ,'author_name']
             }
         },
         'book_form': {
             fields: {
-                pick: ['name']
+                pick: ['id', 'name']
             }
         },
         'language': {
             fields: {
-                pick: ['language_name']
+                pick: ['id', 'language_name']
             }
         },
         'publisher': {
             fields: {
-                pick: ['name']
+                pick: ['id', 'name']
+            }
+        },
+        'provider': {
+            fields: {
+                pick: ['id', 'name']
             }
         },
         'images': {

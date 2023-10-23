@@ -9,7 +9,16 @@ export default class BookController {
 
     public async getListBook({request, response}: HttpContextContract) {
         const {page, limit} = request.qs()
-        return response.json(await Book.query().paginate(page, limit))
+        const books = await Book.query()
+                        .preload('ccategory')
+                        .preload('author')
+                        .preload('bookForm')
+                        .preload('images')
+                        .preload('language')
+                        .preload('publisher')
+                        .preload('provider')
+                        .paginate(page, limit)
+        return response.json(books.serialize(AdminBookFilterFields))
     }
 
     public async getBookDetail({params, response}: HttpContextContract) {
