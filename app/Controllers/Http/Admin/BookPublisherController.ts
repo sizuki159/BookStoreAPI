@@ -6,12 +6,12 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 export default class BookPublisherController {
     public async getAll({request, response}: HttpContextContract) {
         const {page, limit} = PageLimitUtils(request.qs())
-        return response.json(await BookPublisher.query().paginate(page, limit))
+        return response.json(await BookPublisher.query().orderBy('created_at', 'desc').paginate(page, limit))
     }
 
     public async getAllWithTrashed({request, response}: HttpContextContract) {
         const {page, limit} = PageLimitUtils(request.qs())
-        return response.json(await BookPublisher.onlyTrashed().paginate(page, limit))
+        return response.json(await BookPublisher.onlyTrashed().orderBy('created_at', 'desc').paginate(page, limit))
     }
 
     public async add({request, response}: HttpContextContract) {

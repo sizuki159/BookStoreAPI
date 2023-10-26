@@ -20,6 +20,7 @@ export default class BookController {
                         .preload('language')
                         .preload('publisher')
                         .preload('provider')
+                        .orderBy('created_at', 'desc')
                         .paginate(page, limit)
 
         return response.json(books.serialize(AdminBookFilterFields))
@@ -35,13 +36,14 @@ export default class BookController {
                         .preload('language')
                         .preload('publisher')
                         .preload('provider')
+                        .orderBy('created_at', 'desc')
                         .paginate(page, limit)
         return response.json(books.serialize(AdminBookFilterFields))
     }
 
     public async getBookDetail({params, response}: HttpContextContract) {
         const isbnCode = params.isbn_code
-        const book = await Book.find(isbnCode)
+        const book = await Book.findBy('isbn_code', isbnCode)
         if(!book) {
             return response.notFound({
                 message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
@@ -94,9 +96,10 @@ export default class BookController {
                 book.load('provider'),
             ])
             return response.created(book.serialize(AdminBookFilterFields))
-        } catch {
+        } catch (ex) {
             return response.serviceUnavailable({
-                message: 'Lỗi hệ thống.'
+                // message: 'Lỗi hệ thống.'
+                message: ex.message
             })
         }
     }
@@ -104,7 +107,7 @@ export default class BookController {
     public async addImage({params, request, response}: HttpContextContract) {
         const isbnCode = params.isbn_code
 
-        const book = await Book.find(isbnCode)
+        const book = await Book.findBy('isbn_code', isbnCode)
         if(!book) {
             return response.notFound({
                 message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
@@ -222,7 +225,7 @@ export default class BookController {
             }
         })
 
-        const book = await Book.findOrFail(payload.isbn_code)
+        const book = await Book.findByOrFail('isbn_code', payload.isbn_code)
         book.merge(payload)
 
         await book.save()
@@ -236,7 +239,7 @@ export default class BookController {
 
     public async delete({params, response}: HttpContextContract) {
         const isbnCode = params.isbn_code
-        const book = await Book.find(isbnCode)
+        const book = await Book.findBy('isbn_code', isbnCode)
         if(book) {
             await book.delete()
             return response.ok({

@@ -11,10 +11,10 @@ import BookLanguage from './BookLanguage'
 import BookProvider from './BookProvider'
 
 export default class Book extends compose(BaseModel, SoftDeletes) {
-  @column()
+  @column({ isPrimary: true })
   public id: number
 
-  @column({ isPrimary: true })
+  @column()
   public isbnCode: string
 
   @column({columnName: 'book_name'})

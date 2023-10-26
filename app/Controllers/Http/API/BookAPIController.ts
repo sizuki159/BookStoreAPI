@@ -5,11 +5,11 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 export default class BookAPIController {
     public async getBookWithFilter({params, request, response}: HttpContextContract) {
         let {search, min_price, max_price, order_by} = request.qs()
-        let result: any = Book.query()
+        let query = Book.query()
 
         // Full text search
         if(search) {
-            result.whereRaw('MATCH(isbn_code, book_name, `desc`) AGAINST(?)', [search])
+            query.andWhereRaw('MATCH(isbn_code, book_name, `desc`) AGAINST(? IN BOOLEAN MODE)', [search])
         }
 
         // Search theo giá
@@ -20,7 +20,7 @@ export default class BookAPIController {
             if(!max_price) {
                 max_price = 999999999999999
             }
-            result.whereBetween('price', [min_price, max_price])
+            query.andWhereBetween('price', [min_price, max_price])
         }
 
         // order_by
@@ -28,13 +28,13 @@ export default class BookAPIController {
             if(order_by.includes(',')) {
                 let col = order_by.split(',')[0]
                 let direction = order_by.split(',')[1]
-                result.orderBy(col, direction)
+                query.orderBy(col, direction)
             }
         }
 
         // Phân trang
         const {page, limit} = PageLimitUtils(request.qs())
-        result = await result.paginate(page, limit)
+        const result = await query.paginate(page, limit)
 
         return result
     }

@@ -5,7 +5,7 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id', {primaryKey: false})
+      table.increments('id')
       table.string('isbn_code').unique().notNullable()
       table.string('book_name').nullable()
       table.double('price').notNullable()
@@ -21,7 +21,7 @@ export default class extends BaseSchema {
       table.integer('language_id').unsigned().references('id').inTable('book_languages').onDelete('SET NULL')
       table.integer('book_form_id').unsigned().references('id').inTable('book_forms').onDelete('SET NULL')
 
-      table.primary(['isbn_code'])
+      // table.primary(['isbn_code'])
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
