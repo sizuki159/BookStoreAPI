@@ -11,7 +11,7 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 export default class BookController {
 
     public async getListBook({request, response}: HttpContextContract) {
-        let {page, limit} = PageLimitUtils(request.qs())
+        const {page, limit} = PageLimitUtils(request.qs())
         const books = await Book.query()
                         .preload('ccategory')
                         .preload('author')
@@ -22,6 +22,20 @@ export default class BookController {
                         .preload('provider')
                         .paginate(page, limit)
 
+        return response.json(books.serialize(AdminBookFilterFields))
+    }
+
+    public async getListBookTrashed({request, response}: HttpContextContract) {
+        const {page, limit} = PageLimitUtils(request.qs())
+        const books = await Book.onlyTrashed()
+                        .preload('ccategory')
+                        .preload('author')
+                        .preload('bookForm')
+                        .preload('images')
+                        .preload('language')
+                        .preload('publisher')
+                        .preload('provider')
+                        .paginate(page, limit)
         return response.json(books.serialize(AdminBookFilterFields))
     }
 
@@ -134,7 +148,7 @@ export default class BookController {
     }
 
     public async edit({request, response}: HttpContextContract) {
-        const newLanguageSchema = schema.create({
+        const newBookSchema = schema.create({
             "isbn_code": schema.string([rules.exists({
                 table: 'books',
                 column: 'isbn_code'
@@ -175,7 +189,7 @@ export default class BookController {
         })
 
         const payload = await request.validate({
-            schema: newLanguageSchema,
+            schema: newBookSchema,
             messages: {
                 'isbn_code.exists': 'Mã ISBN sách không tồn tại trong dữ liệu!',
                 'ccategory_id.required': 'Cho biết sách này thuộc loại nào!',

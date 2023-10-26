@@ -97,6 +97,7 @@ Route.group(() => {
     //#region Book Product
     Route.group(() => {
       Route.get('/', 'BookController.getListBook')
+      Route.get('/trashed', 'BookController.getListBookTrashed')
       Route.get('/:isbn_code', 'BookController.getBookDetail')
       Route.post('/', 'BookController.add')
       Route.put('/', 'BookController.edit')
@@ -169,6 +170,10 @@ Route.group(() => {
     }).prefix('address')
 
   }).prefix('info')
+
+  Route.group(() => {
+    Route.post('', 'CartController.addProductToCart')
+  }).prefix('cart')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
 

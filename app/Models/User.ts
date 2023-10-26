@@ -11,6 +11,7 @@ import RefreshApiToken from './RefreshApiToken'
 import UserAddress from './UserAddress'
 import UserProfile from './UserProfile'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
+import Cart from './Cart'
 
 
 export default class User extends compose(BaseModel, SoftDeletes) {
@@ -70,6 +71,9 @@ export default class User extends compose(BaseModel, SoftDeletes) {
 
   @hasMany(() => UserAddress)
   public addresses: HasMany<typeof UserAddress>
+
+  @hasMany(() => Cart)
+  public carts: HasMany<typeof Cart>
 
   @hasOne(() => UserProfile)
   public profile: HasOne<typeof UserProfile>
