@@ -67,32 +67,38 @@ export default class BookController {
 
     public async add({request, response}: HttpContextContract) {
         const payload = await request.validate(BookValidator)
-        const book = await Book.create({ //Chua try catch
-            isbnCode: payload.isbn_code,
-            ccategoryId: payload.ccategory_id,
-            name: payload.name,
-            price: payload.price,
-            quantity: payload.quantity,
-            desc: payload.desc,
-            weight: payload.weight,
-            numberOfPages: payload.number_of_pages,
-            publishingYear: payload.publishing_year,
-            providerId: payload.provider_id,
-            languageId: payload.language_id,
-            authorId: payload.author_id,
-            publisherId: payload.publisher_id,
-            bookFormId: payload.book_form_id,
-        })
-        await Promise.all([
-            book.load('ccategory'),
-            book.load('author'),
-            book.load('bookForm'),
-            book.load('images'),
-            book.load('language'),
-            book.load('publisher'),
-            book.load('provider'),
-        ])
-        return response.created(book.serialize(AdminBookFilterFields))
+        try {
+            const book = await Book.create({
+                isbnCode: payload.isbn_code,
+                ccategoryId: payload.ccategory_id,
+                name: payload.name,
+                price: payload.price,
+                quantity: payload.quantity,
+                desc: payload.desc,
+                weight: payload.weight,
+                numberOfPages: payload.number_of_pages,
+                publishingYear: payload.publishing_year,
+                providerId: payload.provider_id,
+                languageId: payload.language_id,
+                authorId: payload.author_id,
+                publisherId: payload.publisher_id,
+                bookFormId: payload.book_form_id,
+            })
+            await Promise.all([
+                book.load('ccategory'),
+                book.load('author'),
+                book.load('bookForm'),
+                book.load('images'),
+                book.load('language'),
+                book.load('publisher'),
+                book.load('provider'),
+            ])
+            return response.created(book.serialize(AdminBookFilterFields))
+        } catch {
+            return response.serviceUnavailable({
+                message: 'Lỗi hệ thống.'
+            })
+        }
     }
 
     public async addImage({params, request, response}: HttpContextContract) {

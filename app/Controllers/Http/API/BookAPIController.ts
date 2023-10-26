@@ -24,10 +24,12 @@ export default class BookAPIController {
         }
 
         // order_by
-        if(order_by.includes(',')) {
-            let col = order_by.split(',')[0]
-            let direction = order_by.split(',')[1]
-            result.orderBy(col, direction)
+        if(order_by) {
+            if(order_by.includes(',')) {
+                let col = order_by.split(',')[0]
+                let direction = order_by.split(',')[1]
+                result.orderBy(col, direction)
+            }
         }
 
         // Phân trang
