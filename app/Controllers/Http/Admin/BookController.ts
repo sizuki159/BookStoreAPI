@@ -67,7 +67,7 @@ export default class BookController {
 
     public async add({request, response}: HttpContextContract) {
         const payload = await request.validate(BookValidator)
-        const book = await Book.create({
+        const book = await Book.create({ //Chua try catch
             isbnCode: payload.isbn_code,
             ccategoryId: payload.ccategory_id,
             name: payload.name,
@@ -83,8 +83,16 @@ export default class BookController {
             publisherId: payload.publisher_id,
             bookFormId: payload.book_form_id,
         })
-
-        return response.created(book)
+        await Promise.all([
+            book.load('ccategory'),
+            book.load('author'),
+            book.load('bookForm'),
+            book.load('images'),
+            book.load('language'),
+            book.load('publisher'),
+            book.load('provider'),
+        ])
+        return response.created(book.serialize(AdminBookFilterFields))
     }
 
     public async addImage({params, request, response}: HttpContextContract) {
