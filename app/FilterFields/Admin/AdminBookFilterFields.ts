@@ -7,7 +7,7 @@ const AdminBookFilterFields: CherryPick = {
     relations: {
         'ccategory': {
             fields: {
-                pick: ['id', 'name']
+                pick: ['id', 'name', 'parent_category_id']
             }
         },
         'author': {

@@ -118,6 +118,7 @@ export default class BookController {
             size: '10mb',
             extnames: ['jpg', 'png', 'gif'],
         })
+        console.log(images)
 
         try {
             for(let image of images) {
