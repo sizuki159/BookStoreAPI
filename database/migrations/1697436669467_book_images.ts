@@ -7,6 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('image_source')
+      table.string('source_location')
       table.enu('enable', ['on', 'off']).defaultTo('on')
       table.string('isbn_code').references('isbn_code').inTable('books').onDelete('CASCADE')
 

@@ -114,15 +114,14 @@ export default class BookController {
             size: '10mb',
             extnames: ['jpg', 'png', 'gif'],
         })
-        console.log(images)
 
         try {
             for(let image of images) {
                 const fileName = `${book.isbnCode}_${image.clientName}`
                 await image.moveToDisk(book.isbnCode, {name: fileName}, 's3')
-
                 await book.related('images').create({
-                    imageSource: image.fileName,
+                    sourceLocation: image.fileName,
+                    imageSource: image.filePath,
                     enable: 'on'
                 })
             }

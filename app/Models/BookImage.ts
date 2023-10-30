@@ -9,6 +9,9 @@ export default class BookImage extends BaseModel {
   @column()
   public imageSource: string
 
+  @column({serializeAs: null})
+  public sourceLocation: string
+
   @column()
   public enable: 'on' | 'off'
 
