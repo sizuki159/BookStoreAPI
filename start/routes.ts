@@ -198,6 +198,12 @@ Route.group(() => {
         Route.get('/', 'BookAPIController.getBookWithFilter')
     }).prefix('book')
     //#endregion
+
+    //#region category
+    Route.group(() => {
+        Route.get('/', 'CategoryAPIController.getAllCategory')
+    }).prefix('category')
+    //#endregion
 }).prefix('api').namespace('App/Controllers/Http/API')
 
 
