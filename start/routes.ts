@@ -112,9 +112,9 @@ Route.group(() => {
 
     }).prefix('product')
     //#endregion
-    
+
   }).prefix('book')
-  
+
   Route.group(() => {
     //#region Parent Category
     Route.group(() => {
@@ -128,8 +128,8 @@ Route.group(() => {
       Route.patch('/restore/:pcategory_id', 'ParentCategoryController.restore')
     }).prefix('parent')
     //#endregion
-  
-  
+
+
     //#region Child Category
     Route.group(() => {
       Route.get('', 'ChildCategoryController.getAll')
@@ -143,8 +143,8 @@ Route.group(() => {
     //#endregion
 
   }).prefix('category')
-  
-  
+
+
 
 }).prefix('admin').namespace('App/Controllers/Http/Admin').middleware(['auth', 'admin'])
 //#endregion
@@ -195,7 +195,15 @@ Route.group(() => {
     Route.get('/', 'BookAPIController.getBookWithFilter')
   }).prefix('book')
   //#endregion
+
+  //#region category
+  Route.group(() => {
+    Route.get('/', 'CategoryAPIController.getAllCategory')
+  }).prefix('category')
+  //#endregion
+
 }).prefix('api').namespace('App/Controllers/Http/API')
+
 
 
 
