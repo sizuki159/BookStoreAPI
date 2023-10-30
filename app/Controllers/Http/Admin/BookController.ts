@@ -60,10 +60,6 @@ export default class BookController {
             book.load('provider'),
         ])
 
-        for(let image of book.images) {
-            image.imageSource = await Drive.use('s3').getSignedUrl(image.imageSource, {expiresIn: '60m'})
-        }
-
         return response.json(book.serialize(AdminBookFilterFields))
     }
 
