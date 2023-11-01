@@ -11,6 +11,24 @@ export default class VoucherController {
         return response.json(vouchers.serialize(AdminVoucherFilterFields))
     }
 
+    public async getVoucherGeneral({request, response}: HttpContextContract) {
+        const {page, limit} = PageLimitUtils(request.qs())
+        const vouchers = await Voucher.query().where('voucherType', Voucher.TYPE.GENERAL).paginate(page, limit)
+        return response.json(vouchers.serialize(AdminVoucherFilterFields))
+    }
+
+    public async getVoucherPersonalized({request, response}: HttpContextContract) {
+        const {page, limit} = PageLimitUtils(request.qs())
+        const vouchers = await Voucher.query().where('voucherType', Voucher.TYPE.PERSONALIZED).paginate(page, limit)
+        return response.json(vouchers.serialize(AdminVoucherFilterFields))
+    }
+
+    public async getVoucherMemberExclusive({request, response}: HttpContextContract) {
+        const {page, limit} = PageLimitUtils(request.qs())
+        const vouchers = await Voucher.query().where('voucherType', Voucher.TYPE.MEMBER_EXCLUSIVE).paginate(page, limit)
+        return response.json(vouchers.serialize(AdminVoucherFilterFields))
+    }
+
     public async addVoucher({request, response}: HttpContextContract) {
         const payload = await request.validate(AddVoucherValidator)
 

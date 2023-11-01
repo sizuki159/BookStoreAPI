@@ -144,6 +144,9 @@ Route.group(() => {
 
     Route.group(() => {
         Route.get('', 'VoucherController.getAll')
+        Route.get('/general', 'VoucherController.getVoucherGeneral')
+        Route.get('/personalized', 'VoucherController.getVoucherPersonalized')
+        Route.get('/member_exclusive', 'VoucherController.getVoucherMemberExclusive')
         Route.post('', 'VoucherController.addVoucher')
     }).prefix('voucher')
 
