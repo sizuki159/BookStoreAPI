@@ -3,7 +3,7 @@ import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Book from './Book'
 
 export default class BookImage extends BaseModel {
-  @column({ isPrimary: true })
+  @column({ isPrimary: true})
   public id: number
 
   @column()
@@ -16,12 +16,12 @@ export default class BookImage extends BaseModel {
   public enable: 'on' | 'off'
 
   @column()
-  public isbnCode: number
+  public isbnCode: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({ autoCreate: true})
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({ autoCreate: true, autoUpdate: true})
   public updatedAt: DateTime
 
   @belongsTo(() => Book)

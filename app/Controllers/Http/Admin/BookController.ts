@@ -124,6 +124,7 @@ export default class BookController {
                     imageSource: image.filePath,
                     enable: 'on'
                 })
+
             }
         } catch {
             await book.related('images').query().delete()
