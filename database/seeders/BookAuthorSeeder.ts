@@ -2,51 +2,242 @@ import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import BookAuthor from 'App/Models/BookAuthor'
 
 export default class extends BaseSeeder {
-  public async run () {
-    // Write your database queries inside the run method
-    await BookAuthor.createMany([
-      {
-        authorName: 'Hồ Anh Thái'
-      },
-      {
-        authorName: 'Nguyễn Vĩnh Nguyên'
-      },
-      {
-        authorName: 'Nguyễn Trương Quý'
-      },
-      {
-        authorName: 'Đỗ Bích Thúy'
-      },
-      {
-        authorName: 'Nguyễn Mai Chi'
-      },
-      {
-        authorName: 'Nguyễn Nhật Ánh'
-      },
-      {
-        authorName: 'Trang Hạ'
-      },
-      {
-        authorName: 'Nguyễn Phong Việt'
-      },
-      {
-        authorName: 'Anh Khang'
-      },
-      {
-        authorName: 'Sơn Paris'
-      },
-      {
-        authorName: 'Gào'
-      },
-      {
-        authorName: 'Nguyễn Ngọc Thạch'
-      },
-      {
-        authorName: 'Đỗ Nhật Nam'
-      },
-      {
-        authorName: 'Hamlet Trương'
-      },
-    ])
-  }
+    public async run() {
+        // Write your database queries inside the run method
+        await BookAuthor.createMany([
+            {
+                authorName: 'Hồ Anh Thái'
+            },
+            {
+                authorName: 'Nguyễn Vĩnh Nguyên'
+            },
+            {
+                authorName: 'Nguyễn Trương Quý'
+            },
+            {
+                authorName: 'Đỗ Bích Thúy'
+            },
+            {
+                authorName: 'Nguyễn Mai Chi'
+            },
+            {
+                authorName: 'Nguyễn Nhật Ánh'
+            },
+            {
+                authorName: 'Trang Hạ'
+            },
+            {
+                authorName: 'Nguyễn Phong Việt'
+            },
+            {
+                authorName: 'Anh Khang'
+            },
+            {
+                authorName: 'Sơn Paris'
+            },
+            {
+                authorName: 'Gào'
+            },
+            {
+                authorName: 'Nguyễn Ngọc Thạch'
+            },
+            {
+                authorName: 'Đỗ Nhật Nam'
+            },
+            {
+                authorName: 'Hamlet Trương'
+            },
+            { authorName: 'Tôn Nguyên Vĩ' },
+            { authorName: 'BTS, Myeongseok Kang' },
+            { authorName: 'Clint Emerson' },
+            { authorName: 'Đại Bông' },
+            { authorName: 'Huy Tiến' },
+            { authorName: 'Lê Văn Tuấn' },
+            { authorName: 'Marry Buffet, Sean Seah' },
+            { authorName: 'Urako Kanamori' },
+            { authorName: 'Miêu Công Tử' },
+            { authorName: 'Miêu Công Tử' },
+            { authorName: 'Tuệ Mẫn' },
+            { authorName: 'James Clear' },
+            { authorName: 'Edwin Durning-Lawrence' },
+            { authorName: 'Akimi Yoshida' },
+            { authorName: 'Minna Lacey' },
+            { authorName: 'Hazel Maskell' },
+            { authorName: 'James Wallace, Jim Erickson' },
+            { authorName: 'Muneyuki Kaneshiro, Yusuke Nomura' },
+            { authorName: 'Phạm Viêm Phương , Huỳnh Văn Thành' },
+            { authorName: 'Li Zheng' },
+            { authorName: 'Lee Jeeheng' },
+            { authorName: 'Tuệ Minh' },
+            { authorName: 'Tuệ Minh' },
+            { authorName: 'DK' },
+            { authorName: 'Rachel Firth' },
+            { authorName: 'Katarína Macurová' },
+            { authorName: 'Tri Thức Việt' },
+            { authorName: 'Lê Xuân Khoa, Xuân Chi, Thanh Huyền' },
+            { authorName: 'Tân Việt' },
+            { authorName: 'Hae Min' },
+            { authorName: 'Michelle Zauner' },
+            { authorName: 'Lê Quýnh' },
+            { authorName: 'Phó Trại Nam, Thư Trùng' },
+            { authorName: 'Takasi Uno' },
+            { authorName: 'Toboso Yana' },
+            { authorName: 'Trương Nguyện Thành' },
+            { authorName: 'Trà Hoa Đậu Biếc' },
+            { authorName: 'Thương Mỗ , Lê Duyên Hải' },
+            { authorName: 'Chris Bradley, Martin Hirt, Sven Smit' },
+            { authorName: 'Song Hong Bing' },
+            { authorName: 'Nhiều Tác Giả' },
+            { authorName: 'BS Trần Thị Huyên Thảo' },
+            { authorName: 'Gege Akutami' },
+            { authorName: 'Daisuke Aizawa, Touzai' },
+            { authorName: 'Thảo Thảo' },
+            { authorName: 'Amy Trương' },
+            { authorName: 'Clyde Prestowitz' },
+            { authorName: 'Hachun Lyonnet, Hương Đỗ, Bubu Hương' },
+            { authorName: 'Hồ Viện Viện' },
+            { authorName: 'Dale Carnegie, Trác Nhã' },
+            { authorName: 'Nguyễn Nhật Ánh' },
+            { authorName: 'Emily Voigt' },
+            { authorName: 'Philippa Perry' },
+            { authorName: 'Nikola Tesla' },
+            { authorName: 'Vãn Tình' },
+            { authorName: 'Masami Sasaki, Wakamatsu Aki' },
+            { authorName: 'José Mauro de Vasconcelos' },
+            { authorName: 'Nhiều Tác Giả' },
+            { authorName: 'Phan Văn Trường' },
+            { authorName: 'Trí' },
+            { authorName: 'Gia Linh' },
+            { authorName: 'Neung In Publishing Company' },
+            { authorName: 'Hiên' },
+            { authorName: 'Wayne Barrett' },
+            { authorName: 'Adam Grant' },
+            { authorName: 'Elvis Phương' },
+            { authorName: 'Audrey Bouquet, Fabien Öckto Lambert' },
+            { authorName: 'Steven Levy' },
+            { authorName: 'Atsushi Ohkubo' },
+            { authorName: 'Nhiều Tác Giả' },
+            { authorName: 'Lưu Hiểu Huy' },
+            { authorName: 'Ron Chernow' },
+            { authorName: 'Hà Yên' },
+            { authorName: 'Hồ Tâm' },
+            { authorName: 'Shoko Kanno' },
+            { authorName: 'Jeffrey Sugerman' },
+            { authorName: 'Nguyễn Thị Xuân Phượng' },
+            { authorName: 'GS Hà Vĩnh Thọ' },
+            { authorName: 'Minh Niệm' },
+            { authorName: 'Charles P Kindleberger, Robert Z Aliber' },
+            { authorName: 'Amateur Psychology Nguyễn Đoàn Minh Thư' },
+            { authorName: 'Kelly Notaras' },
+            { authorName: 'An' },
+            { authorName: 'Tiêu Vệ, Lê Tâm' },
+            { authorName: 'Kat C Wilde' },
+            { authorName: 'Paul Kalanithi' },
+            { authorName: 'Trác Nhã' },
+            { authorName: 'Trúc Dĩ' },
+            { authorName: 'Chung Ju Yung' },
+            { authorName: 'Yasuhisa Hara' },
+            { authorName: 'Trần Văn Thọ' },
+            { authorName: 'Angelo Crippa, Benjamin Barbier, Mélanie Boissonneau, Quentin Ma' },
+            { authorName: 'Rasmus Hoài Nam' },
+            { authorName: 'Rasmus Hoài Nam' },
+            { authorName: 'Rasmus Hoài Nam' },
+            { authorName: 'Nguyễn Nhật Ánh' },
+            { authorName: 'Freya Jaffke' },
+            { authorName: 'macmart' },
+            { authorName: 'Svetlana Alexievich' },
+            { authorName: 'Erika Takeuchi' },
+            { authorName: 'John Perkins' },
+            { authorName: 'Ryosuke Takeuchi, Hikaru Miyoshi' },
+            { authorName: 'Mohammed Bin Rashid Al Maktoum' },
+            { authorName: 'Lý Tường, Vương Lợi Phân' },
+            { authorName: 'Sam Smith' },
+            { authorName: 'Nguyễn Nhật Ánh' },
+            { authorName: 'Yosbook, Xiao Li' },
+            { authorName: 'Yosbook, Xiao Li' },
+            { authorName: 'Hạ Mer' },
+            { authorName: 'macmart' },
+            { authorName: 'Reed Hastings, Erin Meyer' },
+            { authorName: 'Napoleon Hill' },
+            { authorName: 'Napoleon Hill' },
+            { authorName: 'Avinash K Dixit, Barry J Nalebuff' },
+            { authorName: 'Philip Kotler, Gary Armstrong' },
+            { authorName: 'Khaled Hosseini' },
+            { authorName: 'Yoshichi Shimada' },
+            { authorName: 'Og Mandino' },
+            { authorName: 'George S Clason' },
+            { authorName: 'Nguyễn Chí Vịnh' },
+            { authorName: 'Jacob Morgan' },
+            { authorName: 'Yunan' },
+            { authorName: 'Yunan' },
+            { authorName: 'Yunan' },
+            { authorName: 'Linda Locke' },
+            { authorName: 'Nguyễn Nhật Ánh' },
+            { authorName: 'Nguyễn Nhật Ánh' },
+            { authorName: 'Svetlana Alexievich' },
+            { authorName: 'Bubu Hương, Mẹ Ong Bông, Hachun Lyonnet' },
+            { authorName: 'Hachun Lyonnet, Hương Đỗ, Bubu Hương' },
+            { authorName: 'Hachun Lyonnet, Hương Đỗ' },
+            { authorName: 'Hachun Lyonnet, Hương Đỗ' },
+            { authorName: 'Erika Takeuchi' },
+            { authorName: 'Dr C L Claridge' },
+            { authorName: 'Alicia Vu' },
+            { authorName: 'Trương Tiếu Hằng' },
+            { authorName: 'Adele Faber, Elaine Mazlish' },
+            { authorName: 'Tống Mặc' },
+            { authorName: 'Bìa Mềm' },
+            { authorName: 'Robert Maurer' },
+            { authorName: 'Robert G Hagstrom' },
+            { authorName: 'Haruichi Furudate' },
+            { authorName: 'Hubert Seipel' },
+            { authorName: 'Niccolò Machiavelli' },
+            { authorName: 'Christiane Gunzi' },
+            { authorName: 'Albert Rutherford' },
+            { authorName: 'Hồ Viện Viện' },
+            { authorName: 'Nhiều Tác Giả' },
+            { authorName: 'Philip Norman' },
+            { authorName: 'Takehiko Inoue' },
+            { authorName: 'Atsushi Ohkubo' },
+            { authorName: 'Hữu Ước' },
+            { authorName: 'Jordan Belfort' },
+            { authorName: 'Don Gabor' },
+            { authorName: 'Joseph Murphyc' },
+            { authorName: 'Lê Đỗ Quỳnh Hương' },
+            { authorName: 'Saekisan, Hanekoto' },
+            { authorName: 'Wladislaw Jachtchenko' },
+            { authorName: 'Gosho Aoyama, Takeharu Sakurai, Shima Mizuki' },
+            { authorName: 'Ryoichi Murakami' },
+            { authorName: 'Tuệ Minh' },
+            { authorName: 'Lâu Vũ Tình' },
+            { authorName: 'Dr Cherry Vũ' },
+            { authorName: 'Usborne' },
+            { authorName: 'Inamori Kazuo' },
+            { authorName: 'Kuroyanagi Tetsuko' },
+            { authorName: 'Marie Tibi, Fabien Öckto Lambert' },
+            { authorName: 'Peter Lynch, John Rothchild' },
+            { authorName: 'Hồ Lô Xanh' },
+            { authorName: 'Trịnh Công Sơn' },
+            { authorName: 'Tô Mạn' },
+            { authorName: 'Diệp Hồng Vũ' },
+            { authorName: 'Greg Dinkin, Patrick Bet-David' },
+            { authorName: 'Nhiều Tác Giả' },
+            { authorName: 'Avinash K. Dixit, Barry J. Nalebuff' },
+            { authorName: 'Adam Grant' },
+            { authorName: 'An' },
+            { authorName: 'Nhiều Tác Giả' },
+            { authorName: 'Minh Trang, Thu Nấm' },
+            { authorName: 'Jim Collins' },
+            { authorName: 'Khotudien' },
+            { authorName: 'Nhiều Tác Giả Từ Group Thìa Đầy Thơ' },
+            { authorName: 'David Grann' },
+            { authorName: 'Tạ Quốc Kế' },
+            { authorName: 'Thought Catalog' },
+            { authorName: 'Châu Sa Đáy Mắt' },
+            { authorName: 'Giản Tư Trung' },
+            { authorName: 'Dale Carnegie' },
+            { authorName: 'TS David J Lieberman' },
+            { authorName: 'Tracy Hogg, Melinda Blau' },
+            { authorName: 'Robin Sharma' },
+        ])
+    }
 }

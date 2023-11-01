@@ -5,7 +5,7 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class BookAPIController {
     public async getBookWithFilter({ params, request, response }: HttpContextContract) {
-        let { search, min_price, max_price, order_by } = request.qs()
+        let { search, min_price, max_price, author_id, lang_id, order_by } = request.qs()
         let query = Book.query()
             .preload('ccategory')
             .preload('author')
@@ -30,6 +30,16 @@ export default class BookAPIController {
                 max_price = 999999999999999
             }
             query.andWhereBetween('price', [min_price, max_price])
+        }
+
+        // author
+        if(author_id) {
+            query.andWhere('author_id', author_id)
+        }
+
+        // language
+        if(lang_id) {
+            query.andWhere('language_id', lang_id)
         }
 
         // order_by
