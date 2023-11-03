@@ -98,4 +98,9 @@ export default class BookAPIController {
 
         return response.json(result.serialize(AdminBookFilterFields))
     }
+
+    public async getBookWithIBSNCode({params, response}: HttpContextContract) {
+        const isbnCode = params.isbn_code
+        const book = await Book.findBy('isbn_code', isbnCode)
+    }
 }

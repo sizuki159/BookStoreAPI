@@ -2,6 +2,9 @@ import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
+import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
+
+
 import BookImage from './BookImage'
 import ChildCategory from './ChildCategory'
 import BookAuthor from './BookAuthor'
@@ -11,93 +14,101 @@ import BookLanguage from './BookLanguage'
 import BookProvider from './BookProvider'
 
 export default class Book extends compose(BaseModel, SoftDeletes) {
-  @column({ isPrimary: true })
-  public id: number
+    @column({ isPrimary: true })
+    public id: number
 
-  @column()
-  public isbnCode: string
+    @column()
+    public isbnCode: string
 
-  @column({columnName: 'book_name'})
-  public name: string
+    @column({ columnName: 'book_name' })
+    public name: string
 
-  @column()
-  public price: number
+    @column()
+    @slugify({
+        strategy: 'dbIncrement',
+        fields: ['name', 'isbnCode'],
+        allowUpdates: true,
+    })
+    public slug: string
 
-  @column()
-  public quantity: number
+    @column()
+    public price: number
 
-  @column()
-  public desc: string
+    @column()
+    public quantity: number
 
-  @column()
-  public weight: number
+    @column()
+    public desc: string
 
-  @column()
-  public numberOfPages: number
-  
-  @column()
-  public publishingYear: number
+    @column()
+    public weight: number
 
-  @column()
-  public ccategoryId: number
+    @column()
+    public numberOfPages: number
 
-  @column()
-  public authorId: number
+    @column()
+    public publishingYear: number
 
-  @column()
-  public publisherId: number
+    @column()
+    public ccategoryId: number
 
-  @column()
-  public providerId: number
+    @column()
+    public authorId: number
 
-  @column()
-  public languageId: number
+    @column()
+    public publisherId: number
 
-  @column()
-  public bookFormId: number
+    @column()
+    public providerId: number
 
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+    @column()
+    public languageId: number
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+    @column()
+    public bookFormId: number
 
-  //#region Relationship
-  @hasMany(() => BookImage, {
-    localKey: 'isbnCode',
-    foreignKey: 'isbnCode'
-  })
-  public images: HasMany<typeof BookImage>
+    @column.dateTime({ autoCreate: true })
+    public createdAt: DateTime
 
-  @belongsTo(() => ChildCategory, {
-    foreignKey: 'ccategoryId'
-  })
-  public ccategory: BelongsTo<typeof ChildCategory>
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    public updatedAt: DateTime
 
-  @belongsTo(() => BookAuthor, {
-    foreignKey: 'authorId'
-  })
-  public author: BelongsTo<typeof BookAuthor>
+    //#region Relationship
+    @hasMany(() => BookImage, {
+        localKey: 'isbnCode',
+        foreignKey: 'isbnCode'
+    })
+    public images: HasMany<typeof BookImage>
 
-  @belongsTo(() => BookPublisher, {
-    foreignKey: 'publisherId'
-  })
-  public publisher: BelongsTo<typeof BookPublisher>
+    @belongsTo(() => ChildCategory, {
+        foreignKey: 'ccategoryId'
+    })
+    public ccategory: BelongsTo<typeof ChildCategory>
 
-  @belongsTo(() => BookProvider, {
-    foreignKey: 'providerId'
-  })
-  public provider: BelongsTo<typeof BookProvider>
+    @belongsTo(() => BookAuthor, {
+        foreignKey: 'authorId'
+    })
+    public author: BelongsTo<typeof BookAuthor>
 
-  @belongsTo(() => BookForm, {
-    foreignKey: 'bookFormId',
-    serializeAs: 'book_form'
-  })
-  public bookForm: BelongsTo<typeof BookForm>
+    @belongsTo(() => BookPublisher, {
+        foreignKey: 'publisherId'
+    })
+    public publisher: BelongsTo<typeof BookPublisher>
 
-  @belongsTo(() => BookLanguage, {
-    foreignKey: 'languageId'
-  })
-  public language: BelongsTo<typeof BookLanguage>
-  //#endregion
+    @belongsTo(() => BookProvider, {
+        foreignKey: 'providerId'
+    })
+    public provider: BelongsTo<typeof BookProvider>
+
+    @belongsTo(() => BookForm, {
+        foreignKey: 'bookFormId',
+        serializeAs: 'book_form'
+    })
+    public bookForm: BelongsTo<typeof BookForm>
+
+    @belongsTo(() => BookLanguage, {
+        foreignKey: 'languageId'
+    })
+    public language: BelongsTo<typeof BookLanguage>
+    //#endregion
 }

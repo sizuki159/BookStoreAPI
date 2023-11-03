@@ -199,6 +199,7 @@ Route.group(() => {
     //#region Book Product
     Route.group(() => {
         Route.get('/', 'BookAPIController.getBookWithFilter')
+        Route.get('/:isbn_code', 'BookAPIController.getBookWithIBSNCode')
     }).prefix('book')
     //#endregion
 
