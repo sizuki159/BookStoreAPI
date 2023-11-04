@@ -208,6 +208,36 @@ Route.group(() => {
         Route.get('/', 'CategoryAPIController.getAllCategory')
     }).prefix('category')
     //#endregion
+
+    //#region book form
+    Route.group(() => {
+        Route.get('/', 'BookFormAPIController.getAllBookForm')
+    }).prefix('book-form')
+    //#endregion
+
+    //#region bool publisher
+    Route.group(() => {
+        Route.get('/', 'BookPublisherAPIController.getAllPublisher')
+    }).prefix('book-publisher')
+    //#endregion
+
+    //#region bool author
+    Route.group(() => {
+        Route.get('/', 'BookAuthorAPIController.getAll')
+    }).prefix('book-author')
+    //#endregion
+
+    //#region bool lang
+    Route.group(() => {
+        Route.get('/', 'BookLanguageAPIController.getAll')
+    }).prefix('book-lang')
+    //#endregion
+
+    //#region bool provider
+    Route.group(() => {
+        Route.get('/', 'BookProviderAPIController.getAll')
+    }).prefix('book-provider')
+    //#endregion
 }).prefix('api').namespace('App/Controllers/Http/API')
 
 
