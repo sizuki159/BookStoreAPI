@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import BookFilterFields from 'App/FilterFields/API/BookFilterFields'
 import AdminBookFilterFields from 'App/FilterFields/Admin/AdminBookFilterFields'
 import Book from 'App/Models/Book'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
@@ -26,11 +27,11 @@ export default class BookAPIController {
             .preload('publisher')
             .preload('provider')
             .orderBy('created_at', 'desc')
-            
+
         // Full text search
         if (search) {
             // console.log('+' + search + ' ' + '+' + search + ' ' + '+' + search)
-            if(search.length == 10 || search.length == 13) {
+            if (search.length == 10 || search.length == 13) {
                 query.andWhereRaw('MATCH(isbn_code) AGAINST(?)', [search])
                 // Phân trang
                 const { page, limit } = PageLimitUtils(request.qs())
@@ -53,32 +54,32 @@ export default class BookAPIController {
         }
 
         // author
-        if(author_id) {
+        if (author_id) {
             query.andWhere('author_id', author_id)
         }
 
         // language
-        if(lang_id) {
+        if (lang_id) {
             query.andWhere('language_id', lang_id)
         }
 
         // child category
-        if(ccategory_id) {
+        if (ccategory_id) {
             query.andWhere('ccategory_id', ccategory_id)
         }
 
         // publisher
-        if(publisher_id) {
+        if (publisher_id) {
             query.andWhere('publisher_id', publisher_id)
         }
 
         // provider
-        if(provider_id) {
+        if (provider_id) {
             query.andWhere('provider_id', provider_id)
         }
 
         // book form
-        if(book_form_id) {
+        if (book_form_id) {
             query.andWhere('book_form_id', book_form_id)
         }
 
@@ -99,8 +100,25 @@ export default class BookAPIController {
         return response.json(result.serialize(AdminBookFilterFields))
     }
 
-    public async getBookWithIBSNCode({params, response}: HttpContextContract) {
+    public async getBookByIBSNCode({ params, response }: HttpContextContract) {
         const isbnCode = params.isbn_code
         const book = await Book.findBy('isbn_code', isbnCode)
+        if (!book) {
+            return response.notFound({
+                message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
+            })
+        }
+
+        await Promise.all([
+            book.load('ccategory'),
+            book.load('author'),
+            book.load('bookForm'),
+            book.load('images'),
+            book.load('language'),
+            book.load('publisher'),
+            book.load('provider'),
+        ])
+
+        return response.json(book.serialize(BookFilterFields))
     }
 }
