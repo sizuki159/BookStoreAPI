@@ -1,38 +1,38 @@
 import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
 
-const BookFilterFields: CherryPick = {
+const APIBookFilterFields: CherryPick = {
     fields: {
-        pick: ['id', 'isbn_code', 'name', 'slug', 'price', 'quantity', 'desc', 'weight', 'number_of_pages', 'publishing_year']
+        pick: ['id', 'isbn_code','name', 'slug', 'price', 'quantity', 'desc', 'weight', 'number_of_pages', 'publishing_year']
     },
     relations: {
         'ccategory': {
             fields: {
-                pick: ['id', 'name', 'slug', 'parent_category_id']
+                pick: ['id', 'name', 'parent_category_id']
             }
         },
         'author': {
             fields: {
-                pick: ['id' ,'author_name', 'slug']
+                pick: ['id' ,'author_name']
             }
         },
         'book_form': {
             fields: {
-                pick: ['id', 'name', 'slug']
+                pick: ['id', 'name']
             }
         },
         'language': {
             fields: {
-                pick: ['id', 'language_name', 'slug']
+                pick: ['id', 'language_name']
             }
         },
         'publisher': {
             fields: {
-                pick: ['id', 'name', 'slug']
+                pick: ['id', 'name']
             }
         },
         'provider': {
             fields: {
-                pick: ['id', 'name', 'slug']
+                pick: ['id', 'name']
             }
         },
         'images': {
@@ -43,4 +43,4 @@ const BookFilterFields: CherryPick = {
     }
 }
 
-export default BookFilterFields
+export default APIBookFilterFields

@@ -3,25 +3,34 @@ import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 import ParentCategory from './ParentCategory'
+import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 
 export default class ChildCategory extends compose(BaseModel, SoftDeletes) {
-  @column({ isPrimary: true })
-  public id: number
+    @column({ isPrimary: true })
+    public id: number
 
-  @column()
-  public name: string
+    @column()
+    public name: string
 
-  @column()
-  public parentCategoryId: number
+    @column()
+    @slugify({
+        strategy: 'dbIncrement',
+        fields: ['name'],
+        allowUpdates: true,
+    })
+    public slug: string
 
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+    @column()
+    public parentCategoryId: number
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+    @column.dateTime({ autoCreate: true })
+    public createdAt: DateTime
 
-  //#region Relationship
-  @belongsTo(() => ParentCategory)
-  public parentCategory: BelongsTo<typeof ParentCategory>
-  //#endregion
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    public updatedAt: DateTime
+
+    //#region Relationship
+    @belongsTo(() => ParentCategory)
+    public parentCategory: BelongsTo<typeof ParentCategory>
+    //#endregion
 }

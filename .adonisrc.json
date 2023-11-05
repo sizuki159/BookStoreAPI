@@ -24,7 +24,8 @@
     "@adonisjs/auth",
     "adonis-lucid-soft-deletes",
     "@adonisjs/drive-s3",
-    "@adonisjs/lucid-slugify"
+    "@adonisjs/lucid-slugify",
+    "@adonisjs/route-model-binding/build/providers/RmbProvider"
   ],
   "aceProviders": [
     "@adonisjs/repl"

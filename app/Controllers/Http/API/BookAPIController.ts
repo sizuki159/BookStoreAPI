@@ -1,4 +1,6 @@
+import { bind } from '@adonisjs/route-model-binding'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import APIBookFilterFields from 'App/FilterFields/API/APIBookFilterFields'
 import BookFilterFields from 'App/FilterFields/API/BookFilterFields'
 import AdminBookFilterFields from 'App/FilterFields/Admin/AdminBookFilterFields'
 import Book from 'App/Models/Book'
@@ -95,9 +97,7 @@ export default class BookAPIController {
         const { page, limit } = PageLimitUtils(request.qs())
         const result = await query.paginate(page, limit)
 
-        console.log(query.toQuery())
-
-        return response.json(result.serialize(AdminBookFilterFields))
+        return response.json(result.serialize(BookFilterFields))
     }
 
     public async getBookByIBSNCode({ params, response }: HttpContextContract) {
@@ -119,6 +119,19 @@ export default class BookAPIController {
             book.load('provider'),
         ])
 
+        return response.json(book.serialize(BookFilterFields))
+    }
+    @bind()
+    public async getBookBySlug({response}: HttpContextContract, book: Book) {
+        await Promise.all([
+            book.load('ccategory'),
+            book.load('author'),
+            book.load('bookForm'),
+            book.load('images'),
+            book.load('language'),
+            book.load('publisher'),
+            book.load('provider'),
+        ])
         return response.json(book.serialize(BookFilterFields))
     }
 }

@@ -7,6 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('form_name').notNullable().unique()
+      table.string('slug').unique().nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

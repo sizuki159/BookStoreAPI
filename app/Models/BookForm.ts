@@ -2,6 +2,7 @@ import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
+import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 
 export default class BookForm extends compose(BaseModel, SoftDeletes) {
   @column({ isPrimary: true })
@@ -9,6 +10,14 @@ export default class BookForm extends compose(BaseModel, SoftDeletes) {
 
   @column({columnName: 'form_name'})
   public name: string
+
+  @column()
+  @slugify({
+      strategy: 'dbIncrement',
+      fields: ['name'],
+      allowUpdates: true,
+  })
+  public slug: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

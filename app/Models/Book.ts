@@ -26,7 +26,7 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     @column()
     @slugify({
         strategy: 'dbIncrement',
-        fields: ['name', 'isbnCode'],
+        fields: ['name'],
         allowUpdates: true,
     })
     public slug: string

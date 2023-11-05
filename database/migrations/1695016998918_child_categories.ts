@@ -7,6 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('name').notNullable()
+      table.string('slug').unique().nullable()
       table.integer('parent_category_id').unsigned().references('id').inTable('parent_categories').onDelete('SET NULL')
 
       /**

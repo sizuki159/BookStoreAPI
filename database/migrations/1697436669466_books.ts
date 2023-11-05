@@ -7,8 +7,8 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('isbn_code').unique().notNullable()
-      table.string('book_name').nullable()
-      table.string('slug').unique().nullable()
+      table.text('book_name').nullable()
+      table.text('slug').unique().nullable()
       table.double('price').notNullable()
       table.integer('quantity').unsigned().defaultTo(0)
       table.text('desc').nullable()
