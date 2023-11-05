@@ -67,22 +67,15 @@ export default class UserProfileController {
 
         const userAuth = await auth.use('api').authenticate()
         if ((await Hash.verify(userAuth.password!, payload.current_password))) {
-            const user = await User.findOrFail(userAuth.id) //Try catch chỗ này
+            const user = await User.findOrFail(userAuth.id)
             user.password = payload.new_password
             await user.save()
-            // await auth.logout() //Ko cần phải logout ra
             return response.ok({
                 message: 'Thay đổi mật khẩu thành công!'
             })
         } else {
-            return response.status(400).json({
-                errors: [
-                    {
-                        rule: 'minLength',
-                        field: 'current_password',
-                        message: 'Mật khẩu hiện tại không đúng',
-                    }
-                ]
+            return response.badRequest({
+                message: 'Mật khẩu hiện tại không đúng'
             })
         }
     }
