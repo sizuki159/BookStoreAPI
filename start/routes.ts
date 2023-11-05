@@ -178,7 +178,12 @@ Route.group(() => {
     }).prefix('info')
 
     Route.group(() => {
+        Route.get('', 'CartController.getMyCart')
         Route.post('', 'CartController.addProductToCart')
+        Route.put('', 'CartController.updateQuantityFromCart')
+        Route.put('/increase/:id', 'CartController.increase')
+        Route.put('/decrease/:id', 'CartController.decrease')
+        Route.delete('/:isbn_code', 'CartController.deleteBookFromCart')
     }).prefix('cart')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
