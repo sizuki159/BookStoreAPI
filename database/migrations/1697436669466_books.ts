@@ -8,7 +8,8 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('isbn_code').unique().notNullable()
       table.text('book_name').nullable()
-      table.text('slug').unique().nullable()
+      // table.string('slug', 255).unique().nullable() //Cach 1
+      table.text('slug').nullable() //Cach 2
       table.double('price').notNullable()
       table.integer('quantity').unsigned().defaultTo(0)
       table.text('desc').nullable()

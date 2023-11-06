@@ -3,11 +3,12 @@ import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 export default class extends BaseSchema {
   protected tableName = 'book_publishers'
 
-  public async up () {
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.text('publisher_name').notNullable().unique()
-      table.text('slug').unique().nullable()
+      table.string('publisher_name', 255).notNullable().unique()
+      // table.string('slug', 255).unique().nullable()
+      table.text('slug').nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
@@ -18,7 +19,7 @@ export default class extends BaseSchema {
     })
   }
 
-  public async down () {
+  public async down() {
     this.schema.dropTable(this.tableName)
   }
 }
