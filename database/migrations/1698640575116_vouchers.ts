@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.string('voucher_code').notNullable()
       table.double('discount_percentage').defaultTo(0)
       table.double('discount_max_price').nullable()
+      table.integer('count_used').defaultTo(0)
       table.integer('limited').nullable()
       table.string('desc').nullable()
       table.timestamp('start_date').nullable()

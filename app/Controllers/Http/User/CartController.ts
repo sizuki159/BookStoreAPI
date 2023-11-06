@@ -1,14 +1,21 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import VoucherFilterFields from 'App/FilterFields/API/VoucherFilterFields'
 import CartFilterFields from 'App/FilterFields/CartFilterFields'
+import UserAddressFilterFields from 'App/FilterFields/UserAddressFilterFields'
 import Book from 'App/Models/Book'
 import Cart from 'App/Models/Cart'
+import PaymentMethod from 'App/Models/PaymentMethod'
+import User from 'App/Models/User'
+import UserAddress from 'App/Models/UserAddress'
+import Voucher from 'App/Models/Voucher'
+import { DateTime } from 'luxon'
 
 export default class CartController {
     public async getMyCart({auth, response}: HttpContextContract) {
         const myCarts = await Cart.query().where('userId', auth.use('api').user!.id)
                                     .preload('book', book => {
-                                        book.preload('images', image => image.first())
+                                        book.preload('images')
                                     })
         return response.json(myCarts.map((myCart) => {
             return myCart.serialize(CartFilterFields)
@@ -165,6 +172,53 @@ export default class CartController {
                 .delete()
         return response.ok({
             message: `Đã xóa sản phẩm ra khỏi giỏ hàng thành công`
+        })
+    }
+
+    public async preOrder({auth, request, response}: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+
+        const user = await User.findOrFail(userAuth.id)
+
+        const {ids} = request.body()
+        const carts = await Cart.query().where('userId', user.id)
+                                    .andWhereIn('id', ids)
+                                    .preload('book', book => {
+                                        book.preload('images')
+                                    })
+        const productPrice = carts.reduce((sum, cart) => sum + (cart.book.price * cart.quantity), 0)
+
+
+        const paymentMethods = await PaymentMethod.query().where('status', 'active')
+    
+
+        const voucherHints = await Voucher.query()
+                                .where('status', Voucher.STATUS.ACTIVE)
+                                .andWhere('start_date', '<=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+                                .andWhere('end_date', '>=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+                                .andWhere(voucherAvailable => {
+                                    voucherAvailable.where('voucherType', Voucher.TYPE.GENERAL)
+                                                .orWhere('userId', user.id)
+                                                .orWhere('userLevelId', user.userLevelId)
+                                })
+
+        return response.json({
+            user: {
+                voucher: {
+                    hint: voucherHints.map((voucherHint) => voucherHint.serialize(VoucherFilterFields))
+                }
+            },
+            paymentMethods,
+            orders: {
+                price: {
+                    productPrice,
+                    shipFee: 29000,
+                    total: productPrice + 29000
+                },
+                carts: carts.map((cart) => {
+                    return cart.serialize(CartFilterFields)
+                })
+            }
         })
     }
 }

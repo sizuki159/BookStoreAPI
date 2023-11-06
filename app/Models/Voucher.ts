@@ -34,6 +34,9 @@ export default class Voucher extends BaseModel {
     public discountMaxPrice: number | null
 
     @column()
+    public countUsed: number
+
+    @column()
     public limited: number | null
 
     @column()

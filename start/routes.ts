@@ -184,6 +184,8 @@ Route.group(() => {
         Route.put('/increase/:id', 'CartController.increase')
         Route.put('/decrease/:id', 'CartController.decrease')
         Route.delete('/:isbn_code', 'CartController.deleteBookFromCart')
+
+        Route.post('/pre_order', 'CartController.preOrder')
     }).prefix('cart')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')

@@ -1,5 +1,4 @@
 import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
-import BookFilterFields from "./API/BookFilterFields";
 
 const CartFilterFields: CherryPick = {
     fields: {
