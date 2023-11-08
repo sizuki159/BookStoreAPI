@@ -11,4 +11,16 @@ export default class CategoryAPIController {
             return category.serialize(CategoryFilterFields)
         }))
     }
+
+    public async getPCategoryDetail({params, response}: HttpContextContract) {
+        const pcategory_id = params.pcategory_id
+        const pCategory = await ParentCategory.find(pcategory_id)
+        if(!pCategory) {
+            return response.notFound({
+                message: 'Không tìm thấy thể loại sách cha này!'
+            })
+        }
+        await pCategory.load('childrenCategory')
+        return response.json(pCategory)
+    }
 }

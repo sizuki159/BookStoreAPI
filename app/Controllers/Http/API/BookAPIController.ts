@@ -4,6 +4,7 @@ import APIBookFilterFields from 'App/FilterFields/API/APIBookFilterFields'
 import BookFilterFields from 'App/FilterFields/API/BookFilterFields'
 import AdminBookFilterFields from 'App/FilterFields/Admin/AdminBookFilterFields'
 import Book from 'App/Models/Book'
+import { isIsbnCodeValid } from 'App/Utils/CheckIsbnCodeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class BookAPIController {
@@ -32,13 +33,8 @@ export default class BookAPIController {
 
         // Full text search
         if (search) {
-            // console.log('+' + search + ' ' + '+' + search + ' ' + '+' + search)
-            if (search.length == 10 || search.length == 13) {
+            if (isIsbnCodeValid(search)) {              
                 query.andWhereRaw('MATCH(isbn_code) AGAINST(?)', [search])
-                // Phân trang
-                const { page, limit } = PageLimitUtils(request.qs())
-                const result = await query.paginate(page, limit)
-                return response.json(result.serialize(AdminBookFilterFields))
             } else {
                 query.andWhereRaw('MATCH(book_name) AGAINST(?)', [search])
             }

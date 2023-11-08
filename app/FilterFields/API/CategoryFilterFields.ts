@@ -7,7 +7,7 @@ const CategoryFilterFields: CherryPick = {
     relations: {
         'childrenCategory': {
             fields: {
-                pick: ['id', 'name']
+                pick: ['id', 'name', 'parent_category_id']
             }
         }
     }

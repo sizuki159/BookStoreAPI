@@ -7,44 +7,54 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Drive from '@ioc:Adonis/Core/Drive'
 import BookImage from 'App/Models/BookImage'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
+import { isIsbnCodeValid } from 'App/Utils/CheckIsbnCodeUtils'
 
 export default class BookController {
 
-    public async getListBook({request, response}: HttpContextContract) {
-        const {page, limit} = PageLimitUtils(request.qs())
-        const books = await Book.query()
-                        .preload('ccategory')
-                        .preload('author')
-                        .preload('bookForm')
-                        .preload('images')
-                        .preload('language')
-                        .preload('publisher')
-                        .preload('provider')
-                        .orderBy('created_at', 'desc')
-                        .paginate(page, limit)
+    public async getListBook({ request, response }: HttpContextContract) {
+        let { search } = request.qs()
+        const { page, limit } = PageLimitUtils(request.qs())
+        const query = Book.query()
+            .preload('ccategory')
+            .preload('author')
+            .preload('bookForm')
+            .preload('images')
+            .preload('language')
+            .preload('publisher')
+            .preload('provider')
+            .orderBy('created_at', 'desc')
 
-        return response.json(books.serialize(AdminBookFilterFields))
+        // Full text search
+        if (search) {
+            if (isIsbnCodeValid(search)) {
+                query.andWhereRaw('MATCH(isbn_code) AGAINST(?)', [search])
+            } else {
+                query.andWhereRaw('MATCH(book_name) AGAINST(?)', [search])
+            }
+        }
+        const result = await query.paginate(page, limit)
+        return response.json(result.serialize(AdminBookFilterFields))
     }
 
-    public async getListBookTrashed({request, response}: HttpContextContract) {
-        const {page, limit} = PageLimitUtils(request.qs())
+    public async getListBookTrashed({ request, response }: HttpContextContract) {
+        const { page, limit } = PageLimitUtils(request.qs())
         const books = await Book.onlyTrashed()
-                        .preload('ccategory')
-                        .preload('author')
-                        .preload('bookForm')
-                        .preload('images')
-                        .preload('language')
-                        .preload('publisher')
-                        .preload('provider')
-                        .orderBy('created_at', 'desc')
-                        .paginate(page, limit)
+            .preload('ccategory')
+            .preload('author')
+            .preload('bookForm')
+            .preload('images')
+            .preload('language')
+            .preload('publisher')
+            .preload('provider')
+            .orderBy('created_at', 'desc')
+            .paginate(page, limit)
         return response.json(books.serialize(AdminBookFilterFields))
     }
 
-    public async getBookDetail({params, response}: HttpContextContract) {
+    public async getBookDetail({ params, response }: HttpContextContract) {
         const isbnCode = params.isbn_code
         const book = await Book.findBy('isbn_code', isbnCode)
-        if(!book) {
+        if (!book) {
             return response.notFound({
                 message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
             })
@@ -63,7 +73,7 @@ export default class BookController {
         return response.json(book.serialize(AdminBookFilterFields))
     }
 
-    public async add({request, response}: HttpContextContract) {
+    public async add({ request, response }: HttpContextContract) {
         const payload = await request.validate(BookValidator)
         try {
             const book = await Book.create({
@@ -100,11 +110,11 @@ export default class BookController {
         }
     }
 
-    public async addImage({params, request, response}: HttpContextContract) {
+    public async addImage({ params, request, response }: HttpContextContract) {
         const isbnCode = params.isbn_code
 
         const book = await Book.findBy('isbn_code', isbnCode)
-        if(!book) {
+        if (!book) {
             return response.notFound({
                 message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
             })
@@ -116,9 +126,9 @@ export default class BookController {
         })
 
         try {
-            for(let image of images) {
+            for (let image of images) {
                 const fileName = `${book.isbnCode}_${image.clientName}`
-                await image.moveToDisk(book.isbnCode, {name: fileName}, 's3')
+                await image.moveToDisk(book.isbnCode, { name: fileName }, 's3')
                 await book.related('images').create({
                     sourceLocation: image.fileName,
                     imageSource: image.filePath,
@@ -137,18 +147,18 @@ export default class BookController {
         })
     }
 
-    public async deleteImage({params, response}: HttpContextContract) {
+    public async deleteImage({ params, response }: HttpContextContract) {
 
         try {
             const bookImageId = params.book_image_id
-    
+
             const bookImage = await BookImage.find(bookImageId)
-            if(!bookImage) {
+            if (!bookImage) {
                 return response.notFound({
                     message: 'Không tìm thấy ảnh này trong dữ liệu.'
                 })
             }
-            
+
             await bookImage.delete()
             await Drive.use('s3').delete(bookImage.imageSource)
             return response.ok({
@@ -161,14 +171,14 @@ export default class BookController {
         }
     }
 
-    public async edit({request, response}: HttpContextContract) {
+    public async edit({ request, response }: HttpContextContract) {
         const newBookSchema = schema.create({
             "isbn_code": schema.string([rules.exists({
                 table: 'books',
                 column: 'isbn_code'
             })]),
             "ccategory_id": schema.number([
-                rules.exists({table: 'child_categories', column: 'id'})
+                rules.exists({ table: 'child_categories', column: 'id' })
             ]),
             "name": schema.string(),
             "price": schema.number([
@@ -186,19 +196,19 @@ export default class BookController {
             ]),
             "publishing_year": schema.number.optional(),
             "author_id": schema.number.optional([
-                rules.exists({table: 'book_authors', column: 'id'})
+                rules.exists({ table: 'book_authors', column: 'id' })
             ]),
             "publisher_id": schema.number.optional([
-                rules.exists({table: 'book_publishers', column: 'id'})
+                rules.exists({ table: 'book_publishers', column: 'id' })
             ]),
             "language_id": schema.number.optional([
-                rules.exists({table: 'book_languages', column: 'id'})
+                rules.exists({ table: 'book_languages', column: 'id' })
             ]),
             "book_form_id": schema.number.optional([
-                rules.exists({table: 'book_forms', column: 'id'})
+                rules.exists({ table: 'book_forms', column: 'id' })
             ]),
             "provider_id": schema.number.optional([
-                rules.exists({table: 'book_providers', column: 'id'})
+                rules.exists({ table: 'book_providers', column: 'id' })
             ]),
         })
 
@@ -234,10 +244,10 @@ export default class BookController {
         })
     }
 
-    public async delete({params, response}: HttpContextContract) {
+    public async delete({ params, response }: HttpContextContract) {
         const isbnCode = params.isbn_code
         const book = await Book.findBy('isbn_code', isbnCode)
-        if(book) {
+        if (book) {
             await book.delete()
             return response.ok({
                 message: `Đã xóa sách <${book.name}> vào thùng rác thành công.`
@@ -248,10 +258,10 @@ export default class BookController {
         })
     }
 
-    public async destroy({params, response}: HttpContextContract) {
+    public async destroy({ params, response }: HttpContextContract) {
         const isbnCode = params.isbn_code
         const book = await Book.onlyTrashed().where('isbn_code', isbnCode).first()
-        if(book) {
+        if (book) {
             await book.forceDelete()
             return response.ok({
                 message: `Đã xóa sách <${book.name}> vĩnh viễn thành công.`
@@ -262,10 +272,10 @@ export default class BookController {
         })
     }
 
-    public async restore({params, response}: HttpContextContract) {
+    public async restore({ params, response }: HttpContextContract) {
         const isbnCode = params.isbn_code
         const book = await Book.onlyTrashed().where('isbn_code', isbnCode).first()
-        if(book) {
+        if (book) {
             await book.restore()
             return response.ok({
                 message: `Đã khôi phục sách <${book.name}> thành công.`
