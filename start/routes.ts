@@ -214,6 +214,7 @@ Route.group(() => {
     //#region category
     Route.group(() => {
         Route.get('/', 'CategoryAPIController.getAllCategory')
+        Route.get('/detail/:pcategory_id', 'CategoryAPIController.getPCategoryDetail')
     }).prefix('category')
     //#endregion
 
