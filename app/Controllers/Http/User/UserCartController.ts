@@ -10,8 +10,9 @@ import User from 'App/Models/User'
 import UserAddress from 'App/Models/UserAddress'
 import Voucher from 'App/Models/Voucher'
 import { DateTime } from 'luxon'
+import { types } from '@ioc:Adonis/Core/Helpers'
 
-export default class CartController {
+export default class UserCartController {
     public async getMyCart({auth, response}: HttpContextContract) {
         const myCarts = await Cart.query().where('userId', auth.use('api').user!.id)
                                     .preload('book', book => {
@@ -50,7 +51,11 @@ export default class CartController {
         const userId = auth.use('api').user!.id
         const cart = await Cart.query().where('userId', userId).andWhere('isbnCode', payload.isbn_code).first()
         if(cart) {
-            cart.quantity += payload.quantity
+            if(cart.quantity + payload.quantity > book.quantity) {
+                cart.quantity = book.quantity
+            } else {
+                cart.quantity += payload.quantity
+            }
             await cart.save()
         } else {
             await Cart.create({
@@ -180,7 +185,14 @@ export default class CartController {
 
         const user = await User.findOrFail(userAuth.id)
 
-        const {ids} = request.body()
+        const {ids, voucherCode} = request.body()
+
+        if(!types.isArray(ids)) {
+            return response.badRequest({
+                message: 'Yêu cầu không hợp lệ'
+            })
+        }
+
         const carts = await Cart.query().where('userId', user.id)
                                     .andWhereIn('id', ids)
                                     .preload('book', book => {
@@ -192,7 +204,7 @@ export default class CartController {
         const paymentMethods = await PaymentMethod.query().where('status', 'active')
     
 
-        const voucherHints = await Voucher.query()
+        const voucherAvailables = await Voucher.query()
                                 .where('status', Voucher.STATUS.ACTIVE)
                                 .andWhere('start_date', '<=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
                                 .andWhere('end_date', '>=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
@@ -202,19 +214,37 @@ export default class CartController {
                                                 .orWhere('userLevelId', user.userLevelId)
                                 })
 
+        // Phí ship tạm thời mặc định 29k
+        const price = {
+            productPrice,
+            shipFee: 29000,
+            discountPrice: 0,
+            total: productPrice + 29000
+        }
+        
+        if(voucherCode) {
+            for(const voucherAvailable of voucherAvailables) {
+                if(voucherAvailable.voucherCode === voucherCode) {
+                    price.discountPrice = price.total * (voucherAvailable.discountPercentage / 100 )
+                    if(voucherAvailable.discountMaxPrice) {
+                        if(price.discountPrice > voucherAvailable.discountMaxPrice) {
+                            price.discountPrice = voucherAvailable.discountMaxPrice
+                        }
+                    }
+                    price.total -= price.discountPrice
+                }
+            }
+        }
+                              
         return response.json({
             user: {
                 voucher: {
-                    hint: voucherHints.map((voucherHint) => voucherHint.serialize(VoucherFilterFields))
+                    hints: voucherAvailables.map((voucherHint) => voucherHint.serialize(VoucherFilterFields))
                 }
             },
             paymentMethods,
             orders: {
-                price: {
-                    productPrice,
-                    shipFee: 29000,
-                    total: productPrice + 29000
-                },
+                price,
                 carts: carts.map((cart) => {
                     return cart.serialize(CartFilterFields)
                 })

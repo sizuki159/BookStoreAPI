@@ -178,15 +178,20 @@ Route.group(() => {
     }).prefix('info')
 
     Route.group(() => {
-        Route.get('', 'CartController.getMyCart')
-        Route.post('', 'CartController.addProductToCart')
-        Route.put('', 'CartController.updateQuantityFromCart')
-        Route.put('/increase/:id', 'CartController.increase')
-        Route.put('/decrease/:id', 'CartController.decrease')
-        Route.delete('/:isbn_code', 'CartController.deleteBookFromCart')
+        Route.get('', 'UserCartController.getMyCart')
+        Route.post('', 'UserCartController.addProductToCart')
+        Route.put('', 'UserCartController.updateQuantityFromCart')
+        Route.put('/increase/:id', 'UserCartController.increase')
+        Route.put('/decrease/:id', 'UserCartController.decrease')
+        Route.delete('/:isbn_code', 'UserCartController.deleteBookFromCart')
 
-        Route.post('/pre_order', 'CartController.preOrder')
+        Route.post('/pre_order', 'UserCartController.preOrder')
     }).prefix('cart')
+
+
+    Route.group(() => {
+        Route.post('/create', 'UserOrderController.createOrder')
+    }).prefix('order')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
 

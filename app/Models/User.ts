@@ -12,6 +12,7 @@ import UserAddress from './UserAddress'
 import UserProfile from './UserProfile'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 import Cart from './Cart'
+import Order from './Order'
 
 
 export default class User extends compose(BaseModel, SoftDeletes) {
@@ -74,6 +75,9 @@ export default class User extends compose(BaseModel, SoftDeletes) {
 
   @hasMany(() => Cart)
   public carts: HasMany<typeof Cart>
+
+  @hasMany(() => Order)
+  public orders: HasMany<typeof Order>
 
   @hasOne(() => UserProfile)
   public profile: HasOne<typeof UserProfile>
