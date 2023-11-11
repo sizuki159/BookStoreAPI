@@ -198,6 +198,13 @@ export default class UserCartController {
                                     .preload('book', book => {
                                         book.preload('images')
                                     })
+
+        if(carts.length === 0) {
+            return response.badRequest({
+                message: 'Yêu cầu không hợp lệ'
+            })
+        }
+
         const productPrice = carts.reduce((sum, cart) => sum + (cart.book.price * cart.quantity), 0)
 
 
