@@ -257,8 +257,10 @@ Route.group(() => {
 
 
     Route.group(() => {
-        
-    }).prefix('payment')
+        Route.group(() => {
+            Route.get('success', 'PaypalController.success')
+        }).prefix('paypal')
+    }).prefix('payment').namespace('App/Controllers/Http/Payment')
 
 }).prefix('api').namespace('App/Controllers/Http/API')
 

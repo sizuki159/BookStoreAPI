@@ -19,7 +19,7 @@ export default class Order extends BaseModel {
     public finalPrice: number
 
     @column()
-    public discount: number
+    public discountPrice: number
 
     @column()
     public voucher: string

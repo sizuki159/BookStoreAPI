@@ -5,6 +5,18 @@ export default class OrderItem extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
+  @column()
+  public orderId: number
+
+  @column()
+  public isbnCode: string
+
+  @column()
+  public quantity: number
+
+  @column()
+  public pricePerUnit: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

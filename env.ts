@@ -26,4 +26,7 @@ export default Env.rules({
     S3_BUCKET: Env.schema.string(),
     S3_REGION: Env.schema.string(),
     S3_ENDPOINT: Env.schema.string.optional(),
+	PAYPAL_MODE: Env.schema.string(),
+	PAYPAL_CLIENT_KEY: Env.schema.string(),
+	PAYPAL_SECRET_KEY: Env.schema.string(),
 })

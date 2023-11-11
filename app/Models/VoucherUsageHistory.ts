@@ -5,6 +5,15 @@ export default class VoucherUsageHistory extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
+  @column()
+  public userId: number
+
+  @column()
+  public voucherId: number
+
+  @column()
+  public orderId: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

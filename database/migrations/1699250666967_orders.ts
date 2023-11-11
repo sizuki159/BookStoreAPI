@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.double('product_price')
       table.double('fee_price')
       table.double('final_price')
-      table.double('discount').nullable()
+      table.double('discount_price').nullable()
       table.string('voucher').nullable()
       table.string('payment_method').references('key').inTable('payment_methods').onDelete('SET NULL')
       table.enu('status', ['unpaid', 'paid', 'cancel', 'success']).defaultTo('unpaid')
