@@ -35,6 +35,9 @@ export default class AddVoucherValidator {
                 table: 'vouchers'
             })
         ]),
+        'require_order_min_price': schema.number([
+            rules.unsigned()
+        ]),
         'discount_percentage': schema.number([
             rules.range(0, 100)
         ]),
@@ -85,6 +88,9 @@ export default class AddVoucherValidator {
 
         'voucher_code.required': 'Thiếu mã voucher',
         'voucher_code.unique': 'Mã này đã tồn tại trong dữ liệu',
+
+        'require_order_min_price.required': 'Thiếu yêu cầu tối thiểu đơn hàng bao nhiêu tiền',
+        'require_order_min_price.unsigned': 'Số tiền tối thiểu của đơn hàng không là số âm',
 
         'discount_percentage.required': 'Thiếu phần trăm giảm giá',
         'discount_percentage.range': 'Phần trăm phải từ 0% -> 100%',

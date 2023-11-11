@@ -20,6 +20,8 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
+Route.get('test', 'TestsController.test')
+
 //#region Auth
 Route.group(() => {
     Route.post('register', 'AuthController.register')
@@ -252,6 +254,12 @@ Route.group(() => {
         Route.get('/', 'BookProviderAPIController.getAll')
     }).prefix('book-provider')
     //#endregion
+
+
+    Route.group(() => {
+        
+    }).prefix('payment')
+
 }).prefix('api').namespace('App/Controllers/Http/API')
 
 

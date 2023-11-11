@@ -28,6 +28,9 @@ export default class Voucher extends BaseModel {
     public voucherCode: string
 
     @column()
+    public requireOrderMinPrice: number
+
+    @column()
     public discountPercentage: number
 
     @column()

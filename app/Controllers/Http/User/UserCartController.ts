@@ -215,6 +215,7 @@ export default class UserCartController {
                                 .where('status', Voucher.STATUS.ACTIVE)
                                 .andWhere('start_date', '<=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
                                 .andWhere('end_date', '>=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+                                .andWhere('require_order_min_price', '<=', productPrice)
                                 .andWhere(voucherAvailable => {
                                     voucherAvailable.where('voucherType', Voucher.TYPE.GENERAL)
                                                 .orWhere('userId', user.id)
