@@ -11,9 +11,6 @@ export default class PaymentMethod extends BaseModel {
   @column()
   public name: string
 
-  @column()
-  public svg: string
-
   @column({serializeAs: null})
   public status: string
 
