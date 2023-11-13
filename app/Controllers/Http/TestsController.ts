@@ -22,20 +22,12 @@ export default class TestsController {
                 "cancel_url": "http://localhost:3333/cancel"
             },
             "transactions": [{
-                "item_list": {
-                    "items": [{
-                        "name": "Book",
-                        "sku": "001",
-                        "price": "25.00",
-                        "currency": "USD",
-                        "quantity": 1,
-                    }]
-                },
                 "amount": {
                     "currency": "USD",
-                    "total": "25.00"
+                    "total": "60"
+
                 },
-                "description": "Hat for the best team ever"
+                "description": "Con cặc"
             }]
         };
 
@@ -45,7 +37,7 @@ export default class TestsController {
                     if (err) {
                         reject(err);
                     } else {
-                        if(payment.links) {
+                        if (payment.links) {
                             for (let i = 0; i < payment.links.length; i++) {
                                 if (payment.links[i].rel === 'approval_url') {
                                     resolve(payment.links[i].href);

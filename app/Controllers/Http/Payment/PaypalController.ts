@@ -1,62 +1,78 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import paypal from 'paypal-rest-sdk'
-import Env from '@ioc:Adonis/Core/Env'
-import Cart from 'App/Models/Cart';
+import paypal from 'App/Services/Paypal';
+import PaypalReceipt from 'App/Models/PaypalReceipt';
+import Invoice from 'App/Models/Invoice';
+import PaymentMethod from 'App/Models/PaymentMethod';
+import Order from 'App/Models/Order';
+import Setting from 'App/Models/Setting';
+import Settings from 'App/Utils/SettingUtils';
+import SettingUtils from 'App/Utils/SettingUtils';
 
 export default class PaypalController {
-
-    public static create() {
-        paypal.configure({
-            'mode': Env.get('PAYPAL_MODE'),
-            'client_id': Env.get('PAYPAL_CLIENT_KEY'),
-            'client_secret': Env.get('PAYPAL_SECRET_KEY')
-        });
-
-        const create_payment_json: paypal.Payment = {
-            "intent": "sale",
-            "payer": {
-                "payment_method": "paypal"
-            },
-            "redirect_urls": {
-                "return_url": "http://localhost:3333/payment/paypal/success",
-                "cancel_url": "http://localhost:3333/payment/paypal/cancel"
-            },
-            "transactions": [{
-                "item_list": {
-                    "items": [
-                        {
-                            "name": "Book",
-                            "sku": "001",
-                            "price": "25.00",
-                            "currency": "USD",
-                            "quantity": 1,
-                        }
-                    ]
-                },
-                "amount": {
-                    "currency": "USD",
-                    "total": "25.00"
-                },
-                "description": "Hat for the best team ever"
-            }]
-        };
-    }
 
     public async success({ request, response }: HttpContextContract) {
         const { paymentId, token, PayerID } = request.qs()
 
         if (!paymentId || !token || !PayerID) {
-            return response.badRequest({
-                message: 'Yêu cầu không hợp lệ'
-            })
+            return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
+        }
+
+        const paypalReceipt = await PaypalReceipt.findBy('payment_id', paymentId)
+        if (!paypalReceipt) {
+            return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
         }
 
         const execute_payment_json: paypal.payment.ExecuteRequest = {
             payer_id: PayerID
         };
 
-        paypal.payment.execute(paymentId, execute_payment_json, () => {
+        const invoice = await Invoice.query()
+            .where('payment_method', PaymentMethod.METHOD.PAYPAL)
+            .andWhere('paypal_payment_id', paypalReceipt.paymentId)
+            .andWhere('status', Invoice.STATUS.UNPAID)
+            .first()
 
-        })
+        if(!invoice) {
+            return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
+        }
+
+
+        const checkPaymentSync = (paymentId: string, execute_payment_json: paypal.payment.ExecuteRequest): Promise<paypal.PaymentResponse> => {
+            return new Promise((resolve, reject) => {
+                paypal.payment.execute(paymentId, execute_payment_json, (err, payment) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(payment)
+                    }
+                })
+            })
+        }
+        try {
+            const paymentResponse = await checkPaymentSync(paymentId, execute_payment_json)
+            if (paymentResponse.state && paymentResponse.state === 'approved') {
+
+                paypalReceipt.merge({
+                    token,
+                    payerId: PayerID
+                })
+                await paypalReceipt.save()
+
+                invoice.status = Invoice.STATUS.PAID
+                await invoice.save()
+
+                await invoice.related('order').query().update('status', Order.STATUS.PAID)
+
+                return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
+
+            }
+
+        } catch (e) {
+            return e
+        }
+    }
+
+    public async cancel({ request, response }: HttpContextContract) {
+        return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
     }
 }

@@ -175,6 +175,7 @@ export default class UserCartController {
                 .where('userId', auth.use('api').user!.id)
                 .andWhere('isbn_code', params.isbn_code)
                 .delete()
+
         return response.ok({
             message: `Đã xóa sản phẩm ra khỏi giỏ hàng thành công`
         })

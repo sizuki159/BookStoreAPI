@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import Order from 'App/Models/Order'
 
 export default class extends BaseSchema {
   protected tableName = 'orders'
@@ -13,7 +14,7 @@ export default class extends BaseSchema {
       table.double('discount_price').nullable()
       table.string('voucher').nullable()
       table.string('payment_method').references('key').inTable('payment_methods').onDelete('SET NULL')
-      table.enu('status', ['unpaid', 'paid', 'cancel', 'success']).defaultTo('unpaid')
+      table.enu('status', Object.values(Order.STATUS)).defaultTo(Order.STATUS.UNPAID)
       table.text('customer_note').nullable()
       table.string('logs').nullable()
 

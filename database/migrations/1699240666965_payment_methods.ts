@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import PaymentMethod from 'App/Models/PaymentMethod'
 
 export default class extends BaseSchema {
   protected tableName = 'payment_methods'
@@ -6,7 +7,7 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('key').unique().notNullable()
+      table.string('key').notNullable().unique()
       table.string('name')
       table.enu('status', ['active', 'inactive']).defaultTo('active')
 
@@ -15,6 +16,23 @@ export default class extends BaseSchema {
        */
       table.timestamp('created_at', { useTz: true }).nullable()
       table.timestamp('updated_at', { useTz: true }).nullable()
+    })
+
+    this.defer(async (db) => {
+      await db.table(this.tableName).multiInsert([
+        {
+          key: PaymentMethod.METHOD.COD,
+          name: 'Thanh toán bằng tiền mặt khi nhận hàng',
+        },
+        {
+          key: PaymentMethod.METHOD.NGANLUONG,
+          name: 'Ví Ngân Lượng',
+        },
+        {
+          key: PaymentMethod.METHOD.PAYPAL,
+          name: 'Ví điện tử Paypal',
+        }
+      ])
     })
   }
 

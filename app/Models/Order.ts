@@ -3,6 +3,14 @@ import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 
 export default class Order extends BaseModel {
+
+    public static STATUS = {
+        UNPAID: 'unpaid',
+        PAID: 'paid',
+        CANCEL: 'cancel',
+        SUCCESS: 'success'
+    }
+
     @column({ isPrimary: true, columnName: 'order_id' })
     public id: number
 

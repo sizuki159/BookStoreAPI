@@ -2,14 +2,15 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Cart from 'App/Models/Cart'
 import User from 'App/Models/User'
 import { types } from '@ioc:Adonis/Core/Helpers'
-import Order from 'App/Models/Order'
 import UserAddress from 'App/Models/UserAddress'
 import Voucher from 'App/Models/Voucher'
 import { DateTime } from 'luxon'
 import VoucherUsageHistory from 'App/Models/VoucherUsageHistory'
 import PaymentMethod from 'App/Models/PaymentMethod'
-import PaypalController from '../Payment/PaypalController'
 import OrderItem from 'App/Models/OrderItem'
+import Invoice from 'App/Models/Invoice'
+import IOrderResponse from 'App/Interfaces/IOrderResponse'
+import PaypalService from 'App/Services/PaypalService'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -115,7 +116,7 @@ export default class UserOrderController {
             })
             await order.refresh()
 
-            if(voucherCode) {
+            if (voucherCode) {
                 await VoucherUsageHistory.query()
                     .update('order_id', order.id)
                     .where('user_id', user.id)
@@ -132,20 +133,41 @@ export default class UserOrderController {
                 await cart.delete()
             }
 
-        } catch {
+            const responseBody: IOrderResponse = {
+                message: 'Đã đặt hàng thành công',
+                payment: {
+                    method: paymentMethod,
+                    url: null
+                }
+            }
+
+            // Tiếp tục với tạo hóa đơn
+            if (paymentMethod === PaymentMethod.METHOD.COD) {
+                return response.ok(responseBody)
+            } else if (paymentMethod === PaymentMethod.METHOD.PAYPAL) {
+                const paymentURL = await PaypalService.create(order)
+                if (paymentURL) {
+                    for (const cart of carts) {
+                        await cart.forceDelete()
+                    }
+                    responseBody.payment.method = paymentMethod
+                    responseBody.payment.url = paymentURL
+                    return response.ok(responseBody)
+
+                } else {
+                    for (const cart of carts) {
+                        await cart.restore()
+                    }
+                    return response.serviceUnavailable({
+                        message: 'Hệ thống lỗi thanh toán với Paypal'
+                    })
+                }
+            }
+
+        } catch (e) {
             return response.serviceUnavailable({
                 message: 'Có lỗi hệ thống xảy ra.'
             })
-        }
-
-        // Tiếp tục với tạo hóa đơn
-        if (paymentMethod === 'cod') {
-            return response.ok({
-                message: 'Đã đặt hàng thành công',
-                payment: null
-            })
-        } else if (paymentMethod === 'paypal') {
-            PaypalController.create()
         }
 
     }

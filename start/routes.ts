@@ -259,6 +259,7 @@ Route.group(() => {
     Route.group(() => {
         Route.group(() => {
             Route.get('success', 'PaypalController.success')
+            Route.get('cancel', 'PaypalController.cancel')
         }).prefix('paypal')
     }).prefix('payment').namespace('App/Controllers/Http/Payment')
 
