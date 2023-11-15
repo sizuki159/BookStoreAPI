@@ -34,7 +34,8 @@
       "adonis-lucid-soft-deletes",
       "@adonisjs/drive-s3",
       "@adonisjs/lucid-slugify",
-      "@adonisjs/route-model-binding/build/adonis-typings"
+      "@adonisjs/route-model-binding/build/adonis-typings",
+      "@adonisjs/mail"
     ]
   }
 }

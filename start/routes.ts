@@ -27,6 +27,12 @@ Route.group(() => {
     Route.post('register', 'AuthController.register')
     Route.post('login', 'AuthController.login')
     Route.post('refresh_token', 'AuthController.refreshToken')
+
+    // Email
+    Route.get('/verify/email/:token', 'VerifyEmailController.verify')
+    Route.post('/verify/email/reset_password', 'VerifyEmailController.verifyResetPassword')
+
+    Route.post('request-recovery', 'AuthController.requestRecovery')
 }).prefix('auth')
 //#endregion
 

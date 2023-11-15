@@ -5,11 +5,13 @@ import RegisterValidator from 'App/Validators/RegisterValidator'
 import ApiToken from 'App/Models/ApiToken'
 import RefreshApiToken from 'App/Models/RefreshApiToken'
 import { DateTime } from 'luxon';
-import UserFilterFields from 'App/FilterFields/UserFilterFields'
+import UserFilterFields from 'App/FilterFields/User/UserFilterFields'
+import Token from 'App/Models/Token'
+import EmailValidator from 'App/Validators/EmailValidator'
 
 export default class AuthController {
-    public async register ({auth, request, response}: HttpContextContract) {
-        const {email, password} = await request.validate(RegisterValidator)
+    public async register({ auth, request, response }: HttpContextContract) {
+        const { email, password } = await request.validate(RegisterValidator)
 
         const user = await User.create({
             email,
@@ -32,7 +34,7 @@ export default class AuthController {
         // const refreshToken = await User.generateRefreshToken(token.tokenHash)
         // await user.load('userLevel')
         // await user.load('userRole')
-        
+
         // return response.created({
         //     "jwtToken": token.token,
         //     "refreshToken": refreshToken,
@@ -40,41 +42,41 @@ export default class AuthController {
         // })
     }
 
-    public async login({auth, request, response}: HttpContextContract) {
-        const {email, password} = request.body()
+    public async login({ auth, request, response }: HttpContextContract) {
+        const { email, password } = request.body()
 
         try {
-            const token = await auth.use('api').attempt(email, password, {expiresIn: '7d'})
+            const token = await auth.use('api').attempt(email, password, { expiresIn: '7d' })
             const user = await User.findByOrFail('email', email)
 
             const apiToken = await ApiToken.findBy('token', token.tokenHash)
-            if(apiToken) {
+            if (apiToken) {
                 apiToken.jwt = token.token
                 await apiToken.save()
             }
 
             const refreshToken = await User.generateRefreshToken(token.tokenHash)
             await Promise.all([user.load('profile'), user.load('userLevel'), user.load('userRole')])
-            
+
             return {
                 "jwtToken": token.token,
                 "refreshToken": refreshToken,
                 "userInfo": user.serialize(UserFilterFields)
             }
-        } catch(ex) {
+        } catch (ex) {
             return response.badRequest({
                 message: 'Đăng nhập thất bại!'
             })
         }
     }
 
-    public async refreshToken({auth, request, response}: HttpContextContract) {
-        const {jwtToken, refreshToken} = request.body()
+    public async refreshToken({ auth, request, response }: HttpContextContract) {
+        const { jwtToken, refreshToken } = request.body()
 
         try {
             // Kiểm tra xem jwt còn hợp lệ không
             const apiToken = await ApiToken.findBy('jwt', jwtToken)
-            if(!apiToken) {
+            if (!apiToken) {
                 return response.ok({
                     "success": false,
                     "message": "JWT is not valid",
@@ -83,7 +85,7 @@ export default class AuthController {
             }
 
             // Jwt chưa hết hạn
-            if(apiToken.expiresAt.toMillis() > DateTime.now().toMillis()) {
+            if (apiToken.expiresAt.toMillis() > DateTime.now().toMillis()) {
                 return response.ok({
                     "success": false,
                     "message": "JWT has not yet expired",
@@ -93,7 +95,7 @@ export default class AuthController {
 
             // Kiểm tra refresh token
             const refreshApiToken = await RefreshApiToken.findBy('refresh_token', refreshToken)
-            if(!refreshApiToken) {
+            if (!refreshApiToken) {
                 return response.ok({
                     "success": false,
                     "message": "Refresh token does not exist",
@@ -102,7 +104,7 @@ export default class AuthController {
             }
 
             // Đã sử dụng
-            if(refreshApiToken.isUsed) {
+            if (refreshApiToken.isUsed) {
                 return response.ok({
                     "success": false,
                     "message": "Refresh token has been used",
@@ -111,7 +113,7 @@ export default class AuthController {
             }
 
             // Đã thu hồi
-            if(refreshApiToken.isRevoked) {
+            if (refreshApiToken.isRevoked) {
                 return response.ok({
                     "success": false,
                     "message": "Refresh token has been revoked",
@@ -120,7 +122,7 @@ export default class AuthController {
             }
 
             await refreshApiToken.load('apiToken')
-            if(refreshApiToken.apiToken.jwt !== jwtToken) {
+            if (refreshApiToken.apiToken.jwt !== jwtToken) {
                 return response.ok({
                     "success": false,
                     "message": "Token does not match",
@@ -128,13 +130,13 @@ export default class AuthController {
                 })
             }
 
-            const tokenReAuth = await auth.use('api').loginViaId(refreshApiToken.apiToken.userId, {expiresIn: '7d'})
+            const tokenReAuth = await auth.use('api').loginViaId(refreshApiToken.apiToken.userId, { expiresIn: '7d' })
 
             refreshApiToken.isUsed = true
             await refreshApiToken.save()
 
             const apiTokenNew = await ApiToken.findBy('token', tokenReAuth.tokenHash)
-            if(apiTokenNew) {
+            if (apiTokenNew) {
                 apiTokenNew.jwt = tokenReAuth.token
                 await apiTokenNew.save()
             }
@@ -156,6 +158,37 @@ export default class AuthController {
                 "data": null
             }
         }
+    }
+
+    // [POST]
+    public async requestRecovery({ request, response }: HttpContextContract) {
+        const { email } = await request.validate(EmailValidator)
+        const user = await User.findBy('email', email)
+        if (!user) {
+            return response.notFound({
+                message: 'Không tìm thấy tài khoản này!',
+                data: null,
+            })
+        }
+
+        // Mail chỉ gửi lại cách nhau 15 phút
+        const record = await Token.query()
+            .where('user_id', user.id)
+            .where('type', 'PASSWORD_RESET')
+            .where('created_at', '>=', DateTime.now().minus({ minutes: 15 }).toFormat('yyyy-MM-dd HH:mm:ss'))
+            .first()
+        if (!record) {
+            await user.sendResetPasswordEmail()
+            return response.json({
+                message: 'Thành công, vui lòng kiểm tra email',
+                data: null,
+            })
+        }
+
+        return response.tooManyRequests({
+            message: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 15 phút.',
+            data: null,
+        })
     }
 
 }
