@@ -69,13 +69,20 @@ export default class Voucher extends BaseModel {
 
     @beforeCreate()
     public static async beforeCreate(voucher: Voucher) {
-        if(voucher.voucherType === this.TYPE.PERSONALIZED) {
-            voucher.userLevelId = null
-        } else if (voucher.voucherType === this.TYPE.MEMBER_EXCLUSIVE) {
-            voucher.userId = null
-        } else {
-            voucher.userId = null
-            voucher.userLevelId = null
+        switch (voucher.voucherType) {
+            case this.TYPE.PERSONALIZED: {
+                voucher.userLevelId = null
+                break
+            }
+            case this.TYPE.MEMBER_EXCLUSIVE: {
+                voucher.userId = null
+                break
+            }
+            case this.TYPE.GENERAL: {
+                voucher.userId = null
+                voucher.userLevelId = null
+                break
+            }
         }
     }
 }
