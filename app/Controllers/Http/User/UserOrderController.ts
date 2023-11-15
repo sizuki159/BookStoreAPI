@@ -8,7 +8,6 @@ import { DateTime } from 'luxon'
 import VoucherUsageHistory from 'App/Models/VoucherUsageHistory'
 import PaymentMethod from 'App/Models/PaymentMethod'
 import OrderItem from 'App/Models/OrderItem'
-import Invoice from 'App/Models/Invoice'
 import IOrderResponse from 'App/Interfaces/IOrderResponse'
 import PaypalService from 'App/Services/PaypalService'
 
@@ -19,18 +18,21 @@ export default class UserOrderController {
 
         const { ids, voucherCode, customerNote, userAddressId, paymentMethod } = request.body()
 
+        // Mảng hợp lệ
         if (!types.isArray(ids)) {
             return response.badRequest({
                 message: 'Yêu cầu không hợp lệ'
             })
         }
 
+        // Phương thức thanh toán hợp lệ
         if (!paymentMethod || !await PaymentMethod.findBy('key', paymentMethod)) {
             return response.badRequest({
                 message: 'Phương thức thanh toán không hợp lệ'
             })
         }
 
+        // Kiểm tra địa chỉ người dùng
         const userAddress = await UserAddress.query()
             .where('id', userAddressId)
             .andWhere('user_id', user.id).first()
@@ -40,6 +42,7 @@ export default class UserOrderController {
             })
         }
 
+        // Lấy danh sách carts
         const carts = await Cart.query().where('userId', user.id)
             .andWhereIn('id', ids)
             .preload('book')
@@ -51,6 +54,7 @@ export default class UserOrderController {
             })
         }
 
+        // Tổng tiền sản phẩm
         const productPrice = carts.reduce((sum, cart) => sum + (cart.book.price * cart.quantity), 0)
 
         // Phí ship tạm thời mặc định 29k
@@ -61,6 +65,7 @@ export default class UserOrderController {
             total: productPrice + 29000
         }
 
+        // Xử lý voucher nếu khách sử dụng
         let voucherId
         if (voucherCode) {
             const voucher = await Voucher.query()
@@ -104,6 +109,8 @@ export default class UserOrderController {
             price.total -= price.discountPrice
         }
 
+
+        // Tạo Order đơn hàng
         try {
             const order = await user.related('orders').create({
                 productPrice: productPrice,
@@ -143,10 +150,30 @@ export default class UserOrderController {
 
             // Tiếp tục với tạo hóa đơn
             if (paymentMethod === PaymentMethod.METHOD.COD) {
+
+                // Trừ số lượng hàng hóa
+                try {
+                    for (const cart of carts) {
+                        cart.book.quantity -= cart.quantity
+                        await cart.book.save()
+                    }
+                } catch {
+                }
+
                 return response.ok(responseBody)
             } else if (paymentMethod === PaymentMethod.METHOD.PAYPAL) {
                 const paymentURL = await PaypalService.create(order)
                 if (paymentURL) {
+
+                    // Trừ số lượng hàng hóa
+                    try {
+                        for (const cart of carts) {
+                            cart.book.quantity -= cart.quantity
+                            await cart.book.save()
+                        }
+                    } catch {
+                    }
+
                     for (const cart of carts) {
                         await cart.forceDelete()
                     }
@@ -162,6 +189,16 @@ export default class UserOrderController {
                         message: 'Hệ thống lỗi thanh toán với Paypal'
                     })
                 }
+            } else {
+
+                // Khôi phục lại giỏ hàng cho khách
+                for (const cart of carts) {
+                    await cart.restore()
+                }
+
+                return response.serviceUnavailable({
+                    message: 'Phương thức thanh toán này đang bảo trì'
+                })
             }
 
         } catch (e) {

@@ -4,8 +4,6 @@ import PaypalReceipt from 'App/Models/PaypalReceipt';
 import Invoice from 'App/Models/Invoice';
 import PaymentMethod from 'App/Models/PaymentMethod';
 import Order from 'App/Models/Order';
-import Setting from 'App/Models/Setting';
-import Settings from 'App/Utils/SettingUtils';
 import SettingUtils from 'App/Utils/SettingUtils';
 
 export default class PaypalController {
@@ -63,7 +61,7 @@ export default class PaypalController {
 
                 await invoice.related('order').query().update('status', Order.STATUS.PAID)
 
-                return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
+                return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL) + '/payment/success')
 
             }
 
@@ -72,7 +70,7 @@ export default class PaypalController {
         }
     }
 
-    public async cancel({ request, response }: HttpContextContract) {
-        return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
+    public async cancel({ response }: HttpContextContract) {
+        return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL) + '/payment/fail')
     }
 }

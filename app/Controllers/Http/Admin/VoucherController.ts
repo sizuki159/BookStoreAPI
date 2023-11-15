@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import AdminVoucherFilterFields from 'App/FilterFields/Admin/AdminVoucherFilterFields'
+import User from 'App/Models/User'
 import Voucher from 'App/Models/Voucher'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import AddVoucherValidator from 'App/Validators/AddVoucherValidator'
@@ -34,9 +35,9 @@ export default class VoucherController {
 
         // Phân loại voucher
         if(payload.voucher_type === Voucher.TYPE.PERSONALIZED) {
-            if(!payload.user_id) {
+            if(!payload.user_email) {
                 return response.badRequest({
-                    message: 'Loại mã cá nhân thì yêu cầu ID người dùng'
+                    message: 'Loại mã cá nhân thì yêu cầu email của người dùng'
                 })
             }
         } else if (payload.voucher_type === Voucher.TYPE.MEMBER_EXCLUSIVE) {
@@ -47,6 +48,15 @@ export default class VoucherController {
             }
         }
 
+        const user = await User.findBy('email', payload.user_email)
+        if(!user) {
+            return response.serviceUnavailable({
+                message: 'Hệ thống có lỗi xảy ra'
+            })
+        }
+
+        payload.user_id = user.id
+        
         const voucher = await Voucher.create(payload)
         return response.ok({
             message: 'Thêm voucher thành công.',

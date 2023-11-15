@@ -54,6 +54,7 @@ class PaypalService {
             };
 
 
+
             const createPaymentSync = (create_payment_json: paypal.Payment): Promise<paypal.PaymentResponse> => {
                 return new Promise((resolve, reject) => {
                     paypal.payment.create(create_payment_json, (err, payment: paypal.PaymentResponse) => {
@@ -65,6 +66,9 @@ class PaypalService {
                     });
                 });
             };
+
+
+
             try {
                 const payment = await createPaymentSync(create_payment_json)
                 if(payment.id && payment.links) {
@@ -94,6 +98,7 @@ class PaypalService {
                 return null
 
             } catch (e) {
+                console.log(e.message)
                 return null
             }
 

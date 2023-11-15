@@ -57,12 +57,14 @@ export default class AddVoucherValidator {
         'status': schema.enum(
             Object.values(Voucher.STATUS)
         ),
-        'user_id': schema.number.optional([
+        'user_email': schema.string.optional([
+            rules.email(),
             rules.exists({
                 table: 'users',
-                column: 'id',
+                column: 'email',
             })
         ]),
+        'user_id': schema.number.optional(),
         'user_level_id': schema.number.optional([
             rules.exists({
                 table: 'user_levels',
@@ -107,7 +109,8 @@ export default class AddVoucherValidator {
 
         'status.enum': 'Hãy chọn đúng loại status',
 
-        'user_id.exists': 'Không tìm thấy ID người dùng này',
+        'user_email.email': 'Email người dùng không đúng định dạng',
+        'user_email.exists': 'Không tìm thấy email của người dùng này',
 
         'user_level_id.exists': 'Không tìm thấy ID User Level này'
     }
