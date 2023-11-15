@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
+import OrderItem from './OrderItem'
 
 export default class Order extends BaseModel {
 
@@ -53,5 +54,11 @@ export default class Order extends BaseModel {
     //#region Relationship
     @belongsTo(() => User)
     public user: BelongsTo<typeof User>
+
+    @hasMany(() => OrderItem, {
+        localKey: 'id',
+        foreignKey: 'orderId',
+    })
+    public items: HasMany<typeof OrderItem>
     //#endregion
 }

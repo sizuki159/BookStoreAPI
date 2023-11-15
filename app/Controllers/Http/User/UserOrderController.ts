@@ -10,6 +10,8 @@ import PaymentMethod from 'App/Models/PaymentMethod'
 import OrderItem from 'App/Models/OrderItem'
 import IOrderResponse from 'App/Interfaces/IOrderResponse'
 import PaypalService from 'App/Services/PaypalService'
+import Order from 'App/Models/Order'
+import MyOrderFilterFields from 'App/FilterFields/User/MyOrderFilterFields'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -174,14 +176,19 @@ export default class UserOrderController {
                     } catch {
                     }
 
+                    // Xóa sản phẩm ra khỏi giỏ hàng
+                    // Vì đã tạo hóa đơn thành công
+                    // Sản phẩm sẽ nằm trong Order Item
                     for (const cart of carts) {
                         await cart.forceDelete()
                     }
+
                     responseBody.payment.method = paymentMethod
                     responseBody.payment.url = paymentURL
                     return response.ok(responseBody)
 
                 } else {
+                    // Khôi phục lại giỏ hàng cho khách
                     for (const cart of carts) {
                         await cart.restore()
                     }
@@ -207,5 +214,31 @@ export default class UserOrderController {
             })
         }
 
+    }
+
+    public async getMyOrder({ auth, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+        const myOrders = await Order.query().where('user_id', userAuth.id)
+
+        return response.json(myOrders.map((myOrder) => myOrder.serialize(MyOrderFilterFields)))
+    }
+
+    public async orderDetail({ params, auth, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+
+        const orderId = params.orderId
+        const order = await Order.query()
+            .where('user_id', userAuth.id)
+            .andWhere('order_id', orderId)
+            .preload('items', items => items.preload('product'))
+            .first()
+
+        if (order) {
+            return response.json(order.serialize(MyOrderFilterFields))
+        }
+
+        return response.notFound({
+            message: 'Không tìm thấy đơn hàng này của bạn'
+        })
     }
 }

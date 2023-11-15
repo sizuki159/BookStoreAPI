@@ -193,6 +193,8 @@ Route.group(() => {
 
     Route.group(() => {
         Route.post('/create', 'UserOrderController.createOrder')
+        Route.get('/my-order', 'UserOrderController.getMyOrder')
+        Route.get('/my-order/:orderId', 'UserOrderController.orderDetail')
     }).prefix('order')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')

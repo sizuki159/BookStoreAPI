@@ -1,5 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import UserAddressFilterFields from 'App/FilterFields/UserAddressFilterFields'
+import UserAddressFilterFields from 'App/FilterFields/User/UserAddressFilterFields'
 import User from 'App/Models/User'
 import UserAddress from 'App/Models/UserAddress'
 
