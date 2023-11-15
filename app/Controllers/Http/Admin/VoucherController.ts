@@ -48,8 +48,6 @@ export default class VoucherController {
         } = payload
         console.log(payload)
         try {
-            console.log(payload.user_email)
-
             switch (payload.voucher_type) {
                 case Voucher.TYPE.GENERAL: {
                     const voucher = await Voucher.create(
@@ -140,21 +138,5 @@ export default class VoucherController {
                 message: 'Hệ thống có lỗi xảy ra'
             })
         }
-
-        // Phân loại voucher
-        // if (payload.voucher_type === Voucher.TYPE.PERSONALIZED) {
-        //     if (!payload.user_email) {
-        //         return response.badRequest({
-        //             message: 'Loại mã cá nhân thì yêu cầu email của người dùng'
-        //         })
-        //     }
-        // } else if (payload.voucher_type === Voucher.TYPE.MEMBER_EXCLUSIVE) {
-        //     if (!payload.user_level_id) {
-        //         return response.badRequest({
-        //             message: 'Loại mã cá nhân thì yêu cầu ID Level User'
-        //         })
-        //     }
-        // }
-
     }
 }

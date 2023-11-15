@@ -84,13 +84,5 @@ export default class Voucher extends BaseModel {
                 break
             }
         }
-        // if (voucher.voucherType === this.TYPE.PERSONALIZED) {
-        //     voucher.userLevelId = null
-        // } else if (voucher.voucherType === this.TYPE.MEMBER_EXCLUSIVE) {
-        //     voucher.userId = null
-        // } else {
-        //     voucher.userId = null
-        //     voucher.userLevelId = null
-        // }
     }
 }
