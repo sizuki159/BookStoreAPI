@@ -48,7 +48,10 @@ export default class VoucherController {
             }
         }
 
-        const user = await User.findBy('email', payload.user_email)
+        // Khi chọn MEMBER_EXCLUSIVE, GENERAL sẽ bị bug do payload.user_email null
+        //Viết tào lao éo chịu test, THG NHÓC HƯ ĐỐN 
+        // Viết cái switch case ở đây xử lí 3 loại voucher 
+        const user = await User.findBy('email', payload.user_email) // Viết tào lao j đây cu
         if(!user) {
             return response.serviceUnavailable({
                 message: 'Hệ thống có lỗi xảy ra'
