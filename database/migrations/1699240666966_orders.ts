@@ -8,6 +8,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('order_id')
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('SET NULL')
+      table.integer('user_address_id').unsigned().references('id').inTable('user_addresses').onDelete('SET NULL')
       table.double('product_price')
       table.double('fee_price')
       table.double('final_price')

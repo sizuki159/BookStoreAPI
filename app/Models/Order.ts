@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import OrderItem from './OrderItem'
+import UserAddress from './UserAddress'
 
 export default class Order extends BaseModel {
 
@@ -17,6 +18,9 @@ export default class Order extends BaseModel {
 
     @column()
     public userId: number
+
+    @column()
+    public userAddressId: number
 
     @column()
     public productPrice: number
@@ -54,6 +58,12 @@ export default class Order extends BaseModel {
     //#region Relationship
     @belongsTo(() => User)
     public user: BelongsTo<typeof User>
+
+    @belongsTo(() => UserAddress, {
+        localKey: 'id',
+        foreignKey: 'userAddressId'
+    })
+    public userAddress: BelongsTo<typeof UserAddress>
 
     @hasMany(() => OrderItem, {
         localKey: 'id',

@@ -122,7 +122,8 @@ export default class UserOrderController {
                 customerNote,
                 voucher: voucherCode,
                 discountPrice: price.discountPrice,
-                paymentMethod
+                paymentMethod,
+                userAddressId: userAddress.id
             })
             await order.refresh()
 
@@ -235,6 +236,13 @@ export default class UserOrderController {
     public async getMyOrder({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const myOrders = await Order.query().where('user_id', userAuth.id)
+            .preload('userAddress', (userAddress) => {
+                userAddress.preload('wards', (wards) => {
+                    wards.preload('district', (district) => {
+                        district.preload('province')
+                    })
+                })
+            })
 
         return response.json(myOrders.map((myOrder) => myOrder.serialize(MyOrderFilterFields)))
     }
@@ -246,7 +254,18 @@ export default class UserOrderController {
         const order = await Order.query()
             .where('user_id', userAuth.id)
             .andWhere('order_id', orderId)
-            .preload('items', items => items.preload('product'))
+            .preload('items', (items) => {
+                items.preload('product', (product) => {
+                    product.preload('images')
+                })
+            })
+            .preload('userAddress', (userAddress) => {
+                userAddress.preload('wards', (wards) => {
+                    wards.preload('district', (district) => {
+                        district.preload('province')
+                    })
+                })
+            })
             .first()
 
         if (order) {
