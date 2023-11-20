@@ -161,7 +161,18 @@ export default class UserOrderController {
                         cart.book.quantity -= cart.quantity
                         await cart.book.save()
                     }
+                    
+                    // Xóa sản phẩm ra khỏi giỏ hàng
+                    // Vì đã tạo hóa đơn thành công
+                    // Sản phẩm sẽ nằm trong Order Item
+                    for (const cart of carts) {
+                        await cart.forceDelete()
+                    }
+
                 } catch {
+                    return response.serviceUnavailable({
+                        message: 'Hệ thống có lỗi xảy ra'
+                    })
                 }
 
                 return response.ok(responseBody)
