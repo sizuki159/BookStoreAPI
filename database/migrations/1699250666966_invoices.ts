@@ -10,7 +10,8 @@ export default class extends BaseSchema {
             table.integer('order_id').unsigned().references('order_id').inTable('orders').onDelete('SET NULL')
             table.string('payment_method').references('key').inTable('payment_methods').onDelete('SET NULL')
             table.string('paypal_payment_id').references('payment_id').inTable('paypal_receipts').onDelete('SET NULL').nullable()
-            table.string('pay_url').nullable()
+            table.string('vnpay_payment_id').references('payment_id').inTable('vnpay_receipts').onDelete('SET NULL').nullable()
+            table.text('pay_url').nullable()
             table.enu('status', Object.values(Invoice.STATUS)).defaultTo(Invoice.STATUS.UNPAID)
             /**
              * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

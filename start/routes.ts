@@ -21,6 +21,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('test', 'TestsController.test')
+Route.get('test/result', 'TestsController.result')
 
 //#region Auth
 Route.group(() => {
@@ -269,6 +270,11 @@ Route.group(() => {
             Route.get('success', 'PaypalController.success')
             Route.get('cancel', 'PaypalController.cancel')
         }).prefix('paypal')
+
+        Route.group(() => {
+            Route.get('process', 'VNPayController.process')
+        }).prefix('vnpay')
+
     }).prefix('payment').namespace('App/Controllers/Http/Payment')
 
 }).prefix('api').namespace('App/Controllers/Http/API')

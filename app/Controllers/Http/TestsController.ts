@@ -1,59 +1,74 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import BookImage from 'App/Models/BookImage'
-
-import paypal from 'paypal-rest-sdk'
+import { DateTime } from 'luxon';
+import qs from 'qs'
+import crypto from 'crypto'
 
 export default class TestsController {
-    public async test({ }: HttpContextContract) {
+    public async test({ request, response }: HttpContextContract) {
+        var tmnCode = 'E4CR4S5D'
+        var secretKey = 'SRZNZVBBDUXKDQLSUPSFOJAWPTLVEERF'
+        var vnpUrl = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'
+        var returnUrl = 'https://sandbox.vnpayment.vn/tryitnow/Home/VnPayIPN'
 
-        paypal.configure({
-            'mode': 'sandbox', //sandbox or live
-            'client_id': 'ASDvcF7gq4G7Mt_7ZksXUoirRCCejo6NK37IE5wnUbM7HsFzFAc2hAxubdDeiAi9YkN6bZ_6Hy_8p11g',
-            'client_secret': 'EOqfAdtTrMViE6WBog9cnSGFxUcVW4aY8oUIKnrD_C4SWDXPaQ2GDmd956ANEzgfi9RENp2Y3Zq9NvMR'
-        });
+        const date = DateTime.now()
+        var createDate = date.toFormat('yyyyMMddHHmmss')
+        var orderId = date.toFormat('HHmmss')
 
-        const create_payment_json: paypal.Payment = {
-            "intent": "sale",
-            "payer": {
-                "payment_method": "paypal"
-            },
-            "redirect_urls": {
-                "return_url": "http://localhost:3333/success",
-                "cancel_url": "http://localhost:3333/cancel"
-            },
-            "transactions": [{
-                "amount": {
-                    "currency": "USD",
-                    "total": "60"
+        var amount = 500000;
+        var bankCode = 'NCB';
+        var orderInfo = 'Đơn hàng';
+        var orderType = 150000;
+        var locale = 'vn';
+        var currCode = 'VND';
+        var vnp_Params = {};
+        vnp_Params['vnp_Version'] = '2.1.0';
+        vnp_Params['vnp_Command'] = 'pay';
+        vnp_Params['vnp_TmnCode'] = tmnCode;
+        vnp_Params['vnp_Merchant'] = 'Sách Việt'
+        vnp_Params['vnp_Locale'] = locale;
+        vnp_Params['vnp_CurrCode'] = currCode;
+        vnp_Params['vnp_TxnRef'] = orderId;
+        vnp_Params['vnp_OrderInfo'] = orderInfo;
+        vnp_Params['vnp_OrderType'] = orderType;
+        vnp_Params['vnp_Amount'] = amount * 100;
+        vnp_Params['vnp_ReturnUrl'] = returnUrl;
+        vnp_Params['vnp_IpAddr'] = '127.0.0.1';
+        vnp_Params['vnp_CreateDate'] = createDate;
+        if (bankCode !== null && bankCode !== '') {
+            vnp_Params['vnp_BankCode'] = bankCode;
+        }
+        vnp_Params = this.sortObject(vnp_Params);
 
-                },
-                "description": "Con cặc"
-            }]
-        };
 
-        const createPaymentSync = (create_payment_json: paypal.Payment) => {
-            return new Promise((resolve, reject) => {
-                paypal.payment.create(create_payment_json, (err, payment: paypal.PaymentResponse) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (payment.links) {
-                            for (let i = 0; i < payment.links.length; i++) {
-                                if (payment.links[i].rel === 'approval_url') {
-                                    resolve(payment.links[i].href);
-                                    return; // Kết thúc vòng lặp khi đã tìm thấy approval_url
-                                }
-                            }
-                        }
-                        reject(new Error('No approval_url found in payment response.'));
-                    }
-                });
-            });
-        };
+        var signData = qs.stringify(vnp_Params, { encode: false });
+        var hmac = crypto.createHmac("sha512", secretKey);
+        var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+        vnp_Params['vnp_SecureHash'] = signed;
+        vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false });
 
-        const payment = await createPaymentSync(create_payment_json)
-        return payment
+        return vnpUrl
+
     }
 
+    private sortObject(obj) {
+        let sorted = {};
+        let str: any = [];
+        let key:any = '';
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                str.push(encodeURIComponent(key));
+            }
+        }
+        str.sort();
+        for (key = 0; key < str.length; key++) {
+            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+        }
+        return sorted;
+    }
+
+
+    public async result({ request, response }: HttpContextContract) {
+        return 'hihi'
+    }
 
 }

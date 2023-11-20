@@ -25,8 +25,8 @@ export default class extends BaseSchema {
           name: 'Thanh toán bằng tiền mặt khi nhận hàng',
         },
         {
-          key: PaymentMethod.METHOD.NGANLUONG,
-          name: 'Ví Ngân Lượng',
+          key: PaymentMethod.METHOD.VNPAY,
+          name: 'Ví điện tử VNPay',
         },
         {
           key: PaymentMethod.METHOD.PAYPAL,

@@ -12,6 +12,7 @@ import IOrderResponse from 'App/Interfaces/IOrderResponse'
 import PaypalService from 'App/Services/PaypalService'
 import Order from 'App/Models/Order'
 import MyOrderFilterFields from 'App/FilterFields/User/MyOrderFilterFields'
+import VNPayService from 'App/Services/VNPayService'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -196,6 +197,20 @@ export default class UserOrderController {
                         message: 'Hệ thống lỗi thanh toán với Paypal'
                     })
                 }
+            } else if (paymentMethod === PaymentMethod.METHOD.VNPAY) {
+                // VNPAY
+                const paymentURL = await VNPayService.create(order)
+                responseBody.payment.method = paymentMethod
+                responseBody.payment.url = paymentURL
+
+                // Xóa sản phẩm ra khỏi giỏ hàng
+                // Vì đã tạo hóa đơn thành công
+                // Sản phẩm sẽ nằm trong Order Item
+                for (const cart of carts) {
+                    await cart.forceDelete()
+                }
+
+                return response.ok(responseBody)
             } else {
 
                 // Khôi phục lại giỏ hàng cho khách
@@ -209,6 +224,7 @@ export default class UserOrderController {
             }
 
         } catch (e) {
+            return e.message
             return response.serviceUnavailable({
                 message: 'Có lỗi hệ thống xảy ra.'
             })

@@ -19,7 +19,10 @@ export default class Invoice extends BaseModel {
     public paymentMethod: string
 
     @column()
-    public paypalPaymentId: string
+    public paypalPaymentId: string | null
+
+    @column()
+    public vnpayPaymentId: string | null
 
     @column()
     public payUrl: string

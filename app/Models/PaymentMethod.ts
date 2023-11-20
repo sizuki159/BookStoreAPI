@@ -5,8 +5,8 @@ export default class PaymentMethod extends BaseModel {
 
     public static METHOD = {
         COD: 'cod',
-        NGANLUONG: 'nganluong',
-        PAYPAL: 'paypal'
+        VNPAY: 'vnpay',
+        PAYPAL: 'paypal',
     }
 
     @column({ isPrimary: true })
