@@ -34,7 +34,7 @@ export default class VerifyEmailController {
         // if token is invalid, not bound to a user, or does not match the auth user
         if (!user) {
             // handle invalid token
-            return response.notFound({
+            return response.badRequest({
                 message: 'Liên kết không hợp lệ hoặc đã hết hạn',
                 data: null,
             })

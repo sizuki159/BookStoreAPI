@@ -24,9 +24,9 @@ export default class ResetPasswordEmail extends BaseMailer {
      * also be async.
      */
     public prepare(message: MessageContract) {
-        message.subject('Đặt lại mật khẩu Sách Việt')
+        message.subject('Đặt lại mật khẩu My Book')
             .to(this.user.email)
-            .from('no-reply@sachviet.top', 'Sách Việt')
+            .from('no-reply@sachviet.top', 'My Book')
             .html(`
       <!-- Change values in [brackets] in the template and pass { {variables} } with API call -->
       <!-- Feel free to adjust it to your needs and delete all these comments-->
@@ -139,7 +139,7 @@ export default class ResetPasswordEmail extends BaseMailer {
                                 </td>
                               </tr>
                               <tr>
-                                ${Env.get('DOMAIN_CLIENT', 'https://sachviet.top')}/auth/recovery/${this.token}
+                                ${Env.get('DOMAIN_CLIENT', 'http://localhost:3000')}/authentication/recovery?token=${this.token}
                               </tr>
                               <tr>
                                 <td style="padding: 10px 0 10px 0; font-size: 14px; line-height: 150%; font-weight: 400; color: #000000; letter-spacing: 0.01em;">
