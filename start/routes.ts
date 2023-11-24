@@ -204,6 +204,11 @@ Route.group(() => {
         Route.get('/my-order/:orderId', 'UserOrderController.orderDetail')
     }).prefix('order')
 
+    Route.group(() => {
+        Route.get('/voucher-partner', 'UserVoucherController.getVoucherPartner')
+        Route.get('/voucher-personalized', 'UserVoucherController.getVoucherPersonalized')
+    }).prefix('voucher')
+
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
 
 
