@@ -12,7 +12,13 @@ export default class extends BaseSeeder {
         password: '12345',
         userRoleId: Roles.ADMIN,
         userLevelId: Levels.SILVER,
-      }
+      },
+      {
+        email: 'starhonkai2001@gmail.com',
+        password: '12345',
+        userRoleId: Roles.USER,
+        userLevelId: Levels.BASIC,
+      },
     ])
   }
 }
