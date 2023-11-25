@@ -7,6 +7,8 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
+      table.text('avatar_source').nullable()
+      table.text('avatar_location').nullable()
       table.string('firstname').nullable()
       table.string('lastname').nullable()
       table.string('phone_number', 11).nullable()

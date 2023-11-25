@@ -170,6 +170,8 @@ Route.group(() => {
         Route.get('', 'UserProfileController.getInfo')
         Route.post('', 'UserProfileController.updateOrCreate')
         Route.patch('/password', 'UserProfileController.changePassword')
+
+        Route.post('/upload-avatar', 'UserProfileController.uploadAvatar')
     }).prefix('profile')
     //#endregion
 

@@ -3,6 +3,7 @@ import User from 'App/Models/User'
 import UserProfile from 'App/Models/UserProfile'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
+import UserProfileFilterFields from 'App/FilterFields/User/UserProfileFilterFields'
 
 
 
@@ -11,13 +12,12 @@ export default class UserProfileController {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
         await user.load('profile')
+        console.log(user.profile)
         if (user.profile) {
-            return user.profile.serialize({
-                fields: ['firstname', 'lastname', 'phone_number', 'gender']
-            })
+            return user.profile.serialize(UserProfileFilterFields)
         }
         return response.notFound({
-            message: 'Bạn chưa cập nhật thông tin cá nhân!'
+            'message': 'Bạn chưa cập nhật thông tin cá nhân!'
         })
     }
 
@@ -40,7 +40,7 @@ export default class UserProfileController {
         }
         catch (e) {
             return response.badRequest({
-                message: 'Cập nhật thông tin thất bại!'
+                'message': 'Cập nhật thông tin thất bại!'
             })
         }
     }
@@ -71,12 +71,46 @@ export default class UserProfileController {
             user.password = payload.new_password
             await user.save()
             return response.ok({
-                message: 'Thay đổi mật khẩu thành công!'
+                'message': 'Thay đổi mật khẩu thành công!'
             })
         } else {
             return response.badRequest({
-                message: 'Mật khẩu hiện tại không đúng'
+                'message': 'Mật khẩu hiện tại không đúng'
             })
         }
+    }
+
+    public async uploadAvatar({auth, request, response}: HttpContextContract) {
+        const image = request.file('avatar_image', {
+            size: '10mb',
+            extnames: ['jpg', 'png', 'gif'],
+        })
+
+        if(image) {
+            try {
+                const userAuth = await auth.use('api').authenticate()
+                const fileName = `${userAuth.id}_${image.clientName}`
+                await image.moveToDisk(`user_avatar/${userAuth.id}`, { name: fileName }, 's3')
+                await UserProfile.updateOrCreate({
+                    userId: userAuth.id
+                }, {
+                    avatarSource: image.filePath,
+                    avatarLocation: image.fileName
+                })
+
+                return response.ok({
+                    'message': 'Cập nhật avatar thành công'
+                })
+                
+            } catch {
+                return response.serviceUnavailable({
+                    'message': 'Có lỗi hệ thống, vui lòng thử lại sau'
+                })
+            }
+        }
+
+        return response.badRequest({
+            'message': 'File ảnh không hợp lệ'
+        })
     }
 }

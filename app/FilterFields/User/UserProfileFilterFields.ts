@@ -2,7 +2,7 @@ import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
 
 const UserProfileFilterFields: CherryPick = {
     fields: {
-        pick: []
+        pick: ['firstname', 'lastname', 'phone_number', 'gender', 'avatar_source']
     }
 }
 
