@@ -204,6 +204,9 @@ Route.group(() => {
         Route.post('/create', 'UserOrderController.createOrder')
         Route.get('/my-order', 'UserOrderController.getMyOrder')
         Route.get('/my-order/:orderId', 'UserOrderController.orderDetail')
+
+        Route.post('/review/write', 'UserOrderReviewController.writeReview')
+        Route.delete('/review/delete/:review_id', 'UserOrderReviewController.deleteReview')
     }).prefix('order')
 
     Route.group(() => {
