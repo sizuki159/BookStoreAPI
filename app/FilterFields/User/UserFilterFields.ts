@@ -4,7 +4,7 @@ const UserFilterFields: CherryPick = {
     relations: {
         'profile': {
             fields: {
-                pick: ['firstname', 'lastname', 'phone_number', 'gender']
+                pick: ['firstname', 'lastname','avatar_source', 'phone_number', 'gender']
             }
         }
     }

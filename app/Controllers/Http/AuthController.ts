@@ -1,13 +1,12 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
-import Hash from '@ioc:Adonis/Core/Hash'
 import RegisterValidator from 'App/Validators/RegisterValidator'
 import ApiToken from 'App/Models/ApiToken'
 import RefreshApiToken from 'App/Models/RefreshApiToken'
 import { DateTime } from 'luxon';
-import UserFilterFields from 'App/FilterFields/User/UserFilterFields'
 import Token from 'App/Models/Token'
 import EmailValidator from 'App/Validators/EmailValidator'
+import UserFilterFields from 'App/FilterFields/User/UserFilterFields'
 
 export default class AuthController {
     public async register({ auth, request, response }: HttpContextContract) {

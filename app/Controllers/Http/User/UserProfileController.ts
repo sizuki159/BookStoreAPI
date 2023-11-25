@@ -12,7 +12,6 @@ export default class UserProfileController {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
         await user.load('profile')
-        console.log(user.profile)
         if (user.profile) {
             return user.profile.serialize(UserProfileFilterFields)
         }
