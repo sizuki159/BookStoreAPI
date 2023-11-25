@@ -63,7 +63,8 @@ export default class UserCartController {
                 await cartDeleted.save()
                 await cartDeleted.restore()
             }
-            
+
+            await cart.refresh()
             if (cart.quantity + payload.quantity > book.quantity) {
                 cart.quantity = book.quantity
             } else {
