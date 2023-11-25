@@ -3,6 +3,7 @@ import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:
 import User from './User'
 import OrderItem from './OrderItem'
 import UserAddress from './UserAddress'
+import OrderReview from './OrderReview'
 
 export default class Order extends BaseModel {
 
@@ -70,5 +71,11 @@ export default class Order extends BaseModel {
         foreignKey: 'orderId',
     })
     public items: HasMany<typeof OrderItem>
+
+    @hasMany(() => OrderReview, {
+        localKey: 'id',
+        foreignKey: 'orderId',
+    })
+    public reviews: HasMany<typeof OrderReview>
     //#endregion
 }
