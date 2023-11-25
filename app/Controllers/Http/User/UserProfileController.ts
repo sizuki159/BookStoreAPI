@@ -4,6 +4,7 @@ import UserProfile from 'App/Models/UserProfile'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
 import UserProfileFilterFields from 'App/FilterFields/User/UserProfileFilterFields'
+import RandomNumber from 'App/Utils/RandomNumber'
 
 
 
@@ -93,20 +94,22 @@ export default class UserProfileController {
             }
             try {
                 const userAuth = await auth.use('api').authenticate()
-                const fileName = `${userAuth.id}_${image.clientName}`
+                const fileName = `${userAuth.id}_avatar_img_id_${RandomNumber.generate6Digit()}`
                 await image.moveToDisk(`user_avatar/${userAuth.id}`, { name: fileName }, 's3')
-                await UserProfile.updateOrCreate({
+                const userProfileUpdated = await UserProfile.updateOrCreate({
                     userId: userAuth.id
                 }, {
                     avatarSource: image.filePath,
                     avatarLocation: image.fileName
                 })
-
+                const updatedData = userProfileUpdated.toJSON()
                 return response.ok({
-                    'message': 'Cập nhật avatar thành công'
+                    'message': 'Cập nhật avatar thành công',
+                    updated_profile: updatedData
                 })
                 
-            } catch {
+            } catch(e) {
+                console.log(e)
                 return response.serviceUnavailable({
                     'message': 'Có lỗi hệ thống, vui lòng thử lại sau'
                 })
