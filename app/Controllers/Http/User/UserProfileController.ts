@@ -87,6 +87,11 @@ export default class UserProfileController {
         })
 
         if(image) {
+            if (image.hasErrors) {
+                return response.badRequest({
+                    'message': 'Chỉ chấp nhận định dạng file (.jpg .png .gif) và file nhỏ hơn 10 MB'
+                })
+            }
             try {
                 const userAuth = await auth.use('api').authenticate()
                 const fileName = `${userAuth.id}_${image.clientName}`

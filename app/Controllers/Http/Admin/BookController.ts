@@ -121,12 +121,17 @@ export default class BookController {
         }
 
         const images = request.files('cover_image', {
-            size: '10mb',
+            size: '15mb',
             extnames: ['jpg', 'png', 'gif'],
         })
 
         try {
             for (let image of images) {
+                if (image.hasErrors) {
+                    return response.badRequest({
+                        'message': 'Chỉ chấp nhận định dạng file (.jpg .png .gif) và file nhỏ hơn 15 MB'
+                    })
+                }
                 const fileName = `${book.isbnCode}_${image.clientName}`
                 await image.moveToDisk(`book_img/${book.isbnCode}`, { name: fileName }, 's3')
                 await book.related('images').create({
