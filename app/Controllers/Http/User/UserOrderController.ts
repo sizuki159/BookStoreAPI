@@ -161,7 +161,7 @@ export default class UserOrderController {
                         cart.book.quantity -= cart.quantity
                         await cart.book.save()
                     }
-                    
+
                     // Xóa sản phẩm ra khỏi giỏ hàng
                     // Vì đã tạo hóa đơn thành công
                     // Sản phẩm sẽ nằm trong Order Item
@@ -247,6 +247,12 @@ export default class UserOrderController {
     public async getMyOrder({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const myOrders = await Order.query().where('user_id', userAuth.id)
+            .preload('items', (items) => {
+                items.preload('product', (product) => {
+                    product.preload('images')
+                })
+            })
+            .preload('user')
             .preload('userAddress', (userAddress) => {
                 userAddress.preload('wards', (wards) => {
                     wards.preload('district', (district) => {
@@ -270,6 +276,7 @@ export default class UserOrderController {
                     product.preload('images')
                 })
             })
+            .preload('user')
             .preload('userAddress', (userAddress) => {
                 userAddress.preload('wards', (wards) => {
                     wards.preload('district', (district) => {

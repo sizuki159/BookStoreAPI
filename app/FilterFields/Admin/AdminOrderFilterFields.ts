@@ -3,7 +3,7 @@ import BookFilterFields from "../API/BookFilterFields";
 import UserAddressFilterFields from "../User/UserAddressFilterFields";
 import UserFilterFields from "../User/UserFilterFields";
 
-const MyOrderFilterFields: CherryPick = {
+const AdminOrderFilterFields: CherryPick = {
     fields: {
         pick: [
             'id',
@@ -33,4 +33,4 @@ const MyOrderFilterFields: CherryPick = {
     }
 }
 
-export default MyOrderFilterFields
+export default AdminOrderFilterFields

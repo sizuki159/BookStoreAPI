@@ -156,9 +156,14 @@ Route.group(() => {
         Route.get('/general', 'VoucherController.getVoucherGeneral')
         Route.get('/personalized', 'VoucherController.getVoucherPersonalized')
         Route.get('/member_exclusive', 'VoucherController.getVoucherMemberExclusive')
+        Route.get('/detail/:voucher_id', 'VoucherController.getVoucherDetail')
         Route.post('', 'VoucherController.addVoucher')
     }).prefix('voucher')
 
+    Route.group(() => {
+        Route.get('/all', 'BookOrderedController.getAllOrder')       
+        Route.get('/detail/:order_id', 'BookOrderedController.orderDetail')         
+    }).prefix('order')
 
 }).prefix('admin').namespace('App/Controllers/Http/Admin').middleware(['auth', 'admin'])
 //#endregion
