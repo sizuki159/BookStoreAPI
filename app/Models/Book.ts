@@ -12,6 +12,7 @@ import BookPublisher from './BookPublisher'
 import BookForm from './BookForm'
 import BookLanguage from './BookLanguage'
 import BookProvider from './BookProvider'
+import ResponseFormat from 'App/Utils/ResponseFormat'
 
 export default class Book extends compose(BaseModel, SoftDeletes) {
     @column({ isPrimary: true })
@@ -67,10 +68,21 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     @column()
     public bookFormId: number
 
-    @column.dateTime({ autoCreate: true })
+    @column.dateTime({
+        autoCreate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public createdAt: DateTime
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    @column.dateTime({
+        autoCreate: true,
+        autoUpdate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public updatedAt: DateTime
 
     //#region Relationship

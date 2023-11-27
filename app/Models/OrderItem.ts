@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, HasOne, belongsTo, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import Book from './Book'
 import Order from './Order'
+import ResponseFormat from 'App/Utils/ResponseFormat'
 
 export default class OrderItem extends BaseModel {
     @column({ isPrimary: true })
@@ -19,10 +20,21 @@ export default class OrderItem extends BaseModel {
     @column()
     public pricePerUnit: number
 
-    @column.dateTime({ autoCreate: true })
+    @column.dateTime({
+        autoCreate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public createdAt: DateTime
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    @column.dateTime({
+        autoCreate: true,
+        autoUpdate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public updatedAt: DateTime
 
     //#region Relationship

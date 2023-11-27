@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, beforeCreate, column } from '@ioc:Adonis/Lucid/Orm'
+import ResponseFormat from 'App/Utils/ResponseFormat'
 
 export default class Voucher extends BaseModel {
 
@@ -60,10 +61,21 @@ export default class Voucher extends BaseModel {
     @column()
     public userLevelId: number | null
 
-    @column.dateTime({ autoCreate: true })
+    @column.dateTime({
+        autoCreate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public createdAt: DateTime
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    @column.dateTime({
+        autoCreate: true,
+        autoUpdate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public updatedAt: DateTime
 
 

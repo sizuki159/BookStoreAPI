@@ -4,6 +4,7 @@ import { BaseModel, BelongsTo, HasMany, HasOne, belongsTo, column, hasMany, hasO
 import User from './User'
 import Book from './Book'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
+import ResponseFormat from 'App/Utils/ResponseFormat'
 
 export default class Cart extends compose(BaseModel, SoftDeletes) {
     @column({ isPrimary: true })
@@ -18,10 +19,21 @@ export default class Cart extends compose(BaseModel, SoftDeletes) {
     @column()
     public quantity: number
 
-    @column.dateTime({ autoCreate: true })
+    @column.dateTime({
+        autoCreate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public createdAt: DateTime
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    @column.dateTime({
+        autoCreate: true,
+        autoUpdate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public updatedAt: DateTime
 
     //#region Relatonship

@@ -4,6 +4,7 @@ import User from './User'
 import OrderItem from './OrderItem'
 import UserAddress from './UserAddress'
 import OrderReview from './OrderReview'
+import ResponseFormat from 'App/Utils/ResponseFormat'
 
 export default class Order extends BaseModel {
 
@@ -50,10 +51,21 @@ export default class Order extends BaseModel {
     @column()
     public logs: string
 
-    @column.dateTime({ autoCreate: true })
+    @column.dateTime({
+        autoCreate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public createdAt: DateTime
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    @column.dateTime({
+        autoCreate: true,
+        autoUpdate: true,
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public updatedAt: DateTime
 
     //#region Relationship
