@@ -30,6 +30,17 @@ export default class VoucherController {
         return response.json(vouchers.serialize(AdminVoucherFilterFields))
     }
 
+    public async getVoucherDetail({ params, response }: HttpContextContract) {
+        const voucherId  = params.voucher_id
+        const voucher = await Voucher.findBy('id', voucherId)
+        if (!voucher) {
+            return response.notFound({
+                message: `Không tìm thấy voucher mang id <${voucherId}>.`
+            })
+        }
+        return response.json(voucher.serialize(AdminVoucherFilterFields))
+    }
+
     public async addVoucher({ request, response }: HttpContextContract) {
         const payload = await request.validate(AddVoucherValidator)
         const {
