@@ -159,6 +159,12 @@ Route.group(() => {
         Route.post('', 'VoucherController.addVoucher')
     }).prefix('voucher')
 
+    Route.group(() => {
+        Route.get('/all', 'FlashSaleController.getAllFlashSale')
+        Route.post('/create', 'FlashSaleController.createFlashSale')
+        Route.post('/hour/create', 'FlashSaleController.createHourOnFlashSaleEvent')
+        Route.post('/hour/add-product', 'FlashSaleController.addProductToFlashSaleHour')
+    }).prefix('flash-sale')
 
 }).prefix('admin').namespace('App/Controllers/Http/Admin').middleware(['auth', 'admin'])
 //#endregion
@@ -274,7 +280,14 @@ Route.group(() => {
     }).prefix('book-provider')
     //#endregion
 
+    //#region Flash Sale
+    Route.group(() => {
+        Route.get('/today', 'FlashSaleAPIController.getFlashSaleToday')
+    }).prefix('flash-sale')
+    //#endregion
 
+
+    //#region Payment Process
     Route.group(() => {
         Route.group(() => {
             Route.get('success', 'PaypalController.success')
@@ -286,6 +299,8 @@ Route.group(() => {
         }).prefix('vnpay')
 
     }).prefix('payment').namespace('App/Controllers/Http/Payment')
+
+    //#endregion
 
 }).prefix('api').namespace('App/Controllers/Http/API')
 

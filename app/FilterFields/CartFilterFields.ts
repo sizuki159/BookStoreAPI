@@ -2,17 +2,33 @@ import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
 
 const CartFilterFields: CherryPick = {
     fields: {
-        pick: ['id', 'isbn_code', 'quantity']
+        pick: [
+            'id',
+            'isbn_code',
+            'quantity',
+        ]
     },
     relations: {
         'book_info': {
             fields: {
-                pick: ['id', 'isbn_code', 'name', 'slug', 'price', 'quantity']
+                pick: [
+                    'id',
+                    'isbn_code',
+                    'name',
+                    'slug',
+                    'price',
+                    'quantity',
+                ]
             },
             relations: {
                 'images': {
                     fields: {
-                        pick: ['id', 'image_source', 'enable', 'isbn_code']
+                        pick: [
+                            'id',
+                            'image_source',
+                            'enable',
+                            'isbn_code',
+                        ]
                     }
                 }
             }

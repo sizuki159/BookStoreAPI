@@ -13,6 +13,8 @@ import PaypalService from 'App/Services/PaypalService'
 import Order from 'App/Models/Order'
 import MyOrderFilterFields from 'App/FilterFields/User/MyOrderFilterFields'
 import VNPayService from 'App/Services/VNPayService'
+import Database from '@ioc:Adonis/Lucid/Database'
+import Book from 'App/Models/Book'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -158,10 +160,11 @@ export default class UserOrderController {
                 // Trừ số lượng hàng hóa
                 try {
                     for (const cart of carts) {
-                        cart.book.quantity -= cart.quantity
-                        await cart.book.save()
+                        await Book.query().decrement('quantity', cart.quantity).where('id', cart.book.id)
+                        // cart.book.quantity -= cart.quantity
+                        // await cart.book.save()
                     }
-                    
+
                     // Xóa sản phẩm ra khỏi giỏ hàng
                     // Vì đã tạo hóa đơn thành công
                     // Sản phẩm sẽ nằm trong Order Item
@@ -183,8 +186,7 @@ export default class UserOrderController {
                     // Trừ số lượng hàng hóa
                     try {
                         for (const cart of carts) {
-                            cart.book.quantity -= cart.quantity
-                            await cart.book.save()
+                            await Book.query().decrement('quantity', cart.quantity).where('id', cart.book.id)
                         }
                     } catch {
                     }
@@ -236,7 +238,6 @@ export default class UserOrderController {
             }
 
         } catch (e) {
-            return e.message
             return response.serviceUnavailable({
                 message: 'Có lỗi hệ thống xảy ra.'
             })

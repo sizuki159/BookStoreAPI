@@ -1,0 +1,200 @@
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import FlashSale from 'App/Models/FlashSale'
+import FlashSaleHour from 'App/Models/FlashSaleHour'
+import FlashSaleProduct from 'App/Models/FlashSaleProduct'
+import { DateTime } from 'luxon'
+
+export default class FlashSaleController {
+
+    public async getAllFlashSale({ }: HttpContextContract) {
+
+    }
+
+    public async createFlashSale({ request, response }: HttpContextContract) {
+        const newFlashSaleSchema = schema.create({
+            'event_name': schema.string(),
+            'event_date': schema.date({ format: 'dd-MM-yyyy' })
+        })
+
+        const payload = await request.validate({
+            schema: newFlashSaleSchema,
+            messages: {
+                'event_name.required': 'Vui lòng nhập tên sự kiện',
+
+                'event_date.required': 'Vui lòng chọn ngày bắt đầu sự kiện',
+                'event_date.date.format': 'Ngày bắt đầu sự kiện có định dạng (dd-MM-yyyy)',
+            }
+        })
+        try {
+
+            const flashSaleExisted = await FlashSale.query()
+                .where('event_date', '=', payload.event_date.toFormat('yyyy-MM-dd HH:mm:ss'))
+                .first()
+
+            if (flashSaleExisted) {
+                return response.badRequest({
+                    'message': `Ngày ${payload.event_date.toFormat('dd/MM/yyyy')} đã có sự kiện <p>${flashSaleExisted.eventName}</p>`
+                })
+            }
+
+            await FlashSale.create({
+                eventName: payload.event_name,
+                eventDate: payload.event_date,
+            })
+
+            return response.ok({
+                message: 'Tạo sự kiện thành công'
+            })
+        } catch {
+            return response.serviceUnavailable({
+                'message': 'Tạo sự kiện flash sale thất bại'
+            })
+        }
+    }
+
+    public async createHourOnFlashSaleEvent({ request, response }: HttpContextContract) {
+        const newFlashSaleHourSchema = schema.create({
+            'flash_sale_id': schema.number([
+                rules.exists({
+                    column: 'id',
+                    table: 'flash_sales'
+                })
+            ]),
+            'percent_discount': schema.number([
+                rules.range(0, 99)
+            ]),
+            'time_start': schema.date({ format: 'HH:mm:ss' }),
+            'time_end': schema.date({ format: 'HH:mm:ss' }),
+        })
+
+        const payload = await request.validate({
+            schema: newFlashSaleHourSchema,
+            messages: {
+                'flash_sale_id.required': 'Thiếu ID sự kiện flash sale',
+                'flash_sale_id.exists': 'ID sự kiện không tồn tại trong hệ thống',
+
+                'percent_discount.required': 'Vui lòng nhập số phần trăm giảm giá',
+                'percent_discount.number': 'Phần trăm giảm giá phải là con số',
+                'percent_discount.range': 'Phần trăm giảm giá chỉ từ 0-99%',
+
+                'time_start.required': 'Vui lòng chọn khung giờ bắt đầu flash sale',
+                'time_start.date.format': 'Khung giờ bắt đầu flash sale có định dạng (HH:mm:ss)',
+
+                'time_end.required': 'Vui lòng chọn khung giờ kết thúc flash sale',
+                'time_end.date.format': 'Khung giờ kết thúc flash sale có định dạng (HH:mm:ss)',
+            }
+        })
+
+        try {
+
+            if (payload.time_end < payload.time_start || payload.time_start.equals(payload.time_end)) {
+                return response.badRequest({
+                    'message': 'Giờ kết thúc không hợp lệ'
+                })
+            }
+            try {
+                if (Number.parseInt(payload.time_end.diff(payload.time_start).toFormat('s')) < 600) {
+                    return response.badRequest({
+                        'message': 'Thời gian flash sale tối thiểu là 10 phút'
+                    })
+                }
+            } catch {
+
+            }
+
+            const flashSale = await FlashSale.findOrFail(payload.flash_sale_id)
+
+            payload.time_start = payload.time_start.set({
+                day: flashSale.eventDate.day,
+                month: flashSale.eventDate.month,
+                year: flashSale.eventDate.year,
+            })
+            payload.time_end = payload.time_end.set({
+                day: flashSale.eventDate.day,
+                month: flashSale.eventDate.month,
+                year: flashSale.eventDate.year,
+            })
+
+            const flashSaleHourExisted = await FlashSaleHour.query()
+                .where('flashSaleId', flashSale.id)
+                .andWhere('timeStart', payload.time_start.toFormat('yyyy-MM-dd HH:mm:ss'))
+                .first()
+
+            if (flashSaleHourExisted) {
+                return response.badRequest({
+                    'message': `Khung giờ này flash sale này đã tồn tại`
+                })
+            }
+
+            flashSale.related('hours').create({
+                percentDiscount: payload.percent_discount,
+                timeStart: payload.time_start,
+                timeEnd: payload.time_end,
+            })
+
+
+            return response.ok({
+                'message': 'Tạo khung giờ flash sale thành công'
+            })
+        } catch {
+            return response.serviceUnavailable({
+                'message': 'Tạo khung giờ flash sale thất bại'
+            })
+        }
+    }
+
+    public async addProductToFlashSaleHour({ request, response }: HttpContextContract) {
+        const newFlashSaleProductSchema = schema.create({
+            'flash_sale_hour_id': schema.number([
+                rules.exists({
+                    column: 'id',
+                    table: 'flash_sale_hours'
+                })
+            ]),
+            'product_id': schema.number([
+                rules.exists({
+                    column: 'id',
+                    table: 'books'
+                })
+            ]),
+        })
+
+        const payload = await request.validate({
+            schema: newFlashSaleProductSchema,
+            messages: {
+                'flash_sale_hour_id.required': 'Thiếu ID khung giờ sự kiện flash sale',
+                'flash_sale_hour_id.exists': 'ID khung giờ sự kiện flash sale không tồn tại trên hệ thống',
+
+                'product_id.required': 'Thiếu ID sản phẩm',
+                'product_id.exists': 'ID sản phẩm không tồn tại trên hệ thống',
+            }
+        })
+
+        try {
+            const flashSaleProductExisted = await FlashSaleProduct.query()
+                .where('flashSaleHourId', payload.flash_sale_hour_id)
+                .andWhere('productId', payload.product_id)
+                .first()
+
+            if (flashSaleProductExisted) {
+                return response.badRequest({
+                    'message': 'Sản phẩm này đã được thêm vào khung giờ sự kiện này trước đó'
+                })
+            }
+
+            const flashSaleHour = await FlashSaleHour.findOrFail(payload.flash_sale_hour_id)
+            await flashSaleHour.related('products').create({
+                productId: payload.product_id
+            })
+
+            return response.ok({
+                'message': 'Thêm sản phẩm vào khung giờ sự kiên thành công'
+            })
+        } catch {
+            return response.serviceUnavailable({
+                'message': 'Thêm sản phẩm vào flash sale thất bại'
+            })
+        }
+    }
+}

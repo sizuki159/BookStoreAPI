@@ -1,6 +1,6 @@
 import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, afterFetch, afterFind, beforeFetch, belongsTo, column, computed, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 
@@ -13,6 +13,10 @@ import BookForm from './BookForm'
 import BookLanguage from './BookLanguage'
 import BookProvider from './BookProvider'
 import ResponseFormat from 'App/Utils/ResponseFormat'
+import FlashSaleProduct from './FlashSaleProduct'
+import FlashSale from './FlashSale'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
+import FlashSaleHour from './FlashSaleHour'
 
 export default class Book extends compose(BaseModel, SoftDeletes) {
     @column({ isPrimary: true })
@@ -68,6 +72,11 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     @column()
     public bookFormId: number
 
+    @computed({serializeAs: 'is_flash_sale'})
+    public get isFlashSale() {
+        return true
+    }
+
     @column.dateTime({
         autoCreate: true,
         serialize: (value: DateTime | null) => {
@@ -122,5 +131,48 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
         foreignKey: 'languageId'
     })
     public language: BelongsTo<typeof BookLanguage>
+
+    @hasMany(() => FlashSaleProduct, {
+        localKey: 'id',
+        foreignKey: 'productId'
+    })
+    public flashSales: HasMany<typeof FlashSaleProduct>
     //#endregion
+
+    @afterFind()
+    public static async afterFindHook(book: Book) {
+        // Check Flash Sale
+        const flashSaleAvailable = await FlashSaleHour.query()
+            .where('time_start', '<=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+            .andWhere('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+            .preload('products')
+            .first()
+
+        if (flashSaleAvailable) {
+            const isMatch = flashSaleAvailable.products.some((item) => item.productId === book.id);
+            if(isMatch) {
+                book.price = book.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+            }
+        }
+    }
+
+    @afterFetch()
+    public static async afterFetchHook(books: Book[]) {
+
+        // Check Flash Sale
+        const flashSaleAvailable = await FlashSaleHour.query()
+            .where('time_start', '<=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+            .andWhere('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+            .preload('products')
+            .first()
+
+        if (flashSaleAvailable) {
+            let flashSaleAvailableProducts = new Map(flashSaleAvailable.products.map(flashSaleAvailable => [flashSaleAvailable.productId, flashSaleAvailable]));
+            let productHaveFlashSales = books.filter(book => flashSaleAvailableProducts.has(book.id));
+            for (const product of productHaveFlashSales) {
+                product.price = product.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+            }
+        }
+
+    }
 }
