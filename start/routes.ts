@@ -293,7 +293,8 @@ Route.group(() => {
 
     //#region Flash Sale
     Route.group(() => {
-        Route.get('/today', 'FlashSaleAPIController.getFlashSaleToday')
+        Route.get('/today/accessable-periods', 'FlashSaleAPIController.getFlashSaleTodayAccessable')
+        
     }).prefix('flash-sale')
     //#endregion
 

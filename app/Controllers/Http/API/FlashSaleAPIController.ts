@@ -5,9 +5,9 @@ import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import { DateTime } from 'luxon'
 
 export default class FlashSaleAPIController {
-    public async getFlashSaleToday({ response }: HttpContextContract) {
+    public async getFlashSaleTodayAccessable({ response }: HttpContextContract) {
 
-        const flashSaleToDay = await FlashSale.query()
+        const flashSaleTodayAccessable = await FlashSale.query()
             .where('event_date', DatetimeUtils.DATE_NOW_WITH_OUT_TIME_SQL)
             .preload('hours', (hours) => {
                 hours.where('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
@@ -19,8 +19,8 @@ export default class FlashSaleAPIController {
                     // })
             })
             .first()
-        if (flashSaleToDay) {
-            return response.ok(flashSaleToDay.serialize(FlashSaleAPIFilterFields))
+        if (flashSaleTodayAccessable) {
+            return response.ok(flashSaleTodayAccessable.serialize(FlashSaleAPIFilterFields))
         }
 
         return response.noContent()
