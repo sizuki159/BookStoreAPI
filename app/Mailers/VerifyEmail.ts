@@ -138,7 +138,7 @@ export default class VerifyEmail extends BaseMailer {
                                 </td>
                               </tr>
                               <tr>
-                                ${Env.get('DOMAIN_SERVER', 'https://api.sachviet.top')}/verify/email/${this.token}
+                                ${Env.get('DOMAIN_SERVER', 'https://api.sachviet.top')}/auth/verify/email/${this.token}
                               </tr>
                               <tr>
                                 <td style="padding: 10px 0 10px 0; font-size: 14px; line-height: 150%; font-weight: 400; color: #000000; letter-spacing: 0.01em;">
