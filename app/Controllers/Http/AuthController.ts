@@ -21,7 +21,7 @@ export default class AuthController {
         await user.sendVerifyEmail()
 
         return response.created({
-            message: 'Đăng ký thành công!',
+            message: 'Đăng ký thành công!, vui lòng xác thực mail hộp thư',
             data: user
         })
 
