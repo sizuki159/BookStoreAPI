@@ -18,6 +18,8 @@ export default class AuthController {
             password
         })
         await user.refresh()
+        await user.sendVerifyEmail()
+
         return response.created({
             message: 'Đăng ký thành công!',
             data: user
