@@ -162,6 +162,10 @@ Route.group(() => {
 
     Route.group(() => {
         Route.get('/all', 'FlashSaleController.getAllFlashSale')
+        Route.get('/:flash_sale_id/hour', 'FlashSaleController.getFlashSaleAllHour')
+        Route.get('/hour/:flash_sale_hour_id', 'FlashSaleController.getFlashSaleHourDetail')
+
+
         Route.post('/create', 'FlashSaleController.createFlashSale')
         Route.post('/hour/create', 'FlashSaleController.createHourOnFlashSaleEvent')
         Route.post('/hour/add-product', 'FlashSaleController.addProductToFlashSaleHour')

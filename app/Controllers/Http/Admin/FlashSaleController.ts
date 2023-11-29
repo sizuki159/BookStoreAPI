@@ -4,12 +4,44 @@ import FlashSale from 'App/Models/FlashSale'
 import FlashSaleHour from 'App/Models/FlashSaleHour'
 import FlashSaleProduct from 'App/Models/FlashSaleProduct'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
+import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import { DateTime } from 'luxon'
 
 export default class FlashSaleController {
 
-    public async getAllFlashSale({ }: HttpContextContract) {
+    public async getAllFlashSale({ request, response }: HttpContextContract) {
+        const { page, limit } = PageLimitUtils(request.qs())
+        const flashSales = await FlashSale.query()
+            .orderBy('created_at', 'desc')
+            .paginate(page, limit)
 
+        return response.json(flashSales)
+    }
+
+    public async getFlashSaleAllHour({ params, response }: HttpContextContract) {
+        const flash_sale_id = params.flash_sale_id
+        const flashSale = await FlashSale.find(flash_sale_id)
+        if(!flashSale) {
+            return response.notFound({
+                'message': 'Không tìm thấy sự kiện Flash Sale này'
+            })
+        }
+        await flashSale.load('hours')
+        return flashSale
+    }
+
+    public async getFlashSaleHourDetail({ params, response }: HttpContextContract) {
+        const flash_sale_hour_id = params.flash_sale_hour_id
+        const flashSaleHour = await FlashSaleHour.find(flash_sale_hour_id)
+        if(!flashSaleHour) {
+            return response.notFound({
+                'message': 'Không tìm thấy khung giờ sự kiện Flash Sale này'
+            })
+        }
+        await flashSaleHour.load('products', (products) => {
+            products.preload('product_info')
+        })
+        return flashSaleHour
     }
 
     public async createFlashSale({ request, response }: HttpContextContract) {

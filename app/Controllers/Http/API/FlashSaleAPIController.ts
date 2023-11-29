@@ -10,7 +10,8 @@ export default class FlashSaleAPIController {
         const flashSaleToDay = await FlashSale.query()
             .where('event_date', DatetimeUtils.DATE_NOW_WITH_OUT_TIME_SQL)
             .preload('hours', (hours) => {
-                hours.orderBy('time_start', 'asc')
+                hours.where('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+                    .orderBy('time_start', 'asc')
                     .preload('products', (products) => {
                         products.preload('product_info', (product_info) => {
                             product_info.preload('images')
