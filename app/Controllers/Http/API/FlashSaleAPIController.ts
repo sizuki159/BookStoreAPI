@@ -11,12 +11,12 @@ export default class FlashSaleAPIController {
             .where('event_date', DatetimeUtils.DATE_NOW_WITH_OUT_TIME_SQL)
             .preload('hours', (hours) => {
                 hours.where('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
-                    .orderBy('time_start', 'asc')
-                    .preload('products', (products) => {
-                        products.preload('product_info', (product_info) => {
-                            product_info.preload('images')
-                        })
-                    })
+                    .orderBy('time_start', 'asc') //dùng api khác để get sp by id flash sale hour
+                    // .preload('products', (products) => {
+                    //     products.preload('product_info', (product_info) => {
+                    //         product_info.preload('images')
+                    //     })
+                    // })
             })
             .first()
         if (flashSaleToDay) {

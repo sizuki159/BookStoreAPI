@@ -11,6 +11,8 @@ const FlashSaleAPIFilterFields: CherryPick = {
         'hours': {
             fields: {
                 pick: [
+                    'id',
+                    'flash_sale_id',
                     'percent_discount',
                     'time_start',
                     'time_end',
