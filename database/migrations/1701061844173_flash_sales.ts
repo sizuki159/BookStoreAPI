@@ -7,7 +7,8 @@ export default class extends BaseSchema {
     public async up() {
         this.schema.createTable(this.tableName, (table) => {
             table.increments('id')
-            table.string('event_name')
+            table.string('event_name').nullable()
+            table.text('event_desc').nullable()
             table.enu('status', Object.values(FlashSale.STATUS)).defaultTo(FlashSale.STATUS.ACTIVE)
 
             /**

@@ -1,7 +1,7 @@
 import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
-import BookFilterFields from "../API/BookFilterFields";
 import UserAddressFilterFields from "../User/UserAddressFilterFields";
 import UserFilterFields from "../User/UserFilterFields";
+import AdminBookFilterFields from "./AdminBookFilterFields";
 
 const AdminOrderFilterFields: CherryPick = {
     fields: {
@@ -25,7 +25,7 @@ const AdminOrderFilterFields: CherryPick = {
                 pick: ['quantity', 'price_per_unit']
             },
             relations: {
-                'product': BookFilterFields
+                'product': AdminBookFilterFields
             }
         },
         'user': UserFilterFields,

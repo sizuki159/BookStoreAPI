@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import { string } from '@ioc:Adonis/Core/Helpers'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
 
 type TokenType = 'PASSWORD_RESET' | 'VERIFY_EMAIL'
 
@@ -61,7 +62,7 @@ export default class Token extends BaseModel {
 
     public static async expireTokens(user: User, relationName: 'passwordResetTokens' | 'verifyEmailTokens') {
         await user.related(relationName).query().update({
-            expiresAt: DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'),
+            expiresAt: DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL),
         })
     }
 
@@ -70,7 +71,7 @@ export default class Token extends BaseModel {
             .preload('user')
             .where('token', token)
             .where('type', type)
-            .where('expiresAt', '>', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+            .where('expiresAt', '>', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .orderBy('createdAt', 'desc')
             .first()
 
@@ -79,7 +80,7 @@ export default class Token extends BaseModel {
 
     public static async verify(token: string, type: TokenType) {
         const record = await Token.query()
-            .where('expiresAt', '>', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+            .where('expiresAt', '>', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .where('token', token)
             .where('type', type)
             .first()

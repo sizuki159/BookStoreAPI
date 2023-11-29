@@ -12,6 +12,9 @@ export default class FlashSaleProduct extends BaseModel {
     @column()
     public productId: number
 
+    @column()
+    public percentDiscount: number
+
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime
 

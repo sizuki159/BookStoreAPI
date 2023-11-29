@@ -13,7 +13,7 @@ const APIBookFilterFields: CherryPick = {
             'weight',
             'number_of_pages',
             'publishing_year',
-            'is_flash_sale',
+            'flash_sale_info'
         ]
     },
     relations: {
@@ -22,6 +22,7 @@ const APIBookFilterFields: CherryPick = {
                 pick: [
                     'id',
                     'name',
+                    'slug',
                     'parent_category_id',
                 ]
             }
@@ -31,6 +32,7 @@ const APIBookFilterFields: CherryPick = {
                 pick: [
                     'id',
                     'author_name',
+                    'slug',
                 ]
             }
         },
@@ -39,6 +41,7 @@ const APIBookFilterFields: CherryPick = {
                 pick: [
                     'id',
                     'name',
+                    'slug',
                 ]
             }
         },
@@ -47,6 +50,7 @@ const APIBookFilterFields: CherryPick = {
                 pick: [
                     'id',
                     'language_name',
+                    'slug',
                 ]
             }
         },
@@ -55,6 +59,7 @@ const APIBookFilterFields: CherryPick = {
                 pick: [
                     'id',
                     'name',
+                    'slug',
                 ]
             }
         },
@@ -63,6 +68,7 @@ const APIBookFilterFields: CherryPick = {
                 pick: [
                     'id',
                     'name',
+                    'slug',
                 ]
             }
         },

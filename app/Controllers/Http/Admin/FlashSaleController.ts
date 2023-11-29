@@ -3,6 +3,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import FlashSale from 'App/Models/FlashSale'
 import FlashSaleHour from 'App/Models/FlashSaleHour'
 import FlashSaleProduct from 'App/Models/FlashSaleProduct'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import { DateTime } from 'luxon'
 
 export default class FlashSaleController {
@@ -29,7 +30,7 @@ export default class FlashSaleController {
         try {
 
             const flashSaleExisted = await FlashSale.query()
-                .where('event_date', '=', payload.event_date.toFormat('yyyy-MM-dd HH:mm:ss'))
+                .where('event_date', '=', payload.event_date.toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
                 .first()
 
             if (flashSaleExisted) {
@@ -116,9 +117,13 @@ export default class FlashSaleController {
                 year: flashSale.eventDate.year,
             })
 
+            // Kiểm tra xem vào sự kiện này đã có khung giờ này chưa
             const flashSaleHourExisted = await FlashSaleHour.query()
                 .where('flashSaleId', flashSale.id)
-                .andWhere('timeStart', payload.time_start.toFormat('yyyy-MM-dd HH:mm:ss'))
+                .andWhere((condition) => {
+                    condition.whereBetween('timeStart', [payload.time_start.toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL), payload.time_end.toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL)])
+                        .orWhereBetween('timeEnd', [payload.time_start.toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL), payload.time_end.toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL)])
+                })
                 .first()
 
             if (flashSaleHourExisted) {
@@ -127,12 +132,12 @@ export default class FlashSaleController {
                 })
             }
 
+            // Tạo khung giờ flash sale
             flashSale.related('hours').create({
                 percentDiscount: payload.percent_discount,
                 timeStart: payload.time_start,
                 timeEnd: payload.time_end,
             })
-
 
             return response.ok({
                 'message': 'Tạo khung giờ flash sale thành công'
@@ -172,6 +177,7 @@ export default class FlashSaleController {
         })
 
         try {
+            // Kiểm tra xem khung giờ sự kiện này đã có sản phẩm này chưa
             const flashSaleProductExisted = await FlashSaleProduct.query()
                 .where('flashSaleHourId', payload.flash_sale_hour_id)
                 .andWhere('productId', payload.product_id)

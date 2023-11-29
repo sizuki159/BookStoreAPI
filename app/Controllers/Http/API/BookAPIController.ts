@@ -1,8 +1,6 @@
 import { bind } from '@adonisjs/route-model-binding'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import APIBookFilterFields from 'App/FilterFields/API/APIBookFilterFields'
-import BookFilterFields from 'App/FilterFields/API/BookFilterFields'
-import AdminBookFilterFields from 'App/FilterFields/Admin/AdminBookFilterFields'
 import Book from 'App/Models/Book'
 import { isIsbnCodeValid } from 'App/Utils/CheckIsbnCodeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
@@ -93,7 +91,7 @@ export default class BookAPIController {
         const { page, limit } = PageLimitUtils(request.qs())
         const result = await query.paginate(page, limit)
 
-        return response.json(result.serialize(BookFilterFields))
+        return response.json(result.serialize(APIBookFilterFields))
     }
 
     public async getBookByIBSNCode({ params, response }: HttpContextContract) {
@@ -115,7 +113,7 @@ export default class BookAPIController {
             book.load('provider'),
         ])
 
-        return response.json(book.serialize(BookFilterFields))
+        return response.json(book.serialize(APIBookFilterFields))
     }
     @bind()
     public async getBookBySlug({response}: HttpContextContract, book: Book) {
@@ -128,6 +126,6 @@ export default class BookAPIController {
             book.load('publisher'),
             book.load('provider'),
         ])
-        return response.json(book.serialize(BookFilterFields))
+        return response.json(book.serialize(APIBookFilterFields))
     }
 }

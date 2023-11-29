@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 import Token from 'App/Models/Token'
 import EmailValidator from 'App/Validators/EmailValidator'
 import UserFilterFields from 'App/FilterFields/User/UserFilterFields'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
 
 export default class AuthController {
     public async register({ auth, request, response }: HttpContextContract) {
@@ -174,7 +175,7 @@ export default class AuthController {
         const record = await Token.query()
             .where('user_id', user.id)
             .where('type', 'PASSWORD_RESET')
-            .where('created_at', '>=', DateTime.now().minus({ minutes: 15 }).toFormat('yyyy-MM-dd HH:mm:ss'))
+            .where('created_at', '>=', DateTime.now().minus({ minutes: 15 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .first()
         if (!record) {
             await user.sendResetPasswordEmail()

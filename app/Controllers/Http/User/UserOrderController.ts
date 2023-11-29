@@ -15,6 +15,7 @@ import MyOrderFilterFields from 'App/FilterFields/User/MyOrderFilterFields'
 import VNPayService from 'App/Services/VNPayService'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Book from 'App/Models/Book'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -76,8 +77,8 @@ export default class UserOrderController {
             const voucher = await Voucher.query()
                 .where('status', Voucher.STATUS.ACTIVE)
                 .andWhere('voucher_code', voucherCode)
-                .andWhere('start_date', '<=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
-                .andWhere('end_date', '>=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+                .andWhere('start_date', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+                .andWhere('end_date', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
                 .andWhere('require_order_min_price', '<=', productPrice)
                 .andWhere(voucherAvailable => {
                     voucherAvailable.where('voucherType', Voucher.TYPE.GENERAL)

@@ -17,6 +17,9 @@ export default class FlashSale extends BaseModel {
     public eventName: string
 
     @column()
+    public eventDesc: string
+
+    @column()
     public status: 'active' | 'inactive'
 
     @column.dateTime({

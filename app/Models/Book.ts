@@ -18,6 +18,17 @@ import FlashSale from './FlashSale'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import FlashSaleHour from './FlashSaleHour'
 
+type FlashSaleInfo = {
+    is_flash_sale: boolean,
+    original_price: number,
+    discount_percent: number,
+    price_after_discount: number,
+    instock_info?: {
+        sold_number: number
+        instock: number,
+    }
+} | undefined
+
 export default class Book extends compose(BaseModel, SoftDeletes) {
     @column({ isPrimary: true })
     public id: number
@@ -72,11 +83,6 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     @column()
     public bookFormId: number
 
-    @computed({serializeAs: 'is_flash_sale'})
-    public get isFlashSale() {
-        return true
-    }
-
     @column.dateTime({
         autoCreate: true,
         serialize: (value: DateTime | null) => {
@@ -93,6 +99,7 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
         }
     })
     public updatedAt: DateTime
+
 
     //#region Relationship
     @hasMany(() => BookImage, {
@@ -139,6 +146,11 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     public flashSales: HasMany<typeof FlashSaleProduct>
     //#endregion
 
+
+    @computed({ serializeAs: 'flash_sale_info' })
+    public flashSaleInfo?: FlashSaleInfo
+
+
     @afterFind()
     public static async afterFindHook(book: Book) {
         // Check Flash Sale
@@ -150,8 +162,15 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
 
         if (flashSaleAvailable) {
             const isMatch = flashSaleAvailable.products.some((item) => item.productId === book.id);
-            if(isMatch) {
-                book.price = book.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+            if (isMatch) {
+                const priceAfterDiscount = book.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+                book.flashSaleInfo = {
+                    is_flash_sale: true,
+                    original_price: book.price,
+                    discount_percent: flashSaleAvailable.percentDiscount,
+                    price_after_discount: priceAfterDiscount
+                }
+                book.price = priceAfterDiscount
             }
         }
     }
@@ -166,11 +185,19 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
             .preload('products')
             .first()
 
+
         if (flashSaleAvailable) {
             let flashSaleAvailableProducts = new Map(flashSaleAvailable.products.map(flashSaleAvailable => [flashSaleAvailable.productId, flashSaleAvailable]));
             let productHaveFlashSales = books.filter(book => flashSaleAvailableProducts.has(book.id));
             for (const product of productHaveFlashSales) {
-                product.price = product.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+                const priceAfterDiscount = product.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+                product.flashSaleInfo = {
+                    is_flash_sale: true,
+                    original_price: product.price,
+                    discount_percent: flashSaleAvailable.percentDiscount,
+                    price_after_discount: priceAfterDiscount,
+                }
+                product.price = priceAfterDiscount
             }
         }
 

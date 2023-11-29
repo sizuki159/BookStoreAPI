@@ -11,6 +11,7 @@ import UserAddress from 'App/Models/UserAddress'
 import Voucher from 'App/Models/Voucher'
 import { DateTime } from 'luxon'
 import { types } from '@ioc:Adonis/Core/Helpers'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
 
 export default class UserCartController {
     public async getMyCart({ auth, response }: HttpContextContract) {
@@ -235,8 +236,8 @@ export default class UserCartController {
 
         const voucherAvailables = await Voucher.query()
             .where('status', Voucher.STATUS.ACTIVE)
-            .andWhere('start_date', '<=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
-            .andWhere('end_date', '>=', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))
+            .andWhere('start_date', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .andWhere('end_date', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .andWhere('require_order_min_price', '<=', productPrice)
             .andWhere(voucherAvailable => {
                 voucherAvailable.where('voucherType', Voucher.TYPE.GENERAL)
