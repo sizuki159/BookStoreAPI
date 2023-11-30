@@ -25,7 +25,7 @@ export default class FlashSale extends BaseModel {
     @column.dateTime({
         autoCreate: true,
         serialize: (value: DateTime | null) => {
-            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+            return value ? value.toFormat(ResponseFormat.DATE) : value
         }
     })
     public eventDate: DateTime

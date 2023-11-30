@@ -13,21 +13,16 @@ export default class FlashSaleController {
         const { page, limit } = PageLimitUtils(request.qs())
         const flashSales = await FlashSale.query()
             .orderBy('created_at', 'desc')
-            .preload('hours')
             .paginate(page, limit)
         return response.json(flashSales)
     }
 
     public async getFlashSaleAllHour({ params, response }: HttpContextContract) {
         const flash_sale_id = params.flash_sale_id
-        const flashSale = await FlashSale.find(flash_sale_id)
-        if (!flashSale) {
-            return response.notFound({
-                'message': 'Không tìm thấy sự kiện Flash Sale này'
-            })
-        }
-        await flashSale.load('hours')
-        return flashSale
+        const flashSaleHourList = await FlashSaleHour.query()
+            .orderBy('created_at', 'desc')
+            .where('flash_sale_id', flash_sale_id)
+        return flashSaleHourList
     }
 
     public async getFlashSaleHourDetail({ params, response }: HttpContextContract) {
