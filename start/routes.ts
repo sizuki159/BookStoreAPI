@@ -29,8 +29,12 @@ Route.group(() => {
     Route.post('login', 'AuthController.login')
     Route.post('refresh_token', 'AuthController.refreshToken')
 
-    // Email
+    // Verify Email
     Route.get('/verify/email/:token', 'VerifyEmailController.verify')
+    Route.post('/request-verify', 'AuthController.requestEmailVerify')
+    // Route.get('/check/is-verified/:email', 'VerifyEmailController.checkEmailVerified')
+
+    // Recovery password Email
     Route.post('/verify/email/reset_password', 'VerifyEmailController.verifyResetPassword')
 
     Route.post('request-recovery', 'AuthController.requestRecovery')
@@ -170,10 +174,10 @@ Route.group(() => {
         Route.post('/hour/create', 'FlashSaleController.createHourOnFlashSaleEvent')
         Route.post('/hour/add-product', 'FlashSaleController.addProductToFlashSaleHour')
     }).prefix('flash-sale')
-    
+
     Route.group(() => {
-        Route.get('/all', 'BookOrderedController.getAllOrder')       
-        Route.get('/detail/:order_id', 'BookOrderedController.orderDetail')         
+        Route.get('/all', 'BookOrderedController.getAllOrder')
+        Route.get('/detail/:order_id', 'BookOrderedController.orderDetail')
     }).prefix('order')
 
 
@@ -294,7 +298,7 @@ Route.group(() => {
     //#region Flash Sale
     Route.group(() => {
         Route.get('/today/accessable-periods', 'FlashSaleAPIController.getFlashSaleTodayAccessable')
-        
+
     }).prefix('flash-sale')
     //#endregion
 

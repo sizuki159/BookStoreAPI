@@ -193,4 +193,47 @@ export default class AuthController {
         })
     }
 
+    // [POST]
+    public async requestEmailVerify({ request, response }: HttpContextContract) {
+        try {
+            const { email } = await request.validate(EmailValidator)
+            const user = await User.findBy('email', email)
+            if (!user) {
+                return response.badRequest({
+                    message: 'Không tìm thấy tài khoản này!',
+                    data: null,
+                })
+            }
+            if (user.isEmailVerified) {
+                return response.badRequest({
+                    message: 'Tài khoản này đã được xác minh Email từ trước!',
+                    data: null,
+                })
+            }
+
+            // Mail chỉ gửi lại cách nhau 15 phút
+            const record = await Token.query()
+                .where('user_id', user.id)
+                .where('type', 'VERIFY_EMAIL')
+                .where('created_at', '>=', DateTime.now().minus({ minutes: 15 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+                .first()
+            if (!record) {
+                await user.sendVerifyEmail()
+                return response.json({
+                    message: 'Đã gửi lại mail xác thực, vui lòng nhấn đường dẫn trong nội dung thư cung cấp',
+                    data: null,
+                })
+            }
+
+            return response.tooManyRequests({
+                message: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 15 phút.',
+                data: null,
+            })
+        } catch (e) {
+            return response.badRequest({
+                message: 'Có lỗi xảy ra, vui lòng thử lại!',
+                data: null,
+            })
+        }
+    }
 }
