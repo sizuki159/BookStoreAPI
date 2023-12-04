@@ -45,10 +45,14 @@ export default class VerifyEmailController {
         try {
             const user = await auth.use('api').authenticate()
             if(user.is_email_verified) {
-                return response.status(200)
+                return response.status(200).json({
+                    'message': 'Tài khoản đã xác minh email'
+                })
             }
         } catch {}
-        return response.unauthorized()
+        return response.status(400).json({
+            'message': 'Tài khoản chưa xác minh email'
+        })
     }
 
     public async verifyResetPassword({ request, response }: HttpContextContract) {
