@@ -155,8 +155,8 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     public static async afterFindHook(book: Book) {
         // Check Flash Sale
         const flashSaleAvailable = await FlashSaleHour.query()
-            .where('time_start', '<=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
-            .andWhere('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+            .where('time_start', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .andWhere('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .preload('products')
             .first()
 
@@ -180,8 +180,8 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
 
         // Check Flash Sale
         const flashSaleAvailable = await FlashSaleHour.query()
-            .where('time_start', '<=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
-            .andWhere('time_end', '>=', DatetimeUtils.DATE_NOW_WITH_TIME_SQL)
+            .where('time_start', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .andWhere('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .preload('products')
             .first()
 
