@@ -27,7 +27,8 @@
     "@adonisjs/drive-s3",
     "@adonisjs/lucid-slugify",
     "@adonisjs/route-model-binding/build/providers/RmbProvider",
-    "@adonisjs/mail"
+    "@adonisjs/mail",
+    "@adonisjs/view"
   ],
   "aceProviders": [
     "@adonisjs/repl"
@@ -45,5 +46,11 @@
   },
   "testProviders": [
     "@japa/preset-adonis/TestsProvider"
+  ],
+  "metaFiles": [
+    {
+      "pattern": "resources/views/**/*.edge",
+      "reloadServer": false
+    }
   ]
 }

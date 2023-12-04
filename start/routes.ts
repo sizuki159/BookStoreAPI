@@ -41,6 +41,10 @@ Route.group(() => {
 }).prefix('auth')
 //#endregion
 
+Route.get('/', async ({ view }) => {
+    return view.render('testview')
+})
+
 //#region Administrator
 
 Route.group(() => {

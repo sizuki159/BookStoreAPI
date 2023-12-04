@@ -35,7 +35,8 @@
       "@adonisjs/drive-s3",
       "@adonisjs/lucid-slugify",
       "@adonisjs/route-model-binding/build/adonis-typings",
-      "@adonisjs/mail"
+      "@adonisjs/mail",
+      "@adonisjs/view"
     ]
   }
 }
