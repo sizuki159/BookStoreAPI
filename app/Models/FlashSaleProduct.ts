@@ -10,7 +10,7 @@ export default class FlashSaleProduct extends BaseModel {
     public flashSaleHourId: number
 
     @column()
-    public productId: number
+    public isbnCode: string
 
     @column()
     public percentDiscount: number
@@ -23,8 +23,8 @@ export default class FlashSaleProduct extends BaseModel {
 
     //#region Relationship
     @belongsTo(() => Book, {
-        localKey: 'id',
-        foreignKey: 'productId'
+        localKey: 'isbnCode',
+        foreignKey: 'isbnCode'
     })
     public product_info: BelongsTo<typeof Book>
     //#endregion

@@ -184,9 +184,9 @@ export default class FlashSaleController {
                     table: 'flash_sale_hours'
                 })
             ]),
-            'product_id': schema.number([
+            'isbn_code': schema.string([
                 rules.exists({
-                    column: 'id',
+                    column: 'isbn_code',
                     table: 'books'
                 })
             ]),
@@ -198,8 +198,8 @@ export default class FlashSaleController {
                 'flash_sale_hour_id.required': 'Thiếu ID khung giờ sự kiện flash sale',
                 'flash_sale_hour_id.exists': 'ID khung giờ sự kiện flash sale không tồn tại trên hệ thống',
 
-                'product_id.required': 'Thiếu ID sản phẩm',
-                'product_id.exists': 'ID sản phẩm không tồn tại trên hệ thống',
+                'isbn_code.required': 'Thiếu ISBN Code sản phẩm',
+                'isbn_code.exists': 'ISBN Code sản phẩm không tồn tại trên hệ thống',
             }
         })
 
@@ -207,7 +207,7 @@ export default class FlashSaleController {
             // Kiểm tra xem khung giờ sự kiện này đã có sản phẩm này chưa
             const flashSaleProductExisted = await FlashSaleProduct.query()
                 .where('flashSaleHourId', payload.flash_sale_hour_id)
-                .andWhere('productId', payload.product_id)
+                .andWhere('isbnCode', payload.isbn_code)
                 .first()
 
             if (flashSaleProductExisted) {
@@ -218,7 +218,7 @@ export default class FlashSaleController {
 
             const flashSaleHour = await FlashSaleHour.findOrFail(payload.flash_sale_hour_id)
             await flashSaleHour.related('products').create({
-                productId: payload.product_id
+                isbnCode: payload.isbn_code
             })
 
             return response.ok({
