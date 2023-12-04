@@ -49,10 +49,12 @@ export default class VerifyEmailController {
                     'message': 'Tài khoản đã xác minh email'
                 })
             }
-        } catch {}
-        return response.status(400).json({
-            'message': 'Tài khoản chưa xác minh email'
-        })
+            return response.status(400).json({
+                'message': 'Tài khoản chưa xác minh email'
+            })
+        } catch {
+            return response.noContent()
+        }
     }
 
     public async verifyResetPassword({ request, response }: HttpContextContract) {
