@@ -32,7 +32,7 @@ Route.group(() => {
     // Verify Email
     Route.get('/verify/email/:token', 'VerifyEmailController.verify')
     Route.post('/request-verify', 'AuthController.requestEmailVerify')
-    // Route.get('/check/is-verified/:email', 'VerifyEmailController.checkEmailVerified')
+    Route.get('/check/is-verified', 'VerifyEmailController.checkEmailVerified')
 
     // Recovery password Email
     Route.post('/verify/email/reset_password', 'VerifyEmailController.verifyResetPassword')

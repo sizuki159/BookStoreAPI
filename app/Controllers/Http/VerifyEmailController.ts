@@ -21,33 +21,15 @@ export default class VerifyEmailController {
         return response.redirect(`${await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL)}/authentication/verify/mail/success`)
     }
 
-    // public async checkEmailVerified({ request, response, params }: HttpContextContract) {
-    //     try {
-    //         const { email } = params
-    //         const user = await User.findBy('email', email)
-    //         if (!user) {
-    //             return response.badRequest({
-    //                 message: 'Không tìm thấy tài khoản này!',
-    //                 data: null,
-    //             })
-    //         }
-    //         if (user.isEmailVerified) {
-    //             return response.ok({
-    //                 message: 'Tài khoản này đã được xác minh Email từ trước!',
-    //                 data: null,
-    //             })
-    //         }
-    //         return response.badRequest({
-    //             message: 'Tài khoản chưa được xác minh email!',
-    //             data: null,
-    //         })
-    //     } catch (e) {
-    //         return response.badRequest({
-    //             message: 'Có lỗi xảy ra, vui lòng thử lại!',
-    //             data: null,
-    //         })
-    //     }
-    // }
+    public async checkEmailVerified({ auth, response }: HttpContextContract) {
+        try {
+            const user = await auth.use('api').authenticate()
+            if(user.is_email_verified) {
+                return response.status(200)
+            }
+        } catch {}
+        return response.unauthorized()
+    }
 
     public async verifyResetPassword({ request, response }: HttpContextContract) {
         const { token, password } = request.body()
