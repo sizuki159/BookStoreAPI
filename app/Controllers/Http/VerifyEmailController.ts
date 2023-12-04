@@ -4,21 +4,41 @@ import User from 'App/Models/User'
 import SettingUtils from 'App/Utils/SettingUtils'
 
 export default class VerifyEmailController {
-    public async verify({ response, params }: HttpContextContract) {
+    public async verify({ response, params, view }: HttpContextContract) {
+
+        const home_url = await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL)
+
         const user = await Token.getTokenUser(params.token, 'VERIFY_EMAIL')
 
         // if token is invalid, not bound to a user, or does not match the auth user
         if (!user) {
-            return response.redirect(`${await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL)}/authentication/verify/mail/fail`)
+            return view.render('verify_email', {
+                image: '/img/delete.png',
+                title: 'Xác nhận email thất bại!',
+                content: 'Đường dẫn không hợp lệ',
+                home_url: home_url,
+            })
         }
         await Token.expireTokens(user, 'verifyEmailTokens')
 
         if (!user.isEmailVerified) {
             user.isEmailVerified = true
             await user.save()
+
+            return view.render('verify_email', {
+                image: '/img/success.png',
+                title: 'Xác nhận email thành công!',
+                content: 'Cảm ơn bạn đã xác nhận email của bạn. Tài khoản của bạn hiện đang hoạt động và sẵn sàng để sử dụng.',
+                home_url: home_url,
+            })
         }
 
-        return response.redirect(`${await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL)}/authentication/verify/mail/success`)
+        return view.render('verify_email', {
+            image: '/img/success.png',
+            title: 'Đã xác nhận email!',
+            content: 'Tài khoản này đã xác nhận trước đó thành công. Tài khoản của bạn hiện đang hoạt động và sẵn sàng để sử dụng.',
+            home_url: home_url,
+        })
     }
 
     public async checkEmailVerified({ auth, response }: HttpContextContract) {
