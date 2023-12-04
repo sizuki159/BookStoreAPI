@@ -161,7 +161,7 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
             .first()
 
         if (flashSaleAvailable) {
-            const isMatch = flashSaleAvailable.products.some((item) => item.productId === book.id);
+            const isMatch = flashSaleAvailable.products.some((item) => item.isbnCode === book.isbnCode);
             if (isMatch) {
                 const priceAfterDiscount = book.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
                 book.flashSaleInfo = {
@@ -187,8 +187,8 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
 
 
         if (flashSaleAvailable) {
-            let flashSaleAvailableProducts = new Map(flashSaleAvailable.products.map(flashSaleAvailable => [flashSaleAvailable.productId, flashSaleAvailable]));
-            let productHaveFlashSales = books.filter(book => flashSaleAvailableProducts.has(book.id));
+            let flashSaleAvailableProducts = new Map(flashSaleAvailable.products.map(flashSaleAvailable => [flashSaleAvailable.isbnCode, flashSaleAvailable]));
+            let productHaveFlashSales = books.filter(book => flashSaleAvailableProducts.has(book.isbnCode));
             for (const product of productHaveFlashSales) {
                 const priceAfterDiscount = product.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
                 product.flashSaleInfo = {
