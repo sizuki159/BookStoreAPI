@@ -15,6 +15,9 @@ export default class BookComment extends BaseModel {
     public isbnCode: string
 
     @column()
+    public rateStar: number
+
+    @column()
     public content: string
 
     @column.dateTime({

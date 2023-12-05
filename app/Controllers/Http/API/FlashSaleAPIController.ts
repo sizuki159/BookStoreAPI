@@ -3,6 +3,7 @@ import FlashSaleAPIFilterFields from 'App/FilterFields/API/FlashSaleAPIFilterFie
 import FlashSale from 'App/Models/FlashSale'
 import FlashSaleHour from 'App/Models/FlashSaleHour'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
+import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import { DateTime } from 'luxon'
 
 export default class FlashSaleAPIController {
@@ -17,8 +18,16 @@ export default class FlashSaleAPIController {
 
         // ******debug tesst chức năng, xóa và uncomment ở trên
         const flashSaleTodayAccessable = await FlashSale.query()
-            .where('event_date', DateTime.now().set({ year: 2023, day: 4, month: 12, hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
-            .preload('hours')
+            .where('event_date', DateTime.now().set({ hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .preload('hours', (hours) => {
+                hours.where('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+                    .orderBy('time_start', 'asc') //dùng api khác để get sp by id flash sale hour
+                // .preload('products', (products) => {
+                //     products.preload('product_info', (product_info) => {
+                //         product_info.preload('images')
+                //     })
+                // })
+            })
             .first()
         // ******debug tesst chức năng, xóa và uncomment ở trên
 
@@ -29,7 +38,9 @@ export default class FlashSaleAPIController {
         return response.noContent()
     }
 
-    public async getFlashSaleHourDetail({ params, response }: HttpContextContract) {
+    public async getFlashSaleHourDetail({ request, params, response }: HttpContextContract) {
+        const { page, limit } = PageLimitUtils(request.qs())
+
         const flash_sale_hour_id = params.flash_sale_hour_id
         const flashSaleHour = await FlashSaleHour.find(flash_sale_hour_id)
         if (!flashSaleHour) {
@@ -37,9 +48,19 @@ export default class FlashSaleAPIController {
                 'message': 'Không tìm thấy khung giờ sự kiện Flash Sale này'
             })
         }
+
         await flashSaleHour.load('products', (products) => {
-            products.preload('product_info')
+            products.preload('product_info', (product_info) => {
+                product_info.preload('author')
+                    .preload('bookForm')
+                    .preload('ccategory')
+                    .preload('images')
+                    .preload('language')
+                    .preload('provider')
+                    .preload('publisher')
+            }).forPage(page, limit)
         })
+
         return flashSaleHour
     }
 }

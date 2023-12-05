@@ -8,7 +8,7 @@ export default class extends BaseSchema {
             table.increments('id')
             table.integer('flash_sale_hour_id').unsigned().references('id').inTable('flash_sale_hours').onDelete('CASCADE')
             table.string('isbn_code').references('isbn_code').inTable('books').onDelete('CASCADE')
-            table.double('percent_discount').defaultTo(10)
+            // table.double('percent_discount').defaultTo(10)
             
             
             table.unique(['flash_sale_hour_id', 'isbn_code'])
