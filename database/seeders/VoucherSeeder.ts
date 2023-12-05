@@ -25,7 +25,7 @@ export default class extends BaseSeeder {
                 limited: 100,
                 desc: 'Chào mừng khai trương, giảm giá lên đến 40%',
                 startDate: DateTime.fromFormat('02-11-2023 00:00:00', 'dd-MM-yyyy HH:mm:ss'),
-                endDate: DateTime.fromFormat('30-11-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
+                endDate: DateTime.fromFormat('31-12-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
                 status: Voucher.STATUS.ACTIVE,
             },
             {
@@ -36,7 +36,7 @@ export default class extends BaseSeeder {
                 limited: 100,
                 desc: 'Chào mừng khai trương, giảm giá lên đến 40%',
                 startDate: DateTime.fromFormat('02-11-2023 00:00:00', 'dd-MM-yyyy HH:mm:ss'),
-                endDate: DateTime.fromFormat('30-11-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
+                endDate: DateTime.fromFormat('31-12-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
                 status: Voucher.STATUS.ACTIVE,
             },
             {
@@ -47,7 +47,7 @@ export default class extends BaseSeeder {
                 limited: 100,
                 desc: 'Chào mừng khai trương, giảm giá lên đến 40%',
                 startDate: DateTime.fromFormat('02-11-2023 00:00:00', 'dd-MM-yyyy HH:mm:ss'),
-                endDate: DateTime.fromFormat('30-11-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
+                endDate: DateTime.fromFormat('31-12-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
                 status: Voucher.STATUS.ACTIVE,
             },
             {
@@ -58,7 +58,7 @@ export default class extends BaseSeeder {
                 limited: 100,
                 desc: 'Chào mừng khai trương, giảm giá lên đến 40%',
                 startDate: DateTime.fromFormat('02-11-2023 00:00:00', 'dd-MM-yyyy HH:mm:ss'),
-                endDate: DateTime.fromFormat('30-11-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
+                endDate: DateTime.fromFormat('31-12-2023 23:59:59', 'dd-MM-yyyy HH:mm:ss'),
                 status: Voucher.STATUS.ACTIVE,
             },
         ])

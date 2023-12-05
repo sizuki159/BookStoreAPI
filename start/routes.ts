@@ -41,10 +41,6 @@ Route.group(() => {
 }).prefix('auth')
 //#endregion
 
-Route.get('/', async ({ view }) => {
-    return view.render('testview')
-})
-
 //#region Administrator
 
 Route.group(() => {
@@ -238,6 +234,12 @@ Route.group(() => {
         Route.get('/voucher-partner', 'UserVoucherController.getVoucherPartner')
         Route.get('/voucher-personalized', 'UserVoucherController.getVoucherPersonalized')
     }).prefix('voucher')
+
+    Route.group(() => {
+        Route.post('/write', 'BookCommentController.writeComment')
+        Route.put('/edit', 'BookCommentController.editComment')
+        Route.delete('/delete/:comment_id', 'BookCommentController.deleteComment')
+    }).prefix('comment')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
 
