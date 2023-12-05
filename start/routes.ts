@@ -264,6 +264,11 @@ Route.group(() => {
         Route.get('/', 'BookAPIController.getBookWithFilter')
         Route.get('/:isbn_code', 'BookAPIController.getBookByIBSNCode')
         Route.get('/slug/:book(slug)', 'BookAPIController.getBookBySlug')
+
+        Route.group(() => {
+            Route.get('/:isbn_code', 'BookCommentAPIController.getCommentByISBNCode')
+        }).prefix('comment')
+
     }).prefix('book')
     //#endregion
 
