@@ -7,18 +7,21 @@ import { DateTime } from 'luxon'
 
 export default class FlashSaleAPIController {
     public async getFlashSaleTodayAccessable({ response }: HttpContextContract) {
+        // const flashSaleTodayAccessable = await FlashSale.query()
+        //     .where('event_date', DateTime.now().set({ hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+        //     .preload('hours', (hours) => {
+        //         hours.where('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+        //             .orderBy('time_start', 'asc') //dùng api khác để get sp by id flash sale hour
+        //     })
+        //     .first()
+
+        // ******debug tesst chức năng, xóa và uncomment ở trên
         const flashSaleTodayAccessable = await FlashSale.query()
-            .where('event_date', DateTime.now().set({ hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
-            .preload('hours', (hours) => {
-                hours.where('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
-                    .orderBy('time_start', 'asc') //dùng api khác để get sp by id flash sale hour
-                    // .preload('products', (products) => {
-                    //     products.preload('product_info', (product_info) => {
-                    //         product_info.preload('images')
-                    //     })
-                    // })
-            })
+            .where('event_date', DateTime.now().set({ year: 2023, day: 4, month: 12, hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .preload('hours')
             .first()
+        // ******debug tesst chức năng, xóa và uncomment ở trên
+
         if (flashSaleTodayAccessable) {
             return response.ok(flashSaleTodayAccessable.serialize(FlashSaleAPIFilterFields))
         }
