@@ -12,8 +12,8 @@ export default class FlashSaleProduct extends BaseModel {
     @column()
     public isbnCode: string
 
-    @column()
-    public percentDiscount: number
+    // @column()
+    // public percentDiscount: number
 
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime

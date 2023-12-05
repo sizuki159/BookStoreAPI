@@ -230,4 +230,34 @@ export default class FlashSaleController {
             })
         }
     }
+
+    public async deleteProductFromFlashSaleHour({ params, response }: HttpContextContract) {
+        const { flash_sale_hour_id, isbn_code } = params
+
+        const flashSaleProduct = await FlashSaleProduct.query()
+            .where('flashSaleHourId', flash_sale_hour_id)
+            .andWhere('isbnCode', isbn_code)
+            .first()
+
+        if (flashSaleProduct) {
+            try {
+                await flashSaleProduct.delete()
+                return response.ok({
+                    'message': 'Xóa sản phẩm này ra khỏi khung giờ sự kiện thành công'
+                })
+            } catch {
+                return response.serviceUnavailable({
+                    'message': 'Có lỗi khi xóa, vui lòng thử lại sau'
+                })
+            }
+        }
+
+        return response.notFound({
+            'message': 'Không tìm thấy sản phẩm này trong khung giờ sự kiện'
+        })
+    }
+
+    public async updateFlashSaleHour({request, response}: HttpContextContract) {
+        
+    }
 }

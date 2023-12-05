@@ -173,6 +173,9 @@ Route.group(() => {
         Route.post('/create', 'FlashSaleController.createFlashSale')
         Route.post('/hour/create', 'FlashSaleController.createHourOnFlashSaleEvent')
         Route.post('/hour/add-product', 'FlashSaleController.addProductToFlashSaleHour')
+
+        Route.delete('/hour/:flash_sale_hour_id/delete-product/:isbn_code', 'FlashSaleController.deleteProductFromFlashSaleHour')
+        Route.put('/hour/update', 'FlashSaleController.updateFlashSaleHour')
     }).prefix('flash-sale')
 
     Route.group(() => {
