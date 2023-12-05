@@ -8,6 +8,7 @@ export default class extends BaseSchema {
             table.increments('id')
             table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
             table.string('isbn_code').references('isbn_code').inTable('books').onDelete('CASCADE')
+            table.enu('rate_star', [1, 2, 3, 4, 5]).defaultTo(5)
             table.text('content')
 
             /**

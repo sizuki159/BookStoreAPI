@@ -37,19 +37,19 @@ export default class FlashSaleAPIController {
                 'message': 'Không tìm thấy khung giờ sự kiện Flash Sale này'
             })
         }
-        
+
         await flashSaleHour.load('products', (products) => {
             products.preload('product_info', (product_info) => {
                 product_info.preload('author')
-                .preload('bookForm')
-                .preload('ccategory')
-                .preload('images')
-                .preload('language')
-                .preload('provider')
-                .preload('publisher')
+                    .preload('bookForm')
+                    .preload('ccategory')
+                    .preload('images')
+                    .preload('language')
+                    .preload('provider')
+                    .preload('publisher')
             }).forPage(page, limit)
         })
-        
+
         return flashSaleHour
     }
 }

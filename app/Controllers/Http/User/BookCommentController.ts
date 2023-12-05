@@ -14,6 +14,9 @@ export default class BookCommentController {
                     table: 'books'
                 })
             ]),
+            'rate_star': schema.enum(
+                [1, 2, 3, 4, 5] as const
+            ),
             'content': schema.string()
         })
 
@@ -23,13 +26,18 @@ export default class BookCommentController {
                 'isbn_code.required': 'Thiếu mã sách bình luận',
                 'isbn_code.exists': 'Mã sách này không tồn tại trên hệ thống',
 
+                'rate_star.required': 'Thiếu số điểm đánh giá (số sao)',
+                'rate_star.enum': 'Số điểm phải là số nguyên từ 1 đến 5',
+
                 'content.required': 'Thiếu nội dung bình luận',
             }
         })
+
         try {
             await BookComment.create({
                 isbnCode: payload.isbn_code,
                 userId: user.id,
+                rateStar: payload.rate_star,
                 content: payload.content
             })
 
@@ -46,36 +54,56 @@ export default class BookCommentController {
     public async editComment({ auth, request, response }: HttpContextContract) {
         const user = await auth.use('api').authenticate()
 
-        const { comment_id, content } = request.body()
-
-        const comment = await BookComment.query()
-            .where('userId', user.id)
-            .andWhere('id', comment_id)
-            .first()
-
-        if (comment) {
-            try {
-                comment.content = content
-                await comment.save()
-    
-                return response.ok({
-                    'message': 'Thành công'
+        const editCommentSchema = schema.create({
+            'comment_id': schema.number([
+                rules.exists({
+                    column: 'id',
+                    table: 'book_comments',
+                    where: {
+                        'user_id': user.id,
+                    }
                 })
-            } catch {
-                return response.serviceUnavailable({
-                    'message': 'Hệ thống đang bảo trì chức năng bình luận'
-                })
-            }
-        }
-        return response.notFound({
-            'message': 'Không tìm thấy comment này của bạn'
+            ]),
+            'rate_star': schema.enum(
+                [1, 2, 3, 4, 5] as const
+            ),
+            'content': schema.string()
         })
+
+        const payload = await request.validate({
+            schema: editCommentSchema,
+            messages: {
+                'comment_id.required': 'Thiếu comment ID',
+                'comment_id.exists': 'ID comment này không tồn tại trên hệ thống',
+
+                'rate_star.required': 'Thiếu số điểm đánh giá (số sao)',
+                'rate_star.enum': 'Số điểm phải là số nguyên từ 1 đến 5',
+
+                'content.required': 'Thiếu nội dung bình luận',
+            }
+        })
+
+        try {
+            await BookComment.query()
+                .update('content', payload.content)
+                .update('rateStar', payload.rate_star)
+                .where('id', payload.comment_id)
+
+            return response.ok({
+                'message': 'Thành công'
+            })
+        } catch {
+            return response.serviceUnavailable({
+                'message': 'Hệ thống đang bảo trì chức năng bình luận'
+            })
+        }
+
     }
 
     public async deleteComment({ auth, params, response }: HttpContextContract) {
         const user = await auth.use('api').authenticate()
 
-        const comment_id  = params.comment_id
+        const comment_id = params.comment_id
 
         const comment = await BookComment.query()
             .where('userId', user.id)
