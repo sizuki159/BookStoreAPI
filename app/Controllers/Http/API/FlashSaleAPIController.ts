@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import FlashSaleAPIFilterFields from 'App/FilterFields/API/FlashSaleAPIFilterFields'
 import FlashSale from 'App/Models/FlashSale'
 import FlashSaleHour from 'App/Models/FlashSaleHour'
@@ -46,13 +47,41 @@ export default class FlashSaleAPIController {
                 product_info.preload('author')
                     .preload('bookForm')
                     .preload('ccategory')
-                    .preload('images')
+                    .preload('images', images => images.groupLimit(1))
                     .preload('language')
                     .preload('provider')
                     .preload('publisher')
             }).forPage(page, limit)
         })
 
-        return flashSaleHour.products
+        for (const flashSaleProduct of flashSaleHour.products) {
+            const priceAfterDiscount = flashSaleProduct.product_info.price * ((100 - flashSaleHour.percentDiscount) / 100)
+
+            // Đếm số lượng đã bán
+            let totalSoldNumber = 0
+            const totalSoldNumberDb = await Database.from('order_items')
+                .where('isbn_code', flashSaleProduct.product_info.isbnCode)
+                .sum('quantity as total_sold_number')
+            try {
+                totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
+            } catch { }
+
+            flashSaleProduct.product_info.flashSaleInfo = {
+                is_flash_sale: true,
+                original_price: flashSaleProduct.product_info.price,
+                discount_percent: flashSaleHour.percentDiscount,
+                price_after_discount: priceAfterDiscount,
+                time_takes_place: {
+                    time_start: flashSaleHour.timeStart.toFormat('HH:mm:ss'),
+                    time_end: flashSaleHour.timeEnd.toFormat('HH:mm:ss'),
+                },
+                instock_info: {
+                    sold_number: totalSoldNumber,
+                    instock: flashSaleProduct.product_info.quantity,
+                }
+            }
+        }
+
+        return flashSaleHour
     }
 }

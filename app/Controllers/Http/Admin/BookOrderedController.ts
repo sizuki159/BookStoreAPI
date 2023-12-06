@@ -9,7 +9,7 @@ export default class BookOrderedController {
         const query = Order.query()
             .preload('items', (items) => {
                 items.preload('product', (product) => {
-                    product.preload('images')
+                    product.preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user')
@@ -34,7 +34,7 @@ export default class BookOrderedController {
             .where('order_id', orderId)
             .preload('items', (items) => {
                 items.preload('product', (product) => {
-                    product.preload('images')
+                    product.preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user')

@@ -17,7 +17,7 @@ export default class UserCartController {
     public async getMyCart({ auth, response }: HttpContextContract) {
         const myCarts = await Cart.query().where('userId', auth.use('api').user!.id)
             .preload('book', book => {
-                book.preload('images')
+                book.preload('images', images => images.groupLimit(1))
             })
         return response.json(myCarts.map((myCart) => {
             return myCart.serialize(CartFilterFields)
@@ -219,7 +219,7 @@ export default class UserCartController {
         const carts = await Cart.query().where('userId', user.id)
             .andWhereIn('id', ids)
             .preload('book', book => {
-                book.preload('images')
+                book.preload('images', images => images.groupLimit(1))
             })
 
         if (carts.length === 0) {

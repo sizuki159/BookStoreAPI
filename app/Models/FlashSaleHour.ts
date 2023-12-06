@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, HasMany, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, afterCreate, beforeCreate, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import FlashSaleProduct from './FlashSaleProduct'
 import ResponseFormat from 'App/Utils/ResponseFormat'
+import FlashSale from './FlashSale'
 
 export default class FlashSaleHour extends BaseModel {
     @column({ isPrimary: true })
@@ -51,5 +52,34 @@ export default class FlashSaleHour extends BaseModel {
         foreignKey: 'flashSaleHourId'
     })
     public products: HasMany<typeof FlashSaleProduct>
+
+    @belongsTo(() => FlashSale, {
+        localKey: 'id',
+        foreignKey: 'flashSaleId',
+    })
+    public flashSale: BelongsTo<typeof FlashSale>
     //#endregion
+
+
+    @beforeCreate()
+    public static async beforeCreateHooks (flashSaleHour: FlashSaleHour) {
+        try {
+            const flashSale = await FlashSale.find(flashSaleHour.flashSaleId)
+            if(flashSale) {
+                flashSaleHour.timeStart = flashSaleHour.timeStart.set({
+                    day: flashSale.eventDate.day,
+                    month: flashSale.eventDate.month,
+                    year: flashSale.eventDate.year,
+                })
+    
+                flashSaleHour.timeEnd = flashSaleHour.timeEnd.set({
+                    day: flashSale.eventDate.day,
+                    month: flashSale.eventDate.month,
+                    year: flashSale.eventDate.year,
+                })
+            }
+        } catch {
+
+        }
+    }
 }

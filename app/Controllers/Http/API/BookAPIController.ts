@@ -23,7 +23,7 @@ export default class BookAPIController {
             .preload('ccategory')
             .preload('author')
             .preload('bookForm')
-            .preload('images')
+            .preload('images', images => images.groupLimit(1))
             .preload('language')
             .preload('publisher')
             .preload('provider')

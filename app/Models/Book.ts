@@ -1,6 +1,6 @@
 import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, HasMany, afterFetch, afterFind, beforeFetch, belongsTo, column, computed, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, afterFetch, afterFind, belongsTo, column, computed, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 
@@ -14,16 +14,21 @@ import BookLanguage from './BookLanguage'
 import BookProvider from './BookProvider'
 import ResponseFormat from 'App/Utils/ResponseFormat'
 import FlashSaleProduct from './FlashSaleProduct'
-import FlashSale from './FlashSale'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import FlashSaleHour from './FlashSaleHour'
+import OrderItem from './OrderItem'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 type FlashSaleInfo = {
     is_flash_sale: boolean,
     original_price: number,
     discount_percent: number,
     price_after_discount: number,
-    instock_info?: {
+    time_takes_place: {
+        time_start: string,
+        time_end: string
+    }
+    instock_info: {
         sold_number: number
         instock: number,
     }
@@ -163,12 +168,32 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
         if (flashSaleAvailable) {
             const isMatch = flashSaleAvailable.products.some((item) => item.isbnCode === book.isbnCode);
             if (isMatch) {
+
+                // Giá giảm
                 const priceAfterDiscount = book.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+
+                // Đếm số lượng đã bán
+                let totalSoldNumber = 0
+                const totalSoldNumberDb = await Database.from('order_items')
+                    .where('isbn_code', book.isbnCode)
+                    .sum('quantity as total_sold_number')
+                try {
+                    totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
+                } catch { }
+
                 book.flashSaleInfo = {
                     is_flash_sale: true,
                     original_price: book.price,
                     discount_percent: flashSaleAvailable.percentDiscount,
-                    price_after_discount: priceAfterDiscount
+                    price_after_discount: priceAfterDiscount,
+                    time_takes_place: {
+                        time_start: flashSaleAvailable.timeStart.toFormat('HH:mm:ss'),
+                        time_end: flashSaleAvailable.timeEnd.toFormat('HH:mm:ss'),
+                    },
+                    instock_info: {
+                        sold_number: totalSoldNumber,
+                        instock: book.quantity,
+                    }
                 }
                 book.price = priceAfterDiscount
             }
@@ -191,11 +216,29 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
             let productHaveFlashSales = books.filter(book => flashSaleAvailableProducts.has(book.isbnCode));
             for (const product of productHaveFlashSales) {
                 const priceAfterDiscount = product.price * ((100 - flashSaleAvailable.percentDiscount) / 100)
+
+                // Đếm số lượng đã bán
+                let totalSoldNumber = 0
+                const totalSoldNumberDb = await Database.from('order_items')
+                    .where('isbn_code', product.isbnCode)
+                    .sum('quantity as total_sold_number')
+                try {
+                    totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
+                } catch { }
+
                 product.flashSaleInfo = {
                     is_flash_sale: true,
                     original_price: product.price,
                     discount_percent: flashSaleAvailable.percentDiscount,
                     price_after_discount: priceAfterDiscount,
+                    time_takes_place: {
+                        time_start: flashSaleAvailable.timeStart.toFormat('HH:mm:ss'),
+                        time_end: flashSaleAvailable.timeEnd.toFormat('HH:mm:ss'),
+                    },
+                    instock_info: {
+                        sold_number: totalSoldNumber,
+                        instock: product.quantity,
+                    }
                 }
                 product.price = priceAfterDiscount
             }

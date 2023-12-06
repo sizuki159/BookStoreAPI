@@ -251,7 +251,7 @@ export default class UserOrderController {
         const myOrders = await Order.query().where('user_id', userAuth.id)
             .preload('items', (items) => {
                 items.preload('product', (product) => {
-                    product.preload('images')
+                    product.preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user')
@@ -275,7 +275,7 @@ export default class UserOrderController {
             .andWhere('order_id', orderId)
             .preload('items', (items) => {
                 items.preload('product', (product) => {
-                    product.preload('images')
+                    product.preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user')

@@ -133,17 +133,6 @@ export default class FlashSaleController {
 
             const flashSale = await FlashSale.findOrFail(payload.flash_sale_id)
 
-            payload.time_start = payload.time_start.set({
-                day: flashSale.eventDate.day,
-                month: flashSale.eventDate.month,
-                year: flashSale.eventDate.year,
-            })
-            payload.time_end = payload.time_end.set({
-                day: flashSale.eventDate.day,
-                month: flashSale.eventDate.month,
-                year: flashSale.eventDate.year,
-            })
-
             // Kiểm tra xem vào sự kiện này đã có khung giờ này chưa
             const flashSaleHourExisted = await FlashSaleHour.query()
                 .where('flashSaleId', flashSale.id)
