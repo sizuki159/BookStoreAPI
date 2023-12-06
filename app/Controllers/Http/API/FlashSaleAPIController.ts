@@ -18,7 +18,7 @@ export default class FlashSaleAPIController {
 
         // ******debug tesst chức năng, xóa và uncomment ở trên
         // const flashSaleTodayAccessable = await FlashSale.query()
-        //     .where('event_date', DateTime.now().set({ day: 5, month: 12, year: 2023, hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+        //     .where('event_date', DateTime.now().set({ day: 6, month: 12, year: 2023, hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
         //     .preload('hours')
         //     .first()
         // ******debug tesst chức năng, xóa và uncomment ở trên
