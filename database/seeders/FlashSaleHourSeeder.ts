@@ -36,11 +36,6 @@ export default class extends BaseSeeder {
                     timeEnd: DateTime.fromFormat('15:59:59', 'HH:mm:ss'),
                 },
                 {
-                    percentDiscount: 40,
-                    timeStart: DateTime.fromFormat('14:00:00', 'HH:mm:ss'),
-                    timeEnd: DateTime.fromFormat('15:59:59', 'HH:mm:ss'),
-                },
-                {
                     percentDiscount: 30,
                     timeStart: DateTime.fromFormat('16:00:00', 'HH:mm:ss'),
                     timeEnd: DateTime.fromFormat('17:59:59', 'HH:mm:ss'),

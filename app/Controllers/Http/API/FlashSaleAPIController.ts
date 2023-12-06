@@ -8,19 +8,19 @@ import { DateTime } from 'luxon'
 
 export default class FlashSaleAPIController {
     public async getFlashSaleTodayAccessable({ response }: HttpContextContract) {
-        // const flashSaleTodayAccessable = await FlashSale.query()
-        //     .where('event_date', DateTime.now().set({ hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
-        //     .preload('hours', (hours) => {
-        //         hours.where('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
-        //             .orderBy('time_start', 'asc') //dùng api khác để get sp by id flash sale hour
-        //     })
-        //     .first()
+        const flashSaleTodayAccessable = await FlashSale.query()
+            .where('event_date', DateTime.now().set({ hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .preload('hours', (hours) => {
+                hours.where('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+                    .orderBy('time_start', 'asc') //dùng api khác để get sp by id flash sale hour
+            })
+            .first()
 
         // ******debug tesst chức năng, xóa và uncomment ở trên
-        const flashSaleTodayAccessable = await FlashSale.query()
-            .where('event_date', DateTime.now().set({ day: 4, month: 12, year: 2023, hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
-            .preload('hours')
-            .first()
+        // const flashSaleTodayAccessable = await FlashSale.query()
+        //     .where('event_date', DateTime.now().set({ day: 5, month: 12, year: 2023, hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+        //     .preload('hours')
+        //     .first()
         // ******debug tesst chức năng, xóa và uncomment ở trên
 
         if (flashSaleTodayAccessable) {
@@ -30,7 +30,7 @@ export default class FlashSaleAPIController {
         return response.noContent()
     }
 
-    public async getFlashSaleHourDetail({ request, params, response }: HttpContextContract) {
+    public async getFlashSaleHourProducts({ request, params, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
 
         const flash_sale_hour_id = params.flash_sale_hour_id
@@ -53,6 +53,6 @@ export default class FlashSaleAPIController {
             }).forPage(page, limit)
         })
 
-        return flashSaleHour
+        return flashSaleHour.products
     }
 }
