@@ -155,6 +155,16 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     @computed({ serializeAs: 'flash_sale_info' })
     public flashSaleInfo?: FlashSaleInfo
 
+    public async getOriginalPrice(): Promise<number> {
+        const product = await Database.from('books')
+            .where('isbn_code', this.isbnCode)
+            .first()
+        if (product) {
+            return product.price
+        }
+        return this.price
+    }
+
 
     @afterFind()
     public static async afterFindHook(book: Book) {
