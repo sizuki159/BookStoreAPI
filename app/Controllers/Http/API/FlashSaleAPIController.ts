@@ -55,7 +55,12 @@ export default class FlashSaleAPIController {
         })
 
         for (const flashSaleProduct of flashSaleHour.products) {
-            const priceAfterDiscount = flashSaleProduct.product_info.price * ((100 - flashSaleHour.percentDiscount) / 100)
+
+            const original_product = await Database.from('books')
+                .where('isbn_code', flashSaleProduct.product_info.isbnCode)
+                .first()
+
+            const priceAfterDiscount = original_product.price * ((100 - flashSaleHour.percentDiscount) / 100)
 
             // Đếm số lượng đã bán
             let totalSoldNumber = 0
@@ -68,7 +73,7 @@ export default class FlashSaleAPIController {
 
             flashSaleProduct.product_info.flashSaleInfo = {
                 is_flash_sale: true,
-                original_price: flashSaleProduct.product_info.price,
+                original_price: original_product.price,
                 discount_percent: flashSaleHour.percentDiscount,
                 price_after_discount: priceAfterDiscount,
                 time_takes_place: {
