@@ -128,7 +128,7 @@ Route.group(() => {
 
     }).prefix('book')
 
-    //#region Category
+    //#region Quản lý Category
     Route.group(() => {
         Route.group(() => {
             Route.get('', 'ParentCategoryController.getAll')
@@ -164,6 +164,7 @@ Route.group(() => {
         Route.post('', 'VoucherController.addVoucher')
     }).prefix('voucher')
 
+    //#region Quản lý Flash Sale
     Route.group(() => {
         Route.get('/all', 'FlashSaleController.getAllFlashSale')
         Route.get('/:flash_sale_id/hour', 'FlashSaleController.getFlashSaleAllHour')
@@ -177,12 +178,20 @@ Route.group(() => {
         Route.delete('/hour/:flash_sale_hour_id/delete-product/:isbn_code', 'FlashSaleController.deleteProductFromFlashSaleHour')
         Route.put('/hour/update', 'FlashSaleController.updateFlashSaleHour')
     }).prefix('flash-sale')
+    //#endregion
 
+    //#region Quản lý Đơn hàng
     Route.group(() => {
         Route.get('/all', 'BookOrderedController.getAllOrder')
         Route.get('/detail/:order_id', 'BookOrderedController.orderDetail')
     }).prefix('order')
+    //#endregion
 
+    //#region Thống kê hệ thống
+    Route.group(() => {
+        Route.get('', 'AdminStatisticController.getStatistic')
+    }).prefix('statistic')
+    //#endregion
 
 }).prefix('admin').namespace('App/Controllers/Http/Admin').middleware(['auth', 'admin'])
 //#endregion
@@ -223,7 +232,7 @@ Route.group(() => {
         Route.post('/pre_order', 'UserCartController.preOrder')
     }).prefix('cart')
 
-
+    // User Order
     Route.group(() => {
         Route.post('/create', 'UserOrderController.createOrder')
         Route.get('/my-order', 'UserOrderController.getMyOrder')
@@ -231,6 +240,8 @@ Route.group(() => {
 
         Route.post('/review/write', 'UserOrderReviewController.writeReview')
         Route.delete('/review/delete/:review_id', 'UserOrderReviewController.deleteReview')
+
+        Route.post('/confirmed', 'UserOrderController.confirmedReceivedOrder')
     }).prefix('order')
 
     Route.group(() => {

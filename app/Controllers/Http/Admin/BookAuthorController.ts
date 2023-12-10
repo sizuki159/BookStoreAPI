@@ -17,23 +17,7 @@ export default class BookAuthorController {
     }
 
     public async add({request, response}: HttpContextContract) {
-        // const newAuthorSchema = schema.create({
-        //     author_name: schema.string([
-        //         rules.unique({
-        //             table: 'book_authors',
-        //             column: 'author_name'
-        //         })
-        //     ]),
-        // })
-        // const payload = await request.validate({
-        //     schema: newAuthorSchema,
-        //     messages: {
-        //         'author_name.unique': 'Tác giả này đã tồn tại.'
-        //     }
-        // })
-
         const {author_name} = request.body()
-
         try {
             const bookAuthor = await BookAuthor.create({authorName: author_name})
             return response.created(bookAuthor)
@@ -52,22 +36,6 @@ export default class BookAuthorController {
                 message: 'Không tìm thấy tác giả sách này!'
             })
         }
-
-        // const newAuthorSchema = schema.create({
-        //     author_name: schema.string([
-        //         rules.unique({
-        //             table: 'book_authors',
-        //             column: 'author_name',
-        //             whereNot: {id: book_author_id}
-        //         })
-        //     ]),
-        // })
-        // const payload = await request.validate({
-        //     schema: newAuthorSchema,
-        //     messages: {
-        //         'author_name.unique': 'Tác giả này đã tồn tại.'
-        //     }
-        // })
         
         bookAuthor.authorName = author_name
         await bookAuthor.save()

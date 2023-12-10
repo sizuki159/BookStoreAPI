@@ -296,4 +296,25 @@ export default class UserOrderController {
             message: 'Không tìm thấy đơn hàng này của bạn'
         })
     }
+
+    public async confirmedReceivedOrder({ auth, request, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+
+        const { order_id } = request.body()
+
+        try {
+            await Order.query()
+                .update('status', Order.STATUS.SUCCESS)
+                .where('order_id', order_id)
+                .andWhere('user_id', userAuth.id)
+
+            return response.ok({
+                'message': 'Xác nhận đã nhận hàng thành công'
+            })
+        } catch {
+            return response.badRequest({
+                'message': 'Thất bại'
+            })
+        }
+    }
 }
