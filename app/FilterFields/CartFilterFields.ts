@@ -18,6 +18,7 @@ const CartFilterFields: CherryPick = {
                     'slug',
                     'price',
                     'quantity',
+                    'flash_sale_info'
                 ]
             },
             relations: {

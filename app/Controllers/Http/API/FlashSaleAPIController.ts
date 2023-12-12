@@ -108,6 +108,6 @@ export default class FlashSaleAPIController {
             return response.json(flashSaleHour)
         }
 
-        return response.ok([])
+        return response.ok({})
     }
 }
