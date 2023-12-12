@@ -86,4 +86,28 @@ export default class FlashSaleAPIController {
 
         return flashSaleHour
     }
+
+    public async getFlashSaleNow({ response }: HttpContextContract) {
+        const flashSaleHour = await FlashSaleHour.query()
+            .where('time_start', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .andWhere('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .first()
+
+        if (flashSaleHour) {
+            await flashSaleHour.load('products', (products) => {
+                products.preload('product_info', (product_info) => {
+                    product_info.preload('author')
+                        .preload('bookForm')
+                        .preload('ccategory')
+                        .preload('images', images => images.groupLimit(1))
+                        .preload('language')
+                        .preload('provider')
+                        .preload('publisher')
+                }).groupLimit(5)
+            })
+            return response.json(flashSaleHour)
+        }
+
+        return response.ok([])
+    }
 }
