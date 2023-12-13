@@ -13,7 +13,8 @@ const APIBookFilterFields: CherryPick = {
             'weight',
             'number_of_pages',
             'publishing_year',
-            'flash_sale_info'
+            'flash_sale_info',
+            'comment_info',
         ]
     },
     relations: {

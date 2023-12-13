@@ -18,6 +18,7 @@ import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import FlashSaleHour from './FlashSaleHour'
 import OrderItem from './OrderItem'
 import Database from '@ioc:Adonis/Lucid/Database'
+import BookComment from './BookComment'
 
 type FlashSaleInfo = {
     is_flash_sale: boolean,
@@ -33,7 +34,10 @@ type FlashSaleInfo = {
         instock: number,
     }
 } | undefined
-
+type CommentInfo = {
+    total_comment: number,
+    avg_star: number,
+} | undefined
 export default class Book extends compose(BaseModel, SoftDeletes) {
     @column({ isPrimary: true })
     public id: number
@@ -155,6 +159,9 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
     @computed({ serializeAs: 'flash_sale_info' })
     public flashSaleInfo?: FlashSaleInfo
 
+    @computed({ serializeAs: 'comment_info' })
+    public commentInfo?: CommentInfo
+
     public async getOriginalPrice(): Promise<number> {
         const product = await Database.from('books')
             .where('isbn_code', this.isbnCode)
@@ -168,6 +175,20 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
 
     @afterFind()
     public static async afterFindHook(book: Book) {
+        //Get total comments and average star vote
+        let totalComments
+        totalComments = (await Database.from('book_comments')
+            .where('isbn_code', book.isbnCode)
+            .count('* as total'))[0].total || 0
+        let averageStarVote
+        averageStarVote = (await Database.from('book_comments')
+            .where('isbn_code', book.isbnCode)
+            .avg('rate_star as avgStar'))[0].avgStar || 0 //Default no comment found will be 0
+        book.commentInfo = {
+            total_comment: totalComments,
+            avg_star: averageStarVote,
+        }
+
         // Check Flash Sale
         const flashSaleAvailable = await FlashSaleHour.query()
             .where('time_start', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
@@ -212,6 +233,22 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
 
     @afterFetch()
     public static async afterFetchHook(books: Book[]) {
+        //Get total comments and average star vote
+        for (const item of books) {
+            let totalComments
+            totalComments = (await Database.from('book_comments')
+                .where('isbn_code', item.isbnCode)
+                .count('* as total'))[0].total || 0
+            let averageStarVote
+            averageStarVote = (await Database.from('book_comments')
+                .where('isbn_code', item.isbnCode)
+                .avg('rate_star as avgStar'))[0].avgStar || 0 //Default no comment found will be 0
+            item.commentInfo = {
+                total_comment: totalComments,
+                avg_star: averageStarVote,
+            }
+        }
+
 
         // Check Flash Sale
         const flashSaleAvailable = await FlashSaleHour.query()
