@@ -57,7 +57,6 @@ export default class VoucherController {
             user_email,
             user_level_id,
         } = payload
-        console.log(payload)
         try {
             switch (payload.voucher_type) {
                 case Voucher.TYPE.GENERAL: {
@@ -144,7 +143,6 @@ export default class VoucherController {
             }
 
         } catch (e) {
-            console.log(e)
             return response.serviceUnavailable({
                 message: 'Hệ thống có lỗi xảy ra'
             })
