@@ -115,8 +115,16 @@ export default class BookAPIController {
 
         return response.json(book.serialize(APIBookFilterFields))
     }
-    @bind()
-    public async getBookBySlug({response}: HttpContextContract, book: Book) {
+
+    public async getBookBySlug({params, response}: HttpContextContract) {
+        const slug = params.slug
+        const book = await Book.findBy('slug', slug)
+        if (!book) {
+            return response.notFound({
+                message: `Không tìm thấy sách mang slug <${slug}>.`
+            })
+        }
+        
         await Promise.all([
             book.load('ccategory'),
             book.load('author'),

@@ -2,8 +2,6 @@ import PaypalReceipt from "App/Models/PaypalReceipt"
 import paypal from "./Paypal"
 import axios from 'axios';
 import Order from "App/Models/Order";
-import Env from '@ioc:Adonis/Core/Env'
-import Route from '@ioc:Adonis/Core/Route'
 import Invoice from "App/Models/Invoice";
 import PaymentMethod from "App/Models/PaymentMethod";
 
@@ -21,8 +19,6 @@ class PaypalService {
                 priceToUSD = order.finalPrice / 24291.775268
             }
             priceToUSD = priceToUSD.toFixed(2)
-            console.log(priceToUSD)
-            
 
             const create_payment_json: paypal.Payment = {
                 "intent": "sale",

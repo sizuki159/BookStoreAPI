@@ -30,7 +30,7 @@ export default class PaypalController {
             .andWhere('status', Invoice.STATUS.UNPAID)
             .first()
 
-        if(!invoice) {
+        if (!invoice) {
             return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL))
         }
 
@@ -59,7 +59,10 @@ export default class PaypalController {
                 invoice.status = Invoice.STATUS.PAID
                 await invoice.save()
 
-                await invoice.related('order').query().update('status', Order.STATUS.PAID)
+                await invoice
+                    .related('order').query()
+                    .update('status', Order.STATUS.CONFIRMED)
+                    .update('payment_status', Order.PAYMENT_STATUS.PAID)
 
                 return response.redirect(await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL) + '/payment/success')
 

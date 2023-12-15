@@ -126,7 +126,7 @@ export default class UserOrderController {
                 voucher: voucherCode,
                 discountPrice: price.discountPrice,
                 paymentMethod,
-                userAddressId: userAddress.id
+                userAddressId: userAddress.id,
             })
             await order.refresh()
 
@@ -156,41 +156,66 @@ export default class UserOrderController {
             }
 
             // Tiếp tục với tạo hóa đơn
-            if (paymentMethod === PaymentMethod.METHOD.COD) {
-
-                // Trừ số lượng hàng hóa
-                try {
-                    for (const cart of carts) {
-                        await Book.query().decrement('quantity', cart.quantity).where('id', cart.book.id)
-                        // cart.book.quantity -= cart.quantity
-                        // await cart.book.save()
-                    }
-
-                    // Xóa sản phẩm ra khỏi giỏ hàng
-                    // Vì đã tạo hóa đơn thành công
-                    // Sản phẩm sẽ nằm trong Order Item
-                    for (const cart of carts) {
-                        await cart.forceDelete()
-                    }
-
-                } catch {
-                    return response.serviceUnavailable({
-                        message: 'Hệ thống có lỗi xảy ra'
-                    })
-                }
-
-                return response.ok(responseBody)
-            } else if (paymentMethod === PaymentMethod.METHOD.PAYPAL) {
-                const paymentURL = await PaypalService.create(order)
-                if (paymentURL) {
-
+            switch (paymentMethod) {
+                case PaymentMethod.METHOD.COD: {
                     // Trừ số lượng hàng hóa
                     try {
                         for (const cart of carts) {
                             await Book.query().decrement('quantity', cart.quantity).where('id', cart.book.id)
                         }
+
+                        // Xóa sản phẩm ra khỏi giỏ hàng
+                        // Vì đã tạo hóa đơn thành công
+                        // Sản phẩm sẽ nằm trong Order Item
+                        for (const cart of carts) {
+                            await cart.forceDelete()
+                        }
+
                     } catch {
+                        return response.serviceUnavailable({
+                            message: 'Hệ thống có lỗi xảy ra'
+                        })
                     }
+                    return response.ok(responseBody)
+                }
+                case PaymentMethod.METHOD.PAYPAL: {
+                    const paymentURL = await PaypalService.create(order)
+                    if (paymentURL) {
+
+                        // Trừ số lượng hàng hóa
+                        try {
+                            for (const cart of carts) {
+                                await Book.query().decrement('quantity', cart.quantity).where('id', cart.book.id)
+                            }
+                        } catch {
+                        }
+
+                        // Xóa sản phẩm ra khỏi giỏ hàng
+                        // Vì đã tạo hóa đơn thành công
+                        // Sản phẩm sẽ nằm trong Order Item
+                        for (const cart of carts) {
+                            await cart.forceDelete()
+                        }
+
+                        responseBody.payment.method = paymentMethod
+                        responseBody.payment.url = paymentURL
+                        return response.ok(responseBody)
+
+                    } else {
+                        // Khôi phục lại giỏ hàng cho khách
+                        for (const cart of carts) {
+                            await cart.restore()
+                        }
+                        return response.serviceUnavailable({
+                            message: 'Hệ thống lỗi thanh toán với Paypal'
+                        })
+                    }
+                }
+                case PaymentMethod.METHOD.VNPAY: {
+                    // VNPAY
+                    const paymentURL = await VNPayService.create(order)
+                    responseBody.payment.method = paymentMethod
+                    responseBody.payment.url = paymentURL
 
                     // Xóa sản phẩm ra khỏi giỏ hàng
                     // Vì đã tạo hóa đơn thành công
@@ -199,51 +224,23 @@ export default class UserOrderController {
                         await cart.forceDelete()
                     }
 
-                    responseBody.payment.method = paymentMethod
-                    responseBody.payment.url = paymentURL
                     return response.ok(responseBody)
-
-                } else {
+                }
+                default:
                     // Khôi phục lại giỏ hàng cho khách
                     for (const cart of carts) {
                         await cart.restore()
                     }
+
                     return response.serviceUnavailable({
-                        message: 'Hệ thống lỗi thanh toán với Paypal'
+                        message: 'Phương thức thanh toán này đang bảo trì'
                     })
-                }
-            } else if (paymentMethod === PaymentMethod.METHOD.VNPAY) {
-                // VNPAY
-                const paymentURL = await VNPayService.create(order)
-                responseBody.payment.method = paymentMethod
-                responseBody.payment.url = paymentURL
-
-                // Xóa sản phẩm ra khỏi giỏ hàng
-                // Vì đã tạo hóa đơn thành công
-                // Sản phẩm sẽ nằm trong Order Item
-                for (const cart of carts) {
-                    await cart.forceDelete()
-                }
-
-                return response.ok(responseBody)
-            } else {
-
-                // Khôi phục lại giỏ hàng cho khách
-                for (const cart of carts) {
-                    await cart.restore()
-                }
-
-                return response.serviceUnavailable({
-                    message: 'Phương thức thanh toán này đang bảo trì'
-                })
             }
-
         } catch (e) {
             return response.serviceUnavailable({
                 message: 'Có lỗi hệ thống xảy ra.'
             })
         }
-
     }
 
     public async getMyOrder({ auth, response }: HttpContextContract) {
@@ -269,7 +266,7 @@ export default class UserOrderController {
     public async orderDetail({ params, auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
 
-        const orderId = params.orderId
+        const orderId = params.order_id
         const order = await Order.query()
             .where('user_id', userAuth.id)
             .andWhere('order_id', orderId)
@@ -297,23 +294,93 @@ export default class UserOrderController {
         })
     }
 
-    public async confirmedReceivedOrder({ auth, request, response }: HttpContextContract) {
+    // Xác nhận completed đơn hàng
+    public async confirmedCompletedOrder({ auth, params, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
 
-        const { order_id } = request.body()
+        const order_id = params.order_id
 
         try {
-            await Order.query()
-                .update('status', Order.STATUS.SUCCESS)
+
+            const order = await Order.query()
                 .where('order_id', order_id)
                 .andWhere('user_id', userAuth.id)
+                .first()
+
+            if (!order) {
+                return response.notFound({
+                    message: 'Không tìm thấy đơn hàng này của bạn'
+                })
+            }
+
+            // Nếu đơn hàng thành công rồi thì thông báo
+            if (order.status === Order.STATUS.COMPLETED) {
+                return response.badRequest({
+                    message: 'Đơn hàng này đã hoàn thành'
+                })
+            }
+            
+            // Chỉ chấp nhận đơn hàng đang vận chuyển
+            if (order.status !== Order.STATUS.DELIVERING) {
+                return response.badRequest({
+                    message: 'Đơn hàng này không thể xác nhận vì chưa vận chuyển'
+                })
+            }
+
+            // Xác nhận
+            order.status = Order.STATUS.COMPLETED
+            await order.save()
 
             return response.ok({
-                'message': 'Xác nhận đã nhận hàng thành công'
+                message: 'Xác nhận đã nhận hàng thành công'
             })
         } catch {
             return response.badRequest({
-                'message': 'Thất bại'
+                message: 'Thất bại'
+            })
+        }
+    }
+
+    // Hủy đơn hàng
+    public async cancelOrder({ auth, params, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+        const orderId = params.order_id
+
+        try {
+            const order = await Order.query()
+                .where('order_id', orderId)
+                .andWhere('user_id', userAuth.id)
+                .first()
+
+            if (!order) {
+                return response.notFound({
+                    message: 'Không tìm thấy đơn hàng này của bạn'
+                })
+            }
+
+            if (order.status !== Order.STATUS.WAITING && order.status !== Order.STATUS.CONFIRMED) {
+                return response.badRequest({
+                    message: 'Đơn hàng không thể hủy'
+                })
+            }
+
+            // Hủy
+            order.status = Order.STATUS.CANCELED
+
+            // Hoàn tiền (nếu có)
+            if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
+                order.paymentStatus = Order.PAYMENT_STATUS.REFUNDED
+                await order.related('user').query().increment('money', order.finalPrice)
+            }
+
+            await order.save()
+
+            return response.ok({
+                message: 'Đã hủy đơn hàng'
+            })
+        } catch {
+            return response.badRequest({
+                message: 'Đã có lỗi xảy ra'
             })
         }
     }

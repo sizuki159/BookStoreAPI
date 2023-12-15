@@ -9,10 +9,17 @@ import ResponseFormat from 'App/Utils/ResponseFormat'
 export default class Order extends BaseModel {
 
     public static STATUS = {
+        WAITING: 'success',
+        CONFIRMED: 'confirmed',
+        DELIVERING: 'delivering',
+        COMPLETED: 'completed',
+        CANCELED: 'canceled',
+    }
+
+    public static PAYMENT_STATUS = {
         UNPAID: 'unpaid',
         PAID: 'paid',
-        CANCEL: 'cancel',
-        SUCCESS: 'success'
+        REFUNDED: 'refunded',
     }
 
     @column({ isPrimary: true, columnName: 'order_id' })
@@ -44,6 +51,9 @@ export default class Order extends BaseModel {
 
     @column()
     public status: string
+
+    @column()
+    public paymentStatus: string
 
     @column()
     public customerNote: string

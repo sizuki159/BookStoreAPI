@@ -236,12 +236,13 @@ Route.group(() => {
     Route.group(() => {
         Route.post('/create', 'UserOrderController.createOrder')
         Route.get('/my-order', 'UserOrderController.getMyOrder')
-        Route.get('/my-order/:orderId', 'UserOrderController.orderDetail')
+        Route.get('/my-order/:order_id', 'UserOrderController.orderDetail')
 
         Route.post('/review/write', 'UserOrderReviewController.writeReview')
         Route.delete('/review/delete/:review_id', 'UserOrderReviewController.deleteReview')
 
-        Route.post('/confirmed', 'UserOrderController.confirmedReceivedOrder')
+        Route.put('/completed/:order_id', 'UserOrderController.confirmedCompletedOrder')
+        Route.delete('/cancel/:order_id', 'UserOrderController.cancelOrder')
     }).prefix('order')
 
     Route.group(() => {
@@ -274,7 +275,7 @@ Route.group(() => {
     Route.group(() => {
         Route.get('/', 'BookAPIController.getBookWithFilter')
         Route.get('/:isbn_code', 'BookAPIController.getBookByIBSNCode')
-        Route.get('/slug/:book(slug)', 'BookAPIController.getBookBySlug')
+        Route.get('/slug/:slug', 'BookAPIController.getBookBySlug')
 
         Route.group(() => {
             Route.get('/:isbn_code', 'BookCommentAPIController.getCommentByISBNCode')
@@ -348,8 +349,4 @@ Route.group(() => {
     //#endregion
 
 }).prefix('api').namespace('App/Controllers/Http/API')
-
-
-
-
 
