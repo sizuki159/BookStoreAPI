@@ -52,6 +52,7 @@ export default class AuthController {
             const user = await User.findByOrFail('email', email)
 
             if(user.status === User.STATUS.LOCKED) {
+                await user.load('apiTokens', apiTokens => apiTokens.delete())
                 return response.badRequest({
                     message: "Tài khoản của bạn đã bị khóa!",
                 })
