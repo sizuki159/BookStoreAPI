@@ -1,6 +1,7 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 import Levels from 'App/Enums/Levels'
 import Roles from 'App/Enums/Roles'
+import User from 'App/Models/User'
 
 export default class extends BaseSchema {
     protected tableName = 'users'
@@ -15,6 +16,7 @@ export default class extends BaseSchema {
             table.integer('user_level_id').unsigned().references('id').inTable('user_levels').onDelete('SET NULL').defaultTo(Levels.BASIC)
             table.integer('user_role_id').unsigned().references('id').inTable('user_roles').onDelete('SET NULL').defaultTo(Roles.USER)
             table.boolean('is_email_verified').notNullable().defaultTo(false)
+            table.enum('status', Object.values(User.STATUS)).defaultTo(User.STATUS.ACTIVE)
 
             /**
              * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL

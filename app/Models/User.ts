@@ -22,6 +22,11 @@ export default class User extends compose(BaseModel, SoftDeletes) {
 
     public static table = 'users'
 
+    public static STATUS = {
+        ACTIVE: 'active',
+        LOCKED: 'locked',
+    }
+
     @column({
         isPrimary: true,
         columnName: 'id'
@@ -52,6 +57,9 @@ export default class User extends compose(BaseModel, SoftDeletes) {
 
     @column()
     public isEmailVerified: boolean
+
+    @column()
+    public status: string
 
     @column.dateTime({ autoCreate: true, serializeAs: null })
     public createdAt: DateTime

@@ -51,6 +51,13 @@ export default class AuthController {
             const token = await auth.use('api').attempt(email, password, { expiresIn: '7d' })
             const user = await User.findByOrFail('email', email)
 
+            if(user.status === User.STATUS.LOCKED) {
+                await user.load('apiTokens', apiTokens => apiTokens.delete())
+                return response.badRequest({
+                    message: "Tài khoản của bạn đã bị khóa!",
+                })
+            }
+
             const apiToken = await ApiToken.findBy('token', token.tokenHash)
             if (apiToken) {
                 apiToken.jwt = token.token
