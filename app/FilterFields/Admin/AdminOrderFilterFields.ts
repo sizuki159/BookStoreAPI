@@ -30,7 +30,15 @@ const AdminOrderFilterFields: CherryPick = {
             }
         },
         'user': UserFilterFields,
-        'userAddress': UserAddressFilterFields
+        'userAddress': UserAddressFilterFields,
+        'review': {
+            fields: {
+                omit: [
+                    'id',
+                    'order_id',
+                ]
+            }
+        }
     }
 }
 
