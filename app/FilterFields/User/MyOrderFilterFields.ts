@@ -14,6 +14,7 @@ const MyOrderFilterFields: CherryPick = {
             'voucher',
             'payment_method',
             'status',
+            'payment_status',
             'customer_note',
             'created_at',
             'updated_at',
