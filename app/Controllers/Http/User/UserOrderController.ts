@@ -259,7 +259,6 @@ export default class UserOrderController {
                     })
                 })
             })
-            .preload('review')
 
         return response.json(myOrders.map((myOrder) => myOrder.serialize(MyOrderFilterFields)))
     }
@@ -284,6 +283,7 @@ export default class UserOrderController {
                     })
                 })
             })
+            .preload('review')
             .first()
 
         if (order) {

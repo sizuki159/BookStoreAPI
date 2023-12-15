@@ -37,7 +37,9 @@ export default class AdminBookOrderedController {
                     product.preload('images', images => images.groupLimit(1))
                 })
             })
-            .preload('user')
+            .preload('user', (user) => {
+                user.preload('profile')
+            })
             .preload('userAddress', (userAddress) => {
                 userAddress.preload('wards', (wards) => {
                     wards.preload('district', (district) => {
