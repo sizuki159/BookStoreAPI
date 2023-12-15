@@ -358,14 +358,15 @@ export default class UserOrderController {
                 })
             }
 
-            if (order.status !== Order.STATUS.WAITING && order.status !== Order.STATUS.CONFIRMED) {
+            if (order.status !== Order.STATUS.PENDING && order.status !== Order.STATUS.CONFIRMED) {
                 return response.badRequest({
                     message: 'Đơn hàng không thể hủy'
                 })
             }
 
-            // Hủy
+            // Hủy đơn hàng
             order.status = Order.STATUS.CANCELED
+            
 
             // Hoàn tiền (nếu có)
             if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {

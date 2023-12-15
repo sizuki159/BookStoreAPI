@@ -184,6 +184,11 @@ Route.group(() => {
     Route.group(() => {
         Route.get('/all', 'AdminBookOrderedController.getAllOrder')
         Route.get('/detail/:order_id', 'AdminBookOrderedController.orderDetail')
+
+        Route.put('/confirmed/:order_id', 'AdminBookOrderedController.confirmOrder')
+        Route.put('/delivering/:order_id', 'AdminBookOrderedController.deliveringOrder')
+        Route.delete('/cancel/:order_id', 'AdminBookOrderedController.cancelOrder')
+
     }).prefix('order')
     //#endregion
 

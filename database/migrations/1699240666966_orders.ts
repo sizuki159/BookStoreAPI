@@ -15,7 +15,7 @@ export default class extends BaseSchema {
       table.double('discount_price').nullable()
       table.string('voucher').nullable()
       table.string('payment_method').references('key').inTable('payment_methods').onDelete('SET NULL')
-      table.enu('status', Object.values(Order.STATUS)).defaultTo(Order.STATUS.WAITING)
+      table.enu('status', Object.values(Order.STATUS)).defaultTo(Order.STATUS.PENDING)
       table.enu('payment_status', Object.values(Order.PAYMENT_STATUS)).defaultTo(Order.PAYMENT_STATUS.UNPAID)
       table.text('customer_note').nullable()
       table.string('logs').nullable()

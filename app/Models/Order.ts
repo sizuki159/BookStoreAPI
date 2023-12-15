@@ -9,7 +9,7 @@ import ResponseFormat from 'App/Utils/ResponseFormat'
 export default class Order extends BaseModel {
 
     public static STATUS = {
-        WAITING: 'waiting',
+        PENDING: 'pending',
         CONFIRMED: 'confirmed',
         DELIVERING: 'delivering',
         COMPLETED: 'completed',
