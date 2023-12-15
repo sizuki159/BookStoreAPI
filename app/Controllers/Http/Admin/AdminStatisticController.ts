@@ -9,6 +9,12 @@ export default class AdminStatisticController {
             .groupBy('isbn_code')
             .orderBy('total_quantity', 'desc')
             .limit(5);
-        return top5Product
+
+
+        // Lấy doanh thu theo tháng của năm
+        const revenueByMonth = await Database.from('orders')
+            .select(Database.raw('SUM(final_price) as total_revenue'))
+            .groupByRaw('extract(month from created_at)')
+        return revenueByMonth
     }
 }

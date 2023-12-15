@@ -4,21 +4,21 @@ import Roles from 'App/Enums/Roles'
 import User from 'App/Models/User'
 
 export default class extends BaseSeeder {
-  public async run () {
-    // Write your database queries inside the run method
-    await User.createMany([
-      {
-        email: 'admin@gmail.com',
-        password: '12345',
-        userRoleId: Roles.ADMIN,
-        userLevelId: Levels.SILVER,
-      },
-      {
-        email: 'starhonkai2001@gmail.com',
-        password: '12345',
-        userRoleId: Roles.USER,
-        userLevelId: Levels.BASIC,
-      },
-    ])
-  }
+    public async run() {
+        // Write your database queries inside the run method
+        await User.createMany([
+            {
+                email: 'admin@gmail.com',
+                password: '12345',
+                userRoleId: Roles.ADMIN,
+                userLevelId: Levels.SILVER,
+            },
+            {
+                email: 'starhonkai2001@gmail.com',
+                password: '12345',
+                userRoleId: Roles.USER,
+                userLevelId: Levels.BASIC,
+            },
+        ])
+    }
 }
