@@ -45,6 +45,7 @@ export default class AdminBookOrderedController {
                     })
                 })
             })
+            .preload('review')
             .first()
 
         if (order) {
