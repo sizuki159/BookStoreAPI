@@ -136,6 +136,20 @@ export default class User extends compose(BaseModel, SoftDeletes) {
         const token = await Token.generatePasswordResetToken(this)
         await new ResetPasswordEmail(this, token).sendLater()
     }
+
+    // Khóa tài khoản
+    public async lock() {
+        this.status = User.STATUS.LOCKED
+        await ApiToken.query().delete().where('userId', this.id)
+        await this.save()
+    }
+
+    // Mở khóa
+    public async unlock() {
+        this.status = User.STATUS.ACTIVE
+        await this.save()
+    }
+
     //#endregion
 
 }

@@ -44,7 +44,7 @@ export default class UserOrderReviewController {
             })
         }
 
-        if (orderByUser.status !== Order.STATUS.SUCCESS) {
+        if (orderByUser.status !== Order.STATUS.COMPLETED) {
             return response.badRequest({
                 'message': 'Chỉ có thể đánh giá được đơn hàng đã thành công'
             })

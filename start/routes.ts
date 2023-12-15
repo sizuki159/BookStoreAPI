@@ -198,6 +198,14 @@ Route.group(() => {
     }).prefix('statistic')
     //#endregion
 
+    //#region Quản lý người dùng
+    Route.group(() => {
+        Route.get('', 'AdminUserController.getAllUsers')
+        Route.put('/locked/:user_id', 'AdminUserController.lockUser')
+        Route.put('/unlocked/:user_id', 'AdminUserController.unlockUser')
+    }).prefix('user')
+    //#endregion
+
 }).prefix('admin').namespace('App/Controllers/Http/Admin').middleware(['auth', 'admin'])
 //#endregion
 
