@@ -3,7 +3,7 @@ import AdminOrderFilterFields from 'App/FilterFields/Admin/AdminOrderFilterField
 import Order from 'App/Models/Order'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
-export default class BookOrderedController {
+export default class AdminBookOrderedController {
     public async getAllOrder({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
         const query = Order.query()

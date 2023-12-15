@@ -1,7 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import ParentCategory from 'App/Models/ParentCategory'
 
-export default class ParentCategoryController {
+export default class AdminParentCategoryController {
     public async getAll({response}: HttpContextContract) {
         return response.json(await ParentCategory.all())
     }

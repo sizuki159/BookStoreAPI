@@ -5,9 +5,8 @@ import FlashSaleHour from 'App/Models/FlashSaleHour'
 import FlashSaleProduct from 'App/Models/FlashSaleProduct'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
-import { DateTime } from 'luxon'
 
-export default class FlashSaleController {
+export default class AdminFlashSaleController {
 
     public async getAllFlashSale({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
@@ -246,7 +245,7 @@ export default class FlashSaleController {
         })
     }
 
-    public async updateFlashSaleHour({request, response}: HttpContextContract) {
+    public async updateFlashSaleHour({}: HttpContextContract) {
         
     }
 }

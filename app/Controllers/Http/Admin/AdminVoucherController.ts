@@ -5,7 +5,7 @@ import Voucher from 'App/Models/Voucher'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import AddVoucherValidator from 'App/Validators/AddVoucherValidator'
 
-export default class VoucherController {
+export default class AdminVoucherController {
     public async getAll({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
         const vouchers = await Voucher.query().paginate(page, limit)

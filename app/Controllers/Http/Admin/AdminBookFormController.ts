@@ -2,7 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BookForm from 'App/Models/BookForm'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 
-export default class BookFormController {
+export default class AdminBookFormController {
     public async getAll({response}: HttpContextContract) {
         return response.json(await BookForm.all())
     }

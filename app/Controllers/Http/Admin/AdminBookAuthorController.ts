@@ -1,10 +1,8 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BookAuthor from 'App/Models/BookAuthor'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
-import { types } from '@ioc:Adonis/Core/Helpers'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
-export default class BookAuthorController {
+export default class AdminBookAuthorController {
     public async getAll({request, response}: HttpContextContract) {
         const {page, limit} = PageLimitUtils(request.qs())
         const books = await BookAuthor.query().orderBy('created_at', 'desc').paginate(page, limit)

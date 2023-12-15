@@ -3,7 +3,7 @@ import BookPublisher from 'App/Models/BookPublisher'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
-export default class BookPublisherController {
+export default class AdminBookPublisherController {
     public async getAll({request, response}: HttpContextContract) {
         const {page, limit} = PageLimitUtils(request.qs())
         return response.json(await BookPublisher.query().orderBy('created_at', 'desc').paginate(page, limit))

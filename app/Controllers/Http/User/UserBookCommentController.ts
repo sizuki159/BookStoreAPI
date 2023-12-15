@@ -2,7 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
 import BookComment from 'App/Models/BookComment'
 
-export default class BookCommentController {
+export default class UserBookCommentController {
     public async writeComment({ auth, request, response }: HttpContextContract) {
 
         const user = await auth.use('api').authenticate()

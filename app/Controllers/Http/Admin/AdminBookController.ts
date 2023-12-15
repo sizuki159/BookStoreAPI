@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Book from 'App/Models/Book'
 import BookValidator from 'App/Validators/BookValidator'
-import Application from '@ioc:Adonis/Core/Application'
 import AdminBookFilterFields from 'App/FilterFields/Admin/AdminBookFilterFields'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Drive from '@ioc:Adonis/Core/Drive'
@@ -9,7 +8,7 @@ import BookImage from 'App/Models/BookImage'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import { isIsbnCodeValid } from 'App/Utils/CheckIsbnCodeUtils'
 
-export default class BookController {
+export default class AdminBookController {
 
     public async getListBook({ request, response }: HttpContextContract) {
         let { search } = request.qs()

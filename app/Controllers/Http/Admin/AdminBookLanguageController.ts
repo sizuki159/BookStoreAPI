@@ -2,7 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BookLanguage from 'App/Models/BookLanguage'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 
-export default class BookLanguageController {
+export default class AdminBookLanguageController {
     public async getAll({response}: HttpContextContract) {
         return response.json(await BookLanguage.all())
     }
