@@ -4,6 +4,7 @@ import axios from 'axios';
 import Order from "App/Models/Order";
 import Invoice from "App/Models/Invoice";
 import PaymentMethod from "App/Models/PaymentMethod";
+import Env from '@ioc:Adonis/Core/Env'
 
 class PaypalService {
     public static async create(order: Order): Promise<string | null> {
@@ -13,6 +14,8 @@ class PaypalService {
                 const exchangeRate = await axios.get('https://open.er-api.com/v6/latest')
                 if (exchangeRate.data.rates) {
                     priceToUSD = order.finalPrice / exchangeRate.data.rates.VND
+                } else {
+                    priceToUSD = order.finalPrice / 24291.775268
                 }
             }
             catch {
@@ -26,8 +29,8 @@ class PaypalService {
                     "payment_method": "paypal"
                 },
                 "redirect_urls": {
-                    "return_url": `http://localhost:3333/api/payment/paypal/success`,
-                    "cancel_url": `http://localhost:3333/api/payment/paypal/cancel`
+                    "return_url": Env.get('PAYPAL_CALLBACK_URL'),
+                    "cancel_url": Env.get('PAYPAL_CALLBACK_CANCEL_URL')
                 },
                 "transactions": [{
                     "item_list": {
