@@ -15,9 +15,6 @@ export default class PaypalReceipt extends BaseModel {
     @column()
     public payerId: string
 
-    @column()
-    public status: string
-
     @column.dateTime({
         autoCreate: true,
         serialize: (value: DateTime | null) => {

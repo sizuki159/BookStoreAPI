@@ -9,6 +9,39 @@ export default class VnpayReceipt extends BaseModel {
     @column()
     public paymentId: string
 
+    @column()
+    public tmnCode: string
+
+    @column()
+    public amount: number
+
+    @column()
+    public bankCode: string
+
+    @column()
+    public bankTranNo: string
+
+    @column()
+    public cardType: string
+
+    @column()
+    public orderInfo: string
+
+    @column()
+    public payDate: string
+
+    @column()
+    public responseCode: string
+
+    @column()
+    public transactionNo: string
+
+    @column()
+    public transactionStatus: string
+
+    @column()
+    public secureHash: string
+
     @column.dateTime({
         autoCreate: true,
         serialize: (value: DateTime | null) => {
