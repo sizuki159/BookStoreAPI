@@ -41,10 +41,10 @@ class VNPayService {
         vnp_Params['vnp_OrderInfo'] = `Order #${order.id}`;
         vnp_Params['vnp_OrderType'] = 150000;
         vnp_Params['vnp_Amount'] = order.finalPrice * 100;
-        vnp_Params['vnp_ReturnUrl'] = Env.get('VNP_CALLBACK_URL', 'http://127.0.0.1:3333/api/payment/vnpay/process');
-        vnp_Params['vnp_IpAddr'] = '127.0.0.1';
+        vnp_Params['vnp_ReturnUrl'] = Env.get('VNP_CALLBACK_URL', 'https://api.sachviet.top/api/payment/vnpay/process');
+        vnp_Params['vnp_IpAddr'] = '143.198.206.105';
         vnp_Params['vnp_CreateDate'] = createDate;
-        vnp_Params['vnp_BankCode'] = 'NCB';
+        // vnp_Params['vnp_BankCode'] = 'NCB';
 
         vnp_Params = sortObject(vnp_Params);
 

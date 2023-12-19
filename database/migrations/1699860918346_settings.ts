@@ -21,11 +21,11 @@ export default class extends BaseSchema {
             await db.table(this.tableName).multiInsert([
                 {
                     key: SettingUtils.KEY.BACKEND_URL,
-                    value: 'http://localhost:3333'
+                    value: 'https://api.sachviet.top'
                 },
                 {
                     key: SettingUtils.KEY.FRONTEND_URL,
-                    value: 'http://localhost:3000'
+                    value: 'https://khoaluantotnghiephcmute.netlify.app'
                 },
             ])
         })
