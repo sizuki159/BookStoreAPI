@@ -18,9 +18,16 @@
 |
 */
 
+import Route from '@ioc:Adonis/Core/Route'
+
 import './routes/auth-routes'
 import './routes/admin-routes'
 import './routes/user-routes'
 import './routes/api-routes'
 
 import './routes/test-routes'
+
+
+Route.any('*', async ({ view }) => {
+    return view.render('default')
+})
