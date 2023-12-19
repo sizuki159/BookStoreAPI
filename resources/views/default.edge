@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sách Việt - Máy Chủ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            flex-direction: column; /* Thêm dòng này để căn giữa lời chào và thời gian */
+        }
+
+        .welcome-message {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px; /* Giảm khoảng cách dưới lời chào */
+        }
+
+        .current-time {
+            color: #007BFF;
+            font-size: 36px;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-message">
+        <p>Xin chào! Bây giờ là:</p>
+    </div>
+    <div class="current-time" id="current-time"></div>
+
+    <script>
+        function updateClock() {
+            var currentTime = new Date();
+            var hours = currentTime.getHours();
+            var minutes = currentTime.getMinutes();
+            var seconds = currentTime.getSeconds();
+
+            // Định dạng thời gian
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            // Hiển thị thời gian
+            document.getElementById('current-time').innerHTML = hours + ':' + minutes + ':' + seconds;
+        }
+
+        // Cập nhật thời gian mỗi giây
+        setInterval(updateClock, 1000);
+
+        // Khởi chạy lần đầu
+        updateClock();
+    </script>
+</body>
+</html>
