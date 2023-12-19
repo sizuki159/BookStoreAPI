@@ -26,8 +26,10 @@ import './routes/user-routes'
 import './routes/api-routes'
 
 import './routes/test-routes'
+import { DateTime } from 'luxon'
 
 
-Route.any('*', async ({ view }) => {
-    return view.render('default')
+Route.any('*', async ({ view, response }) => {
+    const now = DateTime.now()
+    return response.ok(now.toFormat('yyyy-MM-dd HH:mm:ss'));
 })
