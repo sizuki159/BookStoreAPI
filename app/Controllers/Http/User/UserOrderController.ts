@@ -238,6 +238,9 @@ export default class UserOrderController {
             }
         } catch (e) {
             return response.serviceUnavailable({
+                message: e.message
+            })
+            return response.serviceUnavailable({
                 message: 'Có lỗi hệ thống xảy ra.'
             })
         }
