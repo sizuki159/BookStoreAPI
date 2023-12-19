@@ -16,7 +16,6 @@ import ResponseFormat from 'App/Utils/ResponseFormat'
 import FlashSaleProduct from './FlashSaleProduct'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import FlashSaleHour from './FlashSaleHour'
-import OrderItem from './OrderItem'
 import Database from '@ioc:Adonis/Lucid/Database'
 import BookComment from './BookComment'
 
@@ -34,10 +33,12 @@ type FlashSaleInfo = {
         instock: number,
     }
 } | undefined
+
 type CommentInfo = {
     total_comment: number,
     avg_star: number,
 } | undefined
+
 export default class Book extends compose(BaseModel, SoftDeletes) {
     @column({ isPrimary: true })
     public id: number
@@ -153,6 +154,12 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
         foreignKey: 'productId'
     })
     public flashSales: HasMany<typeof FlashSaleProduct>
+
+    @hasMany(() => BookComment, {
+        localKey: 'isbnCode',
+        foreignKey: 'isbnCode'
+    })
+    public comments: HasMany<typeof BookComment>
     //#endregion
 
 
