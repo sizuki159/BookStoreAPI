@@ -7,7 +7,7 @@ export default class extends BaseSchema {
         this.schema.createTable(this.tableName, (table) => {
             table.increments('id')
             table.string('payment_id').notNullable().unique()
-            table.double('amount').notNullable()
+            table.double('amount').nullable()
             table.string('tmn_code').nullable()
             table.string('bank_code').nullable()
             table.string('bank_tran_no').nullable()
