@@ -11,10 +11,10 @@ export default class UserProfile extends BaseModel {
     public userId: number
 
     @column()
-    public avatarSource: string
+    public avatarSource: string | null
 
     @column()
-    public avatarLocation: string
+    public avatarLocation: string | null
 
     @column()
     public firstname: string
