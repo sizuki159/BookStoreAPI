@@ -53,11 +53,11 @@
             "reloadServer": false
         },
         {
-            "pattern": "assets/**",
+            "pattern": "public/**",
             "reloadServer": false
         }
     ],
     "directories": {
-        "public": "assets"
+        "public": "public"
     }
 }
