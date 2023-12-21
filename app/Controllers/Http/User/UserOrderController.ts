@@ -16,6 +16,8 @@ import VNPayService from 'App/Services/VNPayService'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Book from 'App/Models/Book'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
+import PageLimitUtils from 'App/Utils/PageLimitUtils'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -243,24 +245,59 @@ export default class UserOrderController {
         }
     }
 
-    public async getMyOrder({ auth, response }: HttpContextContract) {
+    public async getStatisticMyOrder({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
-        const myOrders = await Order.query().where('user_id', userAuth.id)
-            .preload('items', (items) => {
-                items.preload('product', (product) => {
-                    product.preload('images', images => images.groupLimit(1))
-                })
-            })
-            .preload('user')
-            .preload('userAddress', (userAddress) => {
-                userAddress.preload('wards', (wards) => {
-                    wards.preload('district', (district) => {
-                        district.preload('province')
-                    })
-                })
-            })
+        const myOrderStatistics = await Database
+            .from('orders')
+            .select('status', Database.raw('count(*) as count'))
+            .whereIn('status', Object.values(Order.STATUS))
+            .groupBy('status')
+            .where('user_id', userAuth.id)
 
-        return response.json(myOrders.map((myOrder) => myOrder.serialize(MyOrderFilterFields)))
+        // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
+        const result = Object.values(Order.STATUS).map(status => ({
+            status,
+            total: myOrderStatistics.find(myOrderStatistic => myOrderStatistic.status === status)?.count || 0,
+        }));
+        return response.json(result)
+    }
+
+    public async getMyOrdersWithStatus({ auth, request, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+
+        const { page, limit } = PageLimitUtils(request.qs())
+
+        const newStatusSchema = schema.create({
+            params: schema.object().members({
+                'status': schema.enum(Object.values(Order.STATUS))
+            })
+        })
+        
+        const payload = await request.validate({
+            schema: newStatusSchema,
+            messages: {
+                'params.status.enum': 'Trạng thái không hợp lệ'
+            }
+        })
+
+        const myOrders = await Order.query()
+            .where('user_id', userAuth.id)
+            .andWhere('status', payload.params.status)
+            .paginate(page, limit)
+
+        return response.json(myOrders.serialize(MyOrderFilterFields))
+    }
+
+    public async getAllMyOrders({ auth, request, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+
+        const { page, limit } = PageLimitUtils(request.qs())
+
+        const myOrders = await Order.query()
+            .where('user_id', userAuth.id)
+            .paginate(page, limit)
+
+        return response.json(myOrders.serialize(MyOrderFilterFields))
     }
 
     public async orderDetail({ params, auth, response }: HttpContextContract) {
@@ -320,7 +357,7 @@ export default class UserOrderController {
                     message: 'Đơn hàng này đã hoàn thành'
                 })
             }
-            
+
             // Chỉ chấp nhận đơn hàng đang vận chuyển
             if (order.status !== Order.STATUS.DELIVERING) {
                 return response.badRequest({
@@ -367,7 +404,7 @@ export default class UserOrderController {
 
             // Hủy đơn hàng
             order.status = Order.STATUS.CANCELED
-            
+
 
             // Hoàn tiền (nếu có)
             if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {

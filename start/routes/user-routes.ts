@@ -39,8 +39,10 @@ Route.group(() => {
     // User Order
     Route.group(() => {
         Route.post('/create', 'UserOrderController.createOrder')
-        Route.get('/my-order', 'UserOrderController.getMyOrder')
+        Route.get('/my-order', 'UserOrderController.getAllMyOrders')
         Route.get('/my-order/:order_id', 'UserOrderController.orderDetail')
+        Route.get('/my-order/status/:status', 'UserOrderController.getMyOrdersWithStatus')
+        Route.get('/statistic', 'UserOrderController.getStatisticMyOrder')
 
         Route.post('/review/write', 'UserOrderReviewController.writeReview')
         Route.delete('/review/delete/:review_id', 'UserOrderReviewController.deleteReview')
