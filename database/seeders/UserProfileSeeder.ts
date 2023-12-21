@@ -6,6 +6,24 @@ export default class extends BaseSeeder {
         // Write your database queries inside the run method
         await UserProfile.createMany([
             {
+                "userId": 1,
+                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/3/3_avatar_img_id_512560",
+                "avatarLocation": "user_avatar/3/3_avatar_img_id_512560",
+                "firstname": "Nguyễn",
+                "lastname": "Thành Trung",
+                "phoneNumber": "0334674390",
+                "gender": "male"
+            },
+            {
+                "userId": 2,
+                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/3/3_avatar_img_id_512560",
+                "avatarLocation": "user_avatar/3/3_avatar_img_id_512560",
+                "firstname": "Quách",
+                "lastname": "Diệu Khánh",
+                "phoneNumber": "0938427896",
+                "gender": "male"
+            },
+            {
                 "userId": 3,
                 "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/3/3_avatar_img_id_512560",
                 "avatarLocation": "user_avatar/3/3_avatar_img_id_512560",
