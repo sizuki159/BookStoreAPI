@@ -13,6 +13,7 @@ export default class BookCommentAPIController {
             .preload('user', (user) => {
                 user.preload('profile')
             })
+            .orderBy('created_at', 'desc')
             .paginate(page, limit)
 
         return response.json(comments.serialize(BookCommentAPIFilterFields))

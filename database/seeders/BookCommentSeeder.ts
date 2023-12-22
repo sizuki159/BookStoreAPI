@@ -1,6 +1,7 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import Book from 'App/Models/Book'
 import User from 'App/Models/User';
+import { DateTime } from 'luxon';
 
 export default class extends BaseSeeder {
     public async run() {
@@ -284,14 +285,39 @@ export default class extends BaseSeeder {
         for (const book of books) {
             const comments = getRandomElementsFromArray(commentArr)
             for (const comment of comments) {
+                const createdAt = DateTime.fromFormat(this.getRandomDateTime(), 'yyyy-MM-dd HH:mm:ss')
                 await book.related('comments').create({
                     isbnCode: book.isbnCode,
                     content: comment,
                     rateStar: randomIntWithProbability(),
                     userId: getRandomObject(users)?.id,
+                    createdAt: createdAt,
                 })
             }
         }
 
+    }
+
+    // Hàm tạo ngày giờ ngẫu nhiên từ tháng 1/2020 đến tháng 12/2023
+    private getRandomDateTime() {
+        const startYear = 2020;
+        const endYear = 2023;
+        const startMonth = 0; // Tháng 1
+        const endMonth = 11; // Tháng 12
+
+        // Tính toán số mili giây tương ứng với ngày bắt đầu và ngày kết thúc
+        const startDate = new Date(startYear, startMonth, 1).getTime();
+        const endDate = new Date(endYear, endMonth + 1, 0).getTime();
+
+        // Tạo một số ngẫu nhiên trong khoảng từ startDate đến endDate
+        const randomTime = startDate + Math.random() * (endDate - startDate);
+
+        // Tạo đối tượng Date từ số mili giây ngẫu nhiên
+        const randomDate = new Date(randomTime);
+
+        // Định dạng ngày tháng giờ phút giây theo ý muốn
+        const formattedDateTime = `${randomDate.getFullYear()}-${String(randomDate.getMonth() + 1).padStart(2, '0')}-${String(randomDate.getDate()).padStart(2, '0')} ${String(randomDate.getHours()).padStart(2, '0')}:${String(randomDate.getMinutes()).padStart(2, '0')}:${String(randomDate.getSeconds()).padStart(2, '0')}`;
+
+        return formattedDateTime;
     }
 }
