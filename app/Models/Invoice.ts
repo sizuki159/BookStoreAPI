@@ -2,6 +2,8 @@ import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Order from './Order'
 import ResponseFormat from 'App/Utils/ResponseFormat'
+import { string } from '@ioc:Adonis/Core/Helpers'
+import SettingUtils from 'App/Utils/SettingUtils'
 
 export default class Invoice extends BaseModel {
     public static STATUS = {
@@ -31,6 +33,9 @@ export default class Invoice extends BaseModel {
     @column()
     public status: string
 
+    @column()
+    public hashPrinter: string | null
+
     @column.dateTime({
         autoCreate: true,
         serialize: (value: DateTime | null) => {
@@ -52,4 +57,13 @@ export default class Invoice extends BaseModel {
     @belongsTo(() => Order)
     public order: BelongsTo<typeof Order>
     //#endregion
+
+    public async printInvoice() {
+        this.hashPrinter = string.generateRandom(64)
+        await this.save()
+
+        const serverUrl = await SettingUtils.getSettingByKey('BACKEND_URL')
+
+        return `${serverUrl}/api/payment/invoice/${this.id}/print?hash=` + this.hashPrinter
+    }
 }

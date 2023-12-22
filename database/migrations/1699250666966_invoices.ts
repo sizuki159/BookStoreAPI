@@ -13,6 +13,8 @@ export default class extends BaseSchema {
             table.string('vnpay_payment_id').references('payment_id').inTable('vnpay_receipts').onDelete('SET NULL').nullable()
             table.text('pay_url').nullable()
             table.enu('status', Object.values(Invoice.STATUS)).defaultTo(Invoice.STATUS.UNPAID)
+            table.text('hash_printer').nullable()
+            
             /**
              * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
              */

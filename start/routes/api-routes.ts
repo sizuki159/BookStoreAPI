@@ -86,6 +86,10 @@ Route.group(() => {
             Route.get('process', 'VNPayController.process')
         }).prefix('vnpay')
 
+        Route.group(() => {
+            Route.get('/:invoice_id/print', 'InvoiceAPIController.printInvoice')
+        }).prefix('invoice')
+
     }).prefix('payment').namespace('App/Controllers/Http/Payment')
 
     //#endregion

@@ -5,6 +5,7 @@ import OrderItem from './OrderItem'
 import UserAddress from './UserAddress'
 import OrderReview from './OrderReview'
 import ResponseFormat from 'App/Utils/ResponseFormat'
+import Invoice from './Invoice'
 
 export default class Order extends BaseModel {
 
@@ -99,5 +100,11 @@ export default class Order extends BaseModel {
         foreignKey: 'orderId',
     })
     public review: HasOne<typeof OrderReview>
+
+    @hasOne(() => Invoice, {
+        localKey: 'id',
+        foreignKey: 'orderId',
+    })
+    public invoice: HasOne<typeof Invoice>
     //#endregion
 }

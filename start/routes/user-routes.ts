@@ -49,6 +49,10 @@ Route.group(() => {
 
         Route.put('/completed/:order_id', 'UserOrderController.confirmedCompletedOrder')
         Route.delete('/cancel/:order_id', 'UserOrderController.cancelOrder')
+
+        Route.get('/my-order/:order_id/invoice', 'UserInvoiceController.requestPrintInvoice')
+
+
     }).prefix('order')
 
     Route.group(() => {
