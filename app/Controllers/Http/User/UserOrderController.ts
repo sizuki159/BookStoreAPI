@@ -17,7 +17,8 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Book from 'App/Models/Book'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { schema } from '@ioc:Adonis/Core/Validator'
+import Invoice from 'App/Models/Invoice'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -272,7 +273,7 @@ export default class UserOrderController {
                 'status': schema.enum(Object.values(Order.STATUS))
             })
         })
-        
+
         const payload = await request.validate({
             schema: newStatusSchema,
             messages: {
@@ -310,7 +311,7 @@ export default class UserOrderController {
             .preload('items', (items) => {
                 items.preload('product', (product) => {
                     product.withTrashed()
-                    .preload('images', images => images.groupLimit(1))
+                        .preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user')
@@ -408,9 +409,19 @@ export default class UserOrderController {
 
 
             // Hoàn tiền (nếu có)
-            if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
-                order.paymentStatus = Order.PAYMENT_STATUS.REFUNDED
-                await order.related('user').query().increment('money', order.finalPrice)
+            // Và chỉ hoàn tiền khi thanh toán online trước
+            if (order.paymentMethod !== PaymentMethod.METHOD.COD) {
+                if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
+                    order.paymentStatus = Order.PAYMENT_STATUS.REFUNDED
+                    await order.related('user').query().increment('money', order.finalPrice)
+                }
+
+                // Hủy hóa đơn
+                try {
+                    await Invoice.query()
+                        .update('status', Invoice.STATUS.CANCEL)
+                        .where('order_id', order.id)
+                } catch { }
             }
 
             await order.save()

@@ -152,7 +152,12 @@ Route.group(() => {
 
     //#region Thống kê hệ thống
     Route.group(() => {
-        Route.get('', 'AdminStatisticController.getStatistic')
+        Route.get('/top-product', 'AdminStatisticController.topProductBestSeller')
+        Route.get('/revenue', 'AdminStatisticController.getRevenueWithYear')
+        Route.get('/revenue/current-year', 'AdminStatisticController.getRevenueCurrentYear')
+        Route.get('/revenue/current-month', 'AdminStatisticController.getRevenueCurrentMonth')
+
+        Route.get('/recent-transactions', 'AdminStatisticController.getRecentTransactions')
     }).prefix('statistic')
     //#endregion
 

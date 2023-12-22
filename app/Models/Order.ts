@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, HasMany, HasOne, belongsTo, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, HasOne, ModelQueryBuilderContract, beforeFetch, belongsTo, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import OrderItem from './OrderItem'
 import UserAddress from './UserAddress'
@@ -107,4 +107,9 @@ export default class Order extends BaseModel {
     })
     public invoice: HasOne<typeof Invoice>
     //#endregion
+
+    @beforeFetch()
+    public static autoOrderByCreatedAt(query: ModelQueryBuilderContract<typeof Order>) {
+        query.orderBy('created_at', 'desc')
+    }
 }
