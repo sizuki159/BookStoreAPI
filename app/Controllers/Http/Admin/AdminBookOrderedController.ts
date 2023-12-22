@@ -1,4 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema } from '@ioc:Adonis/Core/Validator'
+import Database from '@ioc:Adonis/Lucid/Database'
 import AdminOrderFilterFields from 'App/FilterFields/Admin/AdminOrderFilterFields'
 import Order from 'App/Models/Order'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
@@ -12,6 +14,45 @@ export default class AdminBookOrderedController {
         return response.json(
             orderList.serialize(AdminOrderFilterFields)
         )
+    }
+
+    public async getStatisticAllOrder({ response }: HttpContextContract) {
+        const myOrderStatistics = await Database
+            .from('orders')
+            .select('status', Database.raw('count(*) as count'))
+            .whereIn('status', Object.values(Order.STATUS))
+            .groupBy('status')
+
+        // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
+        const result = Object.values(Order.STATUS).map(status => ({
+            status,
+            total: myOrderStatistics.find(myOrderStatistic => myOrderStatistic.status === status)?.count || 0,
+        }));
+        return response.json(result)
+    }
+
+    public async getAllOrdersWithStatus({ request, response }: HttpContextContract) {
+
+        const { page, limit } = PageLimitUtils(request.qs())
+
+        const newStatusSchema = schema.create({
+            params: schema.object().members({
+                'status': schema.enum(Object.values(Order.STATUS))
+            })
+        })
+
+        const payload = await request.validate({
+            schema: newStatusSchema,
+            messages: {
+                'params.status.enum': 'Trạng thái không hợp lệ'
+            }
+        })
+
+        const orders = await Order.query()
+            .andWhere('status', payload.params.status)
+            .paginate(page, limit)
+
+        return response.json(orders.serialize(AdminOrderFilterFields))
     }
 
     public async orderDetail({ params, response }: HttpContextContract) {
