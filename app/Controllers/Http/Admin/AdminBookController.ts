@@ -7,6 +7,7 @@ import Drive from '@ioc:Adonis/Core/Drive'
 import BookImage from 'App/Models/BookImage'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import { isIsbnCodeValid } from 'App/Utils/CheckIsbnCodeUtils'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class AdminBookController {
 
@@ -253,26 +254,13 @@ export default class AdminBookController {
         const book = await Book.findBy('isbn_code', isbnCode)
         if (book) {
             await book.delete()
+            await Database.from('carts').delete().where('isbn_code', isbnCode)
             return response.ok({
                 message: `Đã xóa sách <${book.name}> vào thùng rác thành công.`
             })
         }
         return response.notFound({
             message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}>.`
-        })
-    }
-
-    public async destroy({ params, response }: HttpContextContract) {
-        const isbnCode = params.isbn_code
-        const book = await Book.onlyTrashed().where('isbn_code', isbnCode).first()
-        if (book) {
-            await book.forceDelete()
-            return response.ok({
-                message: `Đã xóa sách <${book.name}> vĩnh viễn thành công.`
-            })
-        }
-        return response.notFound({
-            message: `Không tìm thấy sách mang mã số ISBN <${isbnCode}> ở trong thùng rác.`
         })
     }
 

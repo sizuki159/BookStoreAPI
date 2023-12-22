@@ -73,7 +73,6 @@ Route.group(() => {
             Route.post('/', 'AdminBookController.add')
             Route.put('/', 'AdminBookController.edit')
             Route.delete('/delete/:isbn_code', 'AdminBookController.delete')
-            Route.delete('/destroy/:isbn_code', 'AdminBookController.destroy')
             Route.patch('/restore/:isbn_code', 'AdminBookController.restore')
 
             Route.group(() => {
