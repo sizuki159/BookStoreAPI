@@ -6,20 +6,7 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 export default class AdminBookOrderedController {
     public async getAllOrder({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
-        const query = Order.query()
-            .preload('items', (items) => {
-                items.preload('product', (product) => {
-                    product.preload('images', images => images.groupLimit(1))
-                })
-            })
-            .preload('user')
-            .preload('userAddress', (userAddress) => {
-                userAddress.preload('wards', (wards) => {
-                    wards.preload('district', (district) => {
-                        district.preload('province')
-                    })
-                })
-            })
+        const query = Order.query().preload('user').orderBy('created_at', 'desc')
 
         const orderList = await query.paginate(page, limit)
         return response.json(
@@ -34,7 +21,8 @@ export default class AdminBookOrderedController {
             .where('order_id', orderId)
             .preload('items', (items) => {
                 items.preload('product', (product) => {
-                    product.preload('images', images => images.groupLimit(1))
+                    product.withTrashed()
+                        .preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user', (user) => {
@@ -137,7 +125,7 @@ export default class AdminBookOrderedController {
             await order.save()
 
             // Hoàn tiền (nếu có)
-            if(order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
+            if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
                 await order.related('user').query().increment('money', order.finalPrice)
             }
 

@@ -2,12 +2,10 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import VoucherFilterFields from 'App/FilterFields/API/VoucherFilterFields'
 import CartFilterFields from 'App/FilterFields/CartFilterFields'
-import UserAddressFilterFields from 'App/FilterFields/User/UserAddressFilterFields'
 import Book from 'App/Models/Book'
 import Cart from 'App/Models/Cart'
 import PaymentMethod from 'App/Models/PaymentMethod'
 import User from 'App/Models/User'
-import UserAddress from 'App/Models/UserAddress'
 import Voucher from 'App/Models/Voucher'
 import { DateTime } from 'luxon'
 import { types } from '@ioc:Adonis/Core/Helpers'
@@ -17,7 +15,8 @@ export default class UserCartController {
     public async getMyCart({ auth, response }: HttpContextContract) {
         const myCarts = await Cart.query().where('userId', auth.use('api').user!.id)
             .preload('book', book => {
-                book.preload('images', images => images.groupLimit(1))
+                book.withTrashed()
+                .preload('images', images => images.groupLimit(1))
             })
         return response.json(myCarts.map((myCart) => {
             return myCart.serialize(CartFilterFields)
@@ -219,7 +218,8 @@ export default class UserCartController {
         const carts = await Cart.query().where('userId', user.id)
             .andWhereIn('id', ids)
             .preload('book', book => {
-                book.preload('images', images => images.groupLimit(1))
+                book.withTrashed()
+                .preload('images', images => images.groupLimit(1))
             })
 
         if (carts.length === 0) {

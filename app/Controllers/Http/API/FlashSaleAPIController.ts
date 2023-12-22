@@ -44,7 +44,8 @@ export default class FlashSaleAPIController {
 
         await flashSaleHour.load('products', (products) => {
             products.preload('product_info', (product_info) => {
-                product_info.preload('author')
+                product_info.withTrashed()
+                    .preload('author')
                     .preload('bookForm')
                     .preload('ccategory')
                     .preload('images', images => images.groupLimit(1))
@@ -96,7 +97,8 @@ export default class FlashSaleAPIController {
         if (flashSaleHour) {
             await flashSaleHour.load('products', (products) => {
                 products.preload('product_info', (product_info) => {
-                    product_info.preload('author')
+                    product_info.withTrashed()
+                        .preload('author')
                         .preload('bookForm')
                         .preload('ccategory')
                         .preload('images', images => images.groupLimit(1))

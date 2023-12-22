@@ -33,7 +33,7 @@ export default class AdminFlashSaleController {
             })
         }
         await flashSaleHour.load('products', (products) => {
-            products.preload('product_info')
+            products.preload('product_info', (product_info) => product_info.withTrashed())
         })
         return flashSaleHour
     }
@@ -245,7 +245,7 @@ export default class AdminFlashSaleController {
         })
     }
 
-    public async updateFlashSaleHour({}: HttpContextContract) {
-        
+    public async updateFlashSaleHour({ }: HttpContextContract) {
+
     }
 }

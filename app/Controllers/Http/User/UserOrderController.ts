@@ -53,7 +53,7 @@ export default class UserOrderController {
         // Lấy danh sách carts
         const carts = await Cart.query().where('userId', user.id)
             .andWhereIn('id', ids)
-            .preload('book')
+            .preload('book', (book) => book.withTrashed())
 
 
         if (carts.length === 0) {
@@ -309,7 +309,8 @@ export default class UserOrderController {
             .andWhere('order_id', orderId)
             .preload('items', (items) => {
                 items.preload('product', (product) => {
-                    product.preload('images', images => images.groupLimit(1))
+                    product.withTrashed()
+                    .preload('images', images => images.groupLimit(1))
                 })
             })
             .preload('user')
