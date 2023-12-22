@@ -7,13 +7,36 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class AdminBookOrderedController {
     public async getAllOrder({ request, response }: HttpContextContract) {
-        const { page, limit } = PageLimitUtils(request.qs())
-        const query = Order.query().preload('user').orderBy('created_at', 'desc')
 
-        const orderList = await query.paginate(page, limit)
-        return response.json(
-            orderList.serialize(AdminOrderFilterFields)
-        )
+        let { email, status, payment_status } = request.qs()
+
+        let query = Order.query()
+            .preload('user')
+            .orderBy('created_at', 'desc')
+
+
+        // Filter status
+        if (status) {
+            query.where('status', status)
+        }
+
+        // Filter payment status
+        if (payment_status) {
+            query.where('payment_status', payment_status)
+        }
+
+        // Email text search
+        if (email) {
+            query.whereHas('user', (userQuery) => {
+                userQuery.where('email', 'like', `%${email}%`)
+            })
+        }
+
+        // Phân trang
+        const { page, limit } = PageLimitUtils(request.qs())
+        const result = await query.paginate(page, limit)
+
+        return response.json(result.serialize(AdminOrderFilterFields))
     }
 
     public async getStatisticAllOrder({ response }: HttpContextContract) {
@@ -28,31 +51,8 @@ export default class AdminBookOrderedController {
             status,
             total: myOrderStatistics.find(myOrderStatistic => myOrderStatistic.status === status)?.count || 0,
         }));
+        
         return response.json(result)
-    }
-
-    public async getAllOrdersWithStatus({ request, response }: HttpContextContract) {
-
-        const { page, limit } = PageLimitUtils(request.qs())
-
-        const newStatusSchema = schema.create({
-            params: schema.object().members({
-                'status': schema.enum(Object.values(Order.STATUS))
-            })
-        })
-
-        const payload = await request.validate({
-            schema: newStatusSchema,
-            messages: {
-                'params.status.enum': 'Trạng thái không hợp lệ'
-            }
-        })
-
-        const orders = await Order.query()
-            .andWhere('status', payload.params.status)
-            .paginate(page, limit)
-
-        return response.json(orders.serialize(AdminOrderFilterFields))
     }
 
     public async orderDetail({ params, response }: HttpContextContract) {
