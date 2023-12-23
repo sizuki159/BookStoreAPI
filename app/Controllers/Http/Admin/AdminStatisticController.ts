@@ -105,6 +105,40 @@ export default class AdminStatisticController {
             .groupByRaw('extract(year from created_at)')
             .orderBy('year', 'asc')
 
+
+        // Nếu mảng là rỗng thì doanh số 2 năm gần nhất là 0
+        if (revenueInTheLast2Year.length === 0) {
+            return response.json({
+                previous_year: previousYear,
+                previous_year_revenue: 0,
+                current_year: currentYear,
+                current_year_revenue: 0,
+                total_revenue_for_2_year: 0,
+                percentage_change: 0,
+                financial_performance: 'stagnant',
+            })
+        }
+
+        // Nếu mảng là 1 thì kiểm tra xem năm đó là năm nào
+        // Rồi trả về dữ liệu chuẩn
+        // Năm nào thì doanh thu của năm đó
+        // Năm còn lại sẽ là doanh thu 0
+        if (revenueInTheLast2Year.length === 1) {
+            const year = revenueInTheLast2Year[0].year
+            const isCurrentYear = year === currentYear ? true : false
+            if (isCurrentYear) {
+                revenueInTheLast2Year.unshift({
+                    year: isCurrentYear ? previousYear : currentYear,
+                    total_revenue: 1 // Mặc định doanh thu 1
+                })
+            } else {
+                revenueInTheLast2Year.push({
+                    year: isCurrentYear ? previousYear : currentYear,
+                    total_revenue: 0
+                })
+            }
+        }
+
         // So sánh doanh thu của năm hiện tại và năm trước đó
         const percentageChange = this.calculateRevenuePercentageChange(revenueInTheLast2Year);
 
@@ -149,6 +183,40 @@ export default class AdminStatisticController {
             .groupByRaw('extract(year from created_at)')
             .groupByRaw('extract(month from created_at)')
             .orderBy('year', 'asc')
+
+
+        // Nếu mảng là rỗng thì doanh số 2 tháng của 2 năm là 0
+        if (revenueInThisMonthCurrentYearAndPreviousYear.length === 0) {
+            return response.json({
+                previous_month_year_revenue: 0,
+                current_month_year_revenue: 0,
+                total_revenue_for_2_month: 0,
+                percentage_change: 0,
+                financial_performance: 'stagnant',
+            })
+        }
+
+        // Nếu mảng là 1 thì kiểm tra xem tháng đó của năm nào
+        // Rồi trả về dữ liệu chuẩn
+        // Tháng của năm nào thì doanh thu theo tháng của năm đó
+        // Tháng của năm còn lại sẽ là doanh thu 0
+        if (revenueInThisMonthCurrentYearAndPreviousYear.length === 1) {
+            const year = revenueInThisMonthCurrentYearAndPreviousYear[0].year
+            const isCurrentYear = year === currentYear ? true : false
+            if (isCurrentYear) {
+                revenueInThisMonthCurrentYearAndPreviousYear.unshift({
+                    year: isCurrentYear ? previousYear : currentYear,
+                    month: currentMonth,
+                    total_revenue: 1 // Mặc định doanh thu 1
+                })
+            } else {
+                revenueInThisMonthCurrentYearAndPreviousYear.push({
+                    year: isCurrentYear ? previousYear : currentYear,
+                    month: currentMonth,
+                    total_revenue: 0
+                })
+            }
+        }
 
         const percentageChange = this.calculateRevenuePercentageIncrease(revenueInThisMonthCurrentYearAndPreviousYear);
 
