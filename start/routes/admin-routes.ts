@@ -164,6 +164,8 @@ Route.group(() => {
     //#region Quản lý người dùng
     Route.group(() => {
         Route.get('', 'AdminUserController.getAllUsers')
+        Route.get('/detail/:user_id', 'AdminUserController.getUserInformation')
+
         Route.put('/locked/:user_id', 'AdminUserController.lockUser')
         Route.put('/unlocked/:user_id', 'AdminUserController.unlockUser')
     }).prefix('user')

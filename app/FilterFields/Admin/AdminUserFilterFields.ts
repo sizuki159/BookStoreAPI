@@ -1,4 +1,5 @@
 import { CherryPick } from "@ioc:Adonis/Lucid/Orm";
+import UserAddressFilterFields from "../User/UserAddressFilterFields";
 
 const AdminUserFilterFields: CherryPick = {
     fields: {
@@ -36,7 +37,8 @@ const AdminUserFilterFields: CherryPick = {
                     'avatar_source',
                 ]
             }
-        }
+        },
+        addresses: UserAddressFilterFields,
     }
 }
 

@@ -21,7 +21,7 @@ export default class AdminUserController {
         }
 
         // Filter status
-        if(status) {
+        if (status) {
             query.where('status', status)
         }
 
@@ -30,6 +30,31 @@ export default class AdminUserController {
         const result = await query.paginate(page, limit)
 
         return response.json(result.serialize(AdminUserFilterFields))
+    }
+
+    public async getUserInformation({ params, response }: HttpContextContract) {
+        const userId = params.user_id
+
+        // Lấy người dùng nếu không có thì trả không tìm thấy
+        const user = await User.find(userId)
+        if (!user) {
+            return response.notFound({ message: 'Không tìm thấy người dùng' })
+        }
+
+        await Promise.all([
+            user.load('profile'),
+            user.load('userLevel'),
+            user.load('userRole'),
+            user.load('addresses', (userAddress) => {
+                userAddress.preload('wards', (wards) => {
+                    wards.preload('district', (district) => {
+                        district.preload('province')
+                    })
+                })
+            }),
+        ])
+
+        return response.ok(user.serialize(AdminUserFilterFields))
     }
 
     // Khóa tài khoản người dùng
