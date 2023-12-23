@@ -4,7 +4,7 @@ Route.group(() => {
 
     //#region User Profile
     Route.group(() => {
-        Route.get('', 'UserProfileController.getInfo')
+        Route.get('/my-info', 'UserProfileController.getMyInformation')
         Route.post('', 'UserProfileController.updateOrCreate')
         Route.patch('/password', 'UserProfileController.changePassword')
 

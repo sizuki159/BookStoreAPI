@@ -5,20 +5,15 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
 import UserProfileFilterFields from 'App/FilterFields/User/UserProfileFilterFields'
 import RandomNumber from 'App/Utils/RandomNumber'
-
-
+import UserMyInformationFilterFields from 'App/FilterFields/User/UserMyInformationFilterFields'
 
 export default class UserProfileController {
-    public async getInfo({ auth, response }: HttpContextContract) {
+    public async getMyInformation({ auth, response }: HttpContextContract) {
         const userAuth = await auth.use('api').authenticate()
         const user = await User.findOrFail(userAuth.id)
         await user.load('profile')
-        if (user.profile) {
-            return user.profile.serialize(UserProfileFilterFields)
-        }
-        return response.notFound({
-            'message': 'Bạn chưa cập nhật thông tin cá nhân!'
-        })
+
+        return response.ok(user.serialize(UserMyInformationFilterFields))
     }
 
     public async updateOrCreate({ auth, request, response }: HttpContextContract) {
@@ -80,13 +75,13 @@ export default class UserProfileController {
         }
     }
 
-    public async uploadAvatar({auth, request, response}: HttpContextContract) {
+    public async uploadAvatar({ auth, request, response }: HttpContextContract) {
         const image = request.file('avatar_image', {
             size: '10mb',
             extnames: ['jpg', 'png', 'gif'],
         })
 
-        if(image) {
+        if (image) {
             if (image.hasErrors) {
                 return response.badRequest({
                     'message': 'Chỉ chấp nhận định dạng file (.jpg .png .gif) và file nhỏ hơn 10 MB'
@@ -107,8 +102,8 @@ export default class UserProfileController {
                     'message': 'Cập nhật avatar thành công',
                     updated_profile: updatedData
                 })
-                
-            } catch(e) {
+
+            } catch (e) {
                 console.log(e)
                 return response.serviceUnavailable({
                     'message': 'Có lỗi hệ thống, vui lòng thử lại sau'
