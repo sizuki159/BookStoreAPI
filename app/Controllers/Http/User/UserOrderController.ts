@@ -323,6 +323,7 @@ export default class UserOrderController {
                 })
             })
             .preload('review')
+            .preload('payment')
             .first()
 
         if (order) {

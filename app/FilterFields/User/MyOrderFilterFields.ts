@@ -33,7 +33,14 @@ const MyOrderFilterFields: CherryPick = {
             }
         },
         'user': UserFilterFields,
-        'userAddress': UserAddressFilterFields
+        'userAddress': UserAddressFilterFields,
+        'payment': {
+            fields: {
+                pick: [
+                    'name',
+                ]
+            }
+        }
     }
 }
 

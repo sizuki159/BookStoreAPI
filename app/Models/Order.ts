@@ -6,6 +6,7 @@ import UserAddress from './UserAddress'
 import OrderReview from './OrderReview'
 import ResponseFormat from 'App/Utils/ResponseFormat'
 import Invoice from './Invoice'
+import PaymentMethod from './PaymentMethod'
 
 export default class Order extends BaseModel {
 
@@ -88,6 +89,12 @@ export default class Order extends BaseModel {
         foreignKey: 'userAddressId'
     })
     public userAddress: BelongsTo<typeof UserAddress>
+
+    @belongsTo(() => PaymentMethod, {
+        localKey: 'key',
+        foreignKey: 'paymentMethod'
+    })
+    public payment: BelongsTo<typeof PaymentMethod>
 
     @hasMany(() => OrderItem, {
         localKey: 'id',
