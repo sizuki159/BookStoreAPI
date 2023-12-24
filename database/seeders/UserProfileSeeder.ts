@@ -7,7 +7,7 @@ export default class extends BaseSeeder {
         await UserProfile.createMany([
             {
                 "userId": 1,
-                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/3/3_avatar_img_id_512560",
+                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/1/1_avatar_img_id_519755",
                 "avatarLocation": "user_avatar/3/3_avatar_img_id_512560",
                 "firstname": "Nguyễn",
                 "lastname": "Thành Trung",
@@ -16,7 +16,7 @@ export default class extends BaseSeeder {
             },
             {
                 "userId": 2,
-                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/3/3_avatar_img_id_512560",
+                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/2/2_avatar_img_id_454579",
                 "avatarLocation": "user_avatar/3/3_avatar_img_id_512560",
                 "firstname": "Quách",
                 "lastname": "Diệu Khánh",
