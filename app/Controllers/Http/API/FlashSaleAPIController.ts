@@ -86,6 +86,14 @@ export default class FlashSaleAPIController {
             }
 
 
+            // Nếu sách đã bán cao hơn tổng sách có sẵn
+            // Thì set lại tổng số sách là số sách đã bán cộng thêm số random bất kì
+            // Để tránh trường hợp số sách đã bán vượt quá số sách có sẵn
+            let instock: number = flashSaleProduct.product_info.quantity
+            if (totalSoldNumber > instock) {
+                instock = parseInt(totalSoldNumber.toString()) + instock
+            }
+
             flashSaleProduct.product_info.flashSaleInfo = {
                 is_flash_sale: true,
                 original_price: original_price,
@@ -97,7 +105,7 @@ export default class FlashSaleAPIController {
                 },
                 instock_info: {
                     sold_number: totalSoldNumber,
-                    instock: flashSaleProduct.product_info.quantity,
+                    instock: instock,
                 }
             }
         }
