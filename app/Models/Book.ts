@@ -219,6 +219,15 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
                     totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
                 } catch { }
 
+
+                // Nếu sách đã bán cao hơn tổng sách có sẵn
+                // Thì set lại tổng số sách là số sách đã bán cộng thêm số random bất kì
+                // Để tránh trường hợp số sách đã bán vượt quá số sách có sẵn
+                let instock: number = book.quantity
+                if (totalSoldNumber > instock) {
+                    instock = parseInt(totalSoldNumber.toString()) + instock
+                }
+
                 book.flashSaleInfo = {
                     is_flash_sale: true,
                     original_price: book.price,
@@ -230,7 +239,7 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
                     },
                     instock_info: {
                         sold_number: totalSoldNumber,
-                        instock: book.quantity,
+                        instock: instock,
                     }
                 }
                 book.price = priceAfterDiscount
@@ -280,6 +289,14 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
                     totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
                 } catch { }
 
+                // Nếu sách đã bán cao hơn tổng sách có sẵn
+                // Thì set lại tổng số sách là số sách đã bán cộng thêm số random bất kì
+                // Để tránh trường hợp số sách đã bán vượt quá số sách có sẵn
+                let instock: number = product.quantity
+                if (totalSoldNumber > instock) {
+                    instock = parseInt(totalSoldNumber.toString()) + instock
+                }
+
                 product.flashSaleInfo = {
                     is_flash_sale: true,
                     original_price: product.price,
@@ -291,7 +308,7 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
                     },
                     instock_info: {
                         sold_number: totalSoldNumber,
-                        instock: product.quantity,
+                        instock: instock,
                     }
                 }
                 product.price = priceAfterDiscount
