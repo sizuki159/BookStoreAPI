@@ -55,6 +55,14 @@ export default class FlashSaleAPIController {
             }).forPage(page, limit)
         })
 
+        // Lấy flash sale hiện tại
+        // Để so sánh xem phải đây là flash sale hiện tại hay không
+        // Mục đích để hiện đã bán là 0 nếu là khác flash sale hiện tại
+        const flashSaleNow = await FlashSaleHour.query()
+            .where('time_start', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .andWhere('time_end', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .first()
+
         for (const flashSaleProduct of flashSaleHour.products) {
 
             const original_price = await flashSaleProduct.product_info.getOriginalPrice()
@@ -68,6 +76,15 @@ export default class FlashSaleAPIController {
             try {
                 totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
             } catch { }
+
+            // Nếu như flash sale này không phải là flash sale hiện tại
+            // Thì set số lượng đã bán là 0
+            if (flashSaleNow) {
+                if (flashSaleNow.id !== flashSaleHour.id) {
+                    totalSoldNumber = 0
+                }
+            }
+
 
             flashSaleProduct.product_info.flashSaleInfo = {
                 is_flash_sale: true,
