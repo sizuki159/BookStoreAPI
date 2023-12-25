@@ -18,6 +18,7 @@ import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import FlashSaleHour from './FlashSaleHour'
 import Database from '@ioc:Adonis/Lucid/Database'
 import BookComment from './BookComment'
+import Order from './Order'
 
 type FlashSaleInfo = {
     is_flash_sale: boolean,
@@ -213,8 +214,10 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
                 // Đếm số lượng đã bán
                 let totalSoldNumber = 0
                 const totalSoldNumberDb = await Database.from('order_items')
-                    .where('isbn_code', book.isbnCode)
-                    .sum('quantity as total_sold_number')
+                    .leftJoin('orders', 'order_items.order_id', 'orders.order_id')
+                    .where('order_items.isbn_code', book.isbnCode)
+                    .andWhere('orders.status', '!=', Order.STATUS.CANCELED)
+                    .sum('order_items.quantity as total_sold_number')
                 try {
                     totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
                 } catch { }
@@ -283,8 +286,10 @@ export default class Book extends compose(BaseModel, SoftDeletes) {
                 // Đếm số lượng đã bán
                 let totalSoldNumber = 0
                 const totalSoldNumberDb = await Database.from('order_items')
-                    .where('isbn_code', product.isbnCode)
-                    .sum('quantity as total_sold_number')
+                    .leftJoin('orders', 'order_items.order_id', 'orders.order_id')
+                    .where('order_items.isbn_code', product.isbnCode)
+                    .andWhere('orders.status', '!=', Order.STATUS.CANCELED)
+                    .sum('order_items.quantity as total_sold_number')
                 try {
                     totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
                 } catch { }

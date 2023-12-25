@@ -3,6 +3,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import FlashSaleAPIFilterFields from 'App/FilterFields/API/FlashSaleAPIFilterFields'
 import FlashSale from 'App/Models/FlashSale'
 import FlashSaleHour from 'App/Models/FlashSaleHour'
+import Order from 'App/Models/Order'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import { DateTime } from 'luxon'
@@ -71,8 +72,10 @@ export default class FlashSaleAPIController {
             // Đếm số lượng đã bán
             let totalSoldNumber = 0
             const totalSoldNumberDb = await Database.from('order_items')
-                .where('isbn_code', flashSaleProduct.product_info.isbnCode)
-                .sum('quantity as total_sold_number')
+                .leftJoin('orders', 'order_items.order_id', 'orders.order_id')
+                .where('order_items.isbn_code', flashSaleProduct.product_info.isbnCode)
+                .andWhere('orders.status', '!=', Order.STATUS.CANCELED)
+                .sum('order_items.quantity as total_sold_number')
             try {
                 totalSoldNumber = totalSoldNumberDb[0].total_sold_number ? totalSoldNumberDb[0].total_sold_number : totalSoldNumber
             } catch { }
