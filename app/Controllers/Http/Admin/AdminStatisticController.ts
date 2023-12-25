@@ -98,9 +98,9 @@ export default class AdminStatisticController {
                 width: 14,
             },
             {
-                header: 'Giảm giá',
+                header: 'Đã giảm giá',
                 key: 'discount_price',
-                width: 10,
+                width: 13,
             },
             {
                 header: 'Thành tiền',

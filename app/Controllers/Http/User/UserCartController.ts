@@ -233,7 +233,7 @@ export default class UserCartController {
 
         const paymentMethods = await PaymentMethod.query().where('status', 'active')
 
-
+        // Gợi ý mã giảm giá
         const voucherAvailables = await Voucher.query()
             .where('status', Voucher.STATUS.ACTIVE)
             .andWhere('start_date', '<=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
@@ -244,6 +244,13 @@ export default class UserCartController {
                     .orWhere('userId', user.id)
                     .orWhere('userLevelId', user.userLevelId)
             })
+            // Không gợi ý mã giảm giá đã sử dụng
+            // Và cũng không được sử dụng
+            .andWhereNotExists(voucherUsed => {
+                voucherUsed.from('voucher_usage_histories')
+                .whereColumn('voucher_usage_histories.voucher_id', 'vouchers.id')
+                .andWhereColumn('voucher_usage_histories.user_id', userAuth.id)
+            })
 
         // Phí ship tạm thời mặc định 29k
         const price = {
@@ -253,8 +260,11 @@ export default class UserCartController {
             total: productPrice + 29000
         }
 
+        // Nếu có sử dụng mã giảm giá
         if (voucherCode) {
             for (const voucherAvailable of voucherAvailables) {
+                // Mã giảm giá phải hợp lệ
+                // Thì mới tính toán giảm giá tiền
                 if (voucherAvailable.voucherCode === voucherCode) {
                     price.discountPrice = price.total * (voucherAvailable.discountPercentage / 100)
                     if (voucherAvailable.discountMaxPrice) {

@@ -368,8 +368,12 @@ export default class UserOrderController {
                 })
             }
 
-            // Xác nhận
+            // Đổi trạng thái đơn hàng thành hoàn thành
+            // Đổi trạng thái thanh toán thành đã thanh toán nếu là COD
             order.status = Order.STATUS.COMPLETED
+            if(order.paymentMethod === PaymentMethod.METHOD.COD) {
+                order.paymentStatus = Order.PAYMENT_STATUS.PAID
+            }
             await order.save()
 
             return response.ok({
