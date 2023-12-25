@@ -80,9 +80,9 @@
                                 @each(item in items)
                                     <tr>
                                         <td>{{ item.name }}</td>
-                                        <td>{{ item.price_per_unit }}đ</td>
+                                        <td>{{ item.price_per_unit }}</td>
                                         <td>{{ item.quantity }}</td>
-                                        <td class="text-end">{{ item.quantity * item.price_per_unit }}đ</td>
+                                        <td class="text-end">{{ item.total_price }}</td>
                                     </tr>
                                 @end
                             </tbody>
@@ -90,15 +90,15 @@
                         <div class="invoice-body-bottom">
                             <div class="invoice-body-info-item border-bottom">
                                 <div class="info-item-td text-end text-bold">Sub Total:</div>
-                                <div class="info-item-td text-end">{{ price.product_price }}đ</div>
+                                <div class="info-item-td text-end">{{ price.product_price }}</div>
                             </div>
                             <div class="invoice-body-info-item border-bottom">
                                 <div class="info-item-td text-end text-bold">Fee Ship:</div>
-                                <div class="info-item-td text-end">{{ price.fee_price }}đ</div>
+                                <div class="info-item-td text-end">{{ price.fee_price }}</div>
                             </div>
                             <div class="invoice-body-info-item">
                                 <div class="info-item-td text-end text-bold">Total:</div>
-                                <div class="info-item-td text-end">{{ price.final_price }}đ</div>
+                                <div class="info-item-td text-end">{{ price.final_price }}</div>
                             </div>
                         </div>
                     </div>

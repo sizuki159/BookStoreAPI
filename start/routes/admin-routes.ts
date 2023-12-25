@@ -156,8 +156,8 @@ Route.group(() => {
         Route.get('/revenue', 'AdminStatisticController.getRevenueWithYear')
         Route.get('/revenue/current-year', 'AdminStatisticController.getRevenueCurrentYear')
         Route.get('/revenue/current-month', 'AdminStatisticController.getRevenueCurrentMonth')
-
         Route.get('/recent-transactions', 'AdminStatisticController.getRecentTransactions')
+
     }).prefix('statistic')
     //#endregion
 

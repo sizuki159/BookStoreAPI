@@ -94,5 +94,10 @@ Route.group(() => {
 
     //#endregion
 
+
+    // Xuất doanh thu ra excel [Admin private API]
+    Route.get('/statistic/revenue/export', 'AdminStatisticController.exportRevenueFromTo').namespace('App/Controllers/Http/Admin')
+
+
 }).prefix('api').namespace('App/Controllers/Http/API')
 

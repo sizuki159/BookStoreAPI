@@ -1,9 +1,12 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema } from '@ioc:Adonis/Core/Validator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Invoice from 'App/Models/Invoice';
 import Order from 'App/Models/Order';
+import { formatCurrency } from 'App/Utils/FormatCurrency';
 import PageLimitUtils from 'App/Utils/PageLimitUtils';
 import { DateTime } from 'luxon';
+import { Workbook } from 'exceljs'
 
 interface MonthlyData {
     month: number,
@@ -36,6 +39,128 @@ interface IRecentTransactionResponse {
 }
 
 export default class AdminStatisticController {
+
+    public async exportRevenueFromTo({ request, response }: HttpContextContract) {
+
+        const newFromToSchema = schema.create({
+            from: schema.date({ format: 'dd-MM-yyyy' }),
+            to: schema.date({ format: 'dd-MM-yyyy' }),
+        })
+
+        const payload = await request.validate({
+            schema: newFromToSchema,
+            messages: {
+                'from.required': 'Vui lòng chọn thống kê từ ngày',
+                'from.date.format': 'Yêu cầu định dạng (HH:mm:ss)',
+
+                'to.required': 'Vui lòng chọn thống kê đến ngày',
+                'to.date.format': 'Yêu cầu định dạng (HH:mm:ss)',
+            }
+        })
+
+        const orders = await Order.query()
+            .where('status', Order.STATUS.COMPLETED)
+            .andWhere('payment_status', Order.PAYMENT_STATUS.PAID)
+            .andWhereBetween('created_at', [payload.from.toFormat('yyyy-MM-dd'), payload.to.toFormat('yyyy-MM-dd')])
+            .preload('user')
+            .preload('payment')
+
+        const dataArr = orders.map(order => {
+            return {
+                'order_id': order.id,
+                'product_price': order.productPrice,
+                'fee_price': order.feePrice,
+                'discount_price': order.discountPrice,
+                'final_price': order.finalPrice,
+                'payment_method': order.payment.name,
+                'user_email': order.user.email,
+                'created_at': order.createdAt.toFormat('dd-MM-yyyy HH:mm:ss'),
+            }
+        })
+
+
+        let workbook = new Workbook()
+        let worksheet = workbook.addWorksheet(`${payload.from.toFormat('dd-MM-yyyy')} to ${payload.to.toFormat('dd-MM-yyyy')}`)
+        worksheet.columns = [
+            {
+                header: 'Mã đơn hàng',
+                key: 'order_id',
+                width: 15,
+            },
+            {
+                header: 'Giá sản phẩm',
+                key: 'product_price',
+                width: 13,
+            },
+            {
+                header: 'Phí vận chuyển',
+                key: 'fee_price',
+                width: 14,
+            },
+            {
+                header: 'Giảm giá',
+                key: 'discount_price',
+                width: 10,
+            },
+            {
+                header: 'Thành tiền',
+                key: 'final_price',
+                width: 13,
+            },
+            {
+                header: 'Phương thức thanh toán',
+                key: 'payment_method',
+                width: 38,
+            },
+            {
+                header: 'Email khách hàng',
+                key: 'user_email',
+                width: 30,
+            },
+            {
+                header: 'Ngày tạo đơn',
+                key: 'created_at',
+                width: 20,
+            },
+        ]
+
+        // Ghi dữ liệu
+        for (const data of dataArr) {
+            worksheet.addRow({
+                order_id: data.order_id.toString(),
+                product_price: formatCurrency(data.product_price),
+                fee_price: formatCurrency(data.fee_price),
+                discount_price: formatCurrency(data.discount_price),
+                final_price: formatCurrency(data.final_price),
+                payment_method: data.payment_method,
+                user_email: data.user_email,
+                created_at: data.created_at,
+            })
+        }
+
+        // Tổng danh thu dựa vào thành tiền (final_price)
+        const totalRevenue = dataArr.reduce((total, data) => {
+            return total + data.final_price
+        }, 0)
+        worksheet.addRow({})
+        worksheet.addRow({
+            'order_id': 'Tổng doanh thu',
+            'product_price': '',
+            'fee_price': '',
+            'discount_price': '',
+            'final_price': formatCurrency(totalRevenue),
+            'payment_method': '',
+            'user_email': '',
+            'created_at': '',
+
+        })
+
+        response.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response.header('Content-Disposition', 'attachment; filename="doanhthu.csv"')
+
+        await workbook.xlsx.write(response.response)
+        return response.response.end()
+    } s
 
     public async topProductBestSeller({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())

@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Invoice from 'App/Models/Invoice'
+import { formatCurrency } from 'App/Utils/FormatCurrency'
 
 export default class InvoiceAPIController {
     public async printInvoice({ params, request, view }: HttpContextContract) {
@@ -40,15 +41,16 @@ export default class InvoiceAPIController {
             district: invoice.order.userAddress.wards.district.name,
             province: invoice.order.userAddress.wards.district.province.name,
             price: {
-                product_price: invoice.order.productPrice,
-                fee_price: invoice.order.feePrice,
-                final_price: invoice.order.finalPrice,
+                product_price: formatCurrency(invoice.order.productPrice),
+                fee_price: formatCurrency(invoice.order.feePrice),
+                final_price: formatCurrency(invoice.order.finalPrice),
             },
             items: invoice.order.items.map((item) => {
                 return {
                     quantity: item.quantity,
-                    price_per_unit: item.pricePerUnit,
+                    price_per_unit: formatCurrency(item.pricePerUnit),
                     name: item.product.name,
+                    total_price: formatCurrency(item.pricePerUnit * item.quantity),
                 }
             })
         })
