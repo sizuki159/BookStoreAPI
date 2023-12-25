@@ -1,5 +1,4 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { schema } from '@ioc:Adonis/Core/Validator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import AdminOrderFilterFields from 'App/FilterFields/Admin/AdminOrderFilterFields'
 import Book from 'App/Models/Book'
@@ -12,28 +11,31 @@ import PageLimitUtils from 'App/Utils/PageLimitUtils'
 export default class AdminBookOrderedController {
     public async getAllOrder({ request, response }: HttpContextContract) {
 
-        let { email, status, payment_status } = request.qs()
+        let { order_id, email, status, payment_status } = request.qs()
 
         let query = Order.query()
             .preload('user')
             .orderBy('created_at', 'desc')
 
-
-        // Filter status
-        if (status) {
-            query.where('status', status)
-        }
-
-        // Filter payment status
-        if (payment_status) {
-            query.where('payment_status', payment_status)
-        }
-
-        // Email text search
-        if (email) {
-            query.whereHas('user', (userQuery) => {
-                userQuery.where('email', 'like', `%${email}%`)
-            })
+        if(order_id) {
+            query.where('order_id', order_id)
+        } else {
+            // Filter status
+            if (status) {
+                query.where('status', status)
+            }
+    
+            // Filter payment status
+            if (payment_status) {
+                query.where('payment_status', payment_status)
+            }
+    
+            // Email text search
+            if (email) {
+                query.whereHas('user', (userQuery) => {
+                    userQuery.where('email', 'like', `%${email}%`)
+                })
+            }
         }
 
         // Phân trang
