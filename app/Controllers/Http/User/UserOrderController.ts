@@ -399,6 +399,8 @@ export default class UserOrderController {
                 })
             }
 
+            // Chỉ hủy đơn hàng có trạng thái đang chờ xác nhận
+            // Hoặc đã xác nhận
             if (order.status !== Order.STATUS.PENDING && order.status !== Order.STATUS.CONFIRMED) {
                 return response.badRequest({
                     message: 'Đơn hàng không thể hủy'
@@ -426,6 +428,15 @@ export default class UserOrderController {
             }
 
             await order.save()
+
+            // Hủy đơn thì phải hoàn trả số lượng sách về kho
+            // Tăng số lượng sách lên
+            const items = await OrderItem.query().where('order_id', order.id)
+            for (const item of items) {
+                await Book.query()
+                    .increment('quantity', item.quantity)
+                    .where('isbn_code', item.isbnCode)
+            }
 
             return response.ok({
                 message: 'Đã hủy đơn hàng'

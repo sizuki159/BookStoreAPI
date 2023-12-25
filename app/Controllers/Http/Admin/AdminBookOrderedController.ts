@@ -2,7 +2,11 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import AdminOrderFilterFields from 'App/FilterFields/Admin/AdminOrderFilterFields'
+import Book from 'App/Models/Book'
+import Invoice from 'App/Models/Invoice'
 import Order from 'App/Models/Order'
+import OrderItem from 'App/Models/OrderItem'
+import PaymentMethod from 'App/Models/PaymentMethod'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
 export default class AdminBookOrderedController {
@@ -51,7 +55,7 @@ export default class AdminBookOrderedController {
             status,
             total: myOrderStatistics.find(myOrderStatistic => myOrderStatistic.status === status)?.count || 0,
         }));
-        
+
         return response.json(result)
     }
 
@@ -163,11 +167,32 @@ export default class AdminBookOrderedController {
             }
 
             order.status = Order.STATUS.CANCELED
-            await order.save()
 
             // Hoàn tiền (nếu có)
-            if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
-                await order.related('user').query().increment('money', order.finalPrice)
+            // Và chỉ hoàn tiền khi thanh toán online trước
+            if (order.paymentMethod !== PaymentMethod.METHOD.COD) {
+                if (order.paymentStatus === Order.PAYMENT_STATUS.PAID) {
+                    order.paymentStatus = Order.PAYMENT_STATUS.REFUNDED
+                    await order.related('user').query().increment('money', order.finalPrice)
+                }
+
+                // Hủy hóa đơn
+                try {
+                    await Invoice.query()
+                        .update('status', Invoice.STATUS.CANCEL)
+                        .where('order_id', order.id)
+                } catch { }
+            }
+            
+            await order.save()
+
+            // Hủy đơn thì phải hoàn trả số lượng sách về kho
+            // Tăng số lượng sách lên
+            const items = await OrderItem.query().where('order_id', order.id)
+            for (const item of items) {
+                await Book.query()
+                    .increment('quantity', item.quantity)
+                    .where('isbn_code', item.isbnCode)
             }
 
             return response.json({
