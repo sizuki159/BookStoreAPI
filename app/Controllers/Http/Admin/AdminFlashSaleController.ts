@@ -11,6 +11,7 @@ export default class AdminFlashSaleController {
     public async getAllFlashSale({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
         const flashSales = await FlashSale.query()
+            .where('event_date', '>=', DatetimeUtils.DATE_NOW_WITH_OUT_TIME_SQL)
             .orderBy('created_at', 'desc')
             .paginate(page, limit)
         return response.json(flashSales)
@@ -21,7 +22,7 @@ export default class AdminFlashSaleController {
         const flashSaleHourList = await FlashSaleHour.query()
             .orderBy('created_at', 'desc')
             .where('flash_sale_id', flash_sale_id)
-        return flashSaleHourList
+        return response.json(flashSaleHourList)
     }
 
     public async getFlashSaleHourDetail({ params, response }: HttpContextContract) {

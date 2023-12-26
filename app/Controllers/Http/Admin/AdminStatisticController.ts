@@ -62,6 +62,7 @@ export default class AdminStatisticController {
             .where('status', Order.STATUS.COMPLETED)
             .andWhere('payment_status', Order.PAYMENT_STATUS.PAID)
             .andWhereBetween('created_at', [payload.from.toFormat('yyyy-MM-dd'), payload.to.toFormat('yyyy-MM-dd')])
+            .orderBy('created_at', 'asc')
             .preload('user')
             .preload('payment')
 
