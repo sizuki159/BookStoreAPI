@@ -13,11 +13,32 @@ import DatetimeUtils from 'App/Utils/DatetimeUtils'
 
 export default class UserCartController {
     public async getMyCart({ auth, response }: HttpContextContract) {
-        const myCarts = await Cart.query().where('userId', auth.use('api').user!.id)
+        const userAuth = await auth.use('api').authenticate()
+        const myCarts = await Cart.query()
+            .where('userId', userAuth.id)
             .preload('book', book => {
                 book.withTrashed()
-                .preload('images', images => images.groupLimit(1))
+                    .preload('images', images => images.groupLimit(1))
             })
+
+        // Kiểm tra hàng hiện tại còn không
+        try {
+            for (const myCart of myCarts) {
+                try {
+                    // Nếu không còn hàng thì xóa luôn
+                    if (myCart.book.quantity === 0) {
+                        await myCart.forceDelete()
+                    }
+                    // Nếu số lượng trong giỏ hàng lớn hơn số lượng hiện tại
+                    // Thì giảm số lượng trong giỏ hàng xuống
+                    else if (myCart.quantity > myCart.book.quantity) {
+                        myCart.quantity = myCart.book.quantity
+                        await myCart.save()
+                    }
+                } catch { }
+            }
+        } catch { }
+
         return response.json(myCarts.map((myCart) => {
             return myCart.serialize(CartFilterFields)
         }))
@@ -58,7 +79,7 @@ export default class UserCartController {
                 .where('userId', userId)
                 .andWhere('isbnCode', payload.isbn_code)
                 .first()
-            if(cartDeleted) {
+            if (cartDeleted) {
                 cartDeleted.quantity = 0
                 await cartDeleted.save()
                 await cartDeleted.restore()
@@ -219,7 +240,7 @@ export default class UserCartController {
             .andWhereIn('id', ids)
             .preload('book', book => {
                 book.withTrashed()
-                .preload('images', images => images.groupLimit(1))
+                    .preload('images', images => images.groupLimit(1))
             })
 
         if (carts.length === 0) {
@@ -229,7 +250,6 @@ export default class UserCartController {
         }
 
         const productPrice = carts.reduce((sum, cart) => sum + (cart.book.price * cart.quantity), 0)
-
 
         const paymentMethods = await PaymentMethod.query().where('status', 'active')
 
@@ -248,8 +268,8 @@ export default class UserCartController {
             // Và cũng không được sử dụng
             .andWhereNotExists(voucherUsed => {
                 voucherUsed.from('voucher_usage_histories')
-                .whereColumn('voucher_usage_histories.voucher_id', 'vouchers.id')
-                .andWhereColumn('voucher_usage_histories.user_id', userAuth.id)
+                    .whereColumn('voucher_usage_histories.voucher_id', 'vouchers.id')
+                    .andWhereColumn('voucher_usage_histories.user_id', userAuth.id)
             })
 
         // Phí ship tạm thời mặc định 29k
