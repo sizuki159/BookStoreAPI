@@ -3775,7 +3775,16 @@ export default class extends BaseSeeder {
                 "lastname": "Hương Xuân",
                 "phoneNumber": "0356122002",
                 "gender": "female"
-            }
+            },
+            {
+                "userId": 420,
+                "avatarSource": "https://sachviet.sgp1.digitaloceanspaces.com/user_avatar/419/419_avatar_img_id_612868",
+                "avatarLocation": "user_avatar/419/419_avatar_img_id_612868",
+                "firstname": "Nguyễn",
+                "lastname": "Thành Trung",
+                "phoneNumber": "0334674390",
+                "gender": "female"
+            },
         ])
     }
 }

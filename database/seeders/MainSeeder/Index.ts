@@ -43,8 +43,8 @@ export default class extends BaseSeeder {
         // Tạo thông tin về voucher
         await this.runSeeder(await import('../VoucherSeeder'))
 
-        // Tạo thông tin về vỏ hàng
-        await this.runSeeder(await import('../CartSeeder'))
+        // // Tạo thông tin về vỏ hàng
+        // await this.runSeeder(await import('../CartSeeder'))
 
         // Tạo thông tin về đơn hàng
         await this.runSeeder(await import('../OrderSeeder'))

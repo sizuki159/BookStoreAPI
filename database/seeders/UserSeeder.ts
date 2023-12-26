@@ -2943,7 +2943,15 @@ export default class extends BaseSeeder {
                 "password": "VJstD_GaTvWJNyEa-RZ2",
                 "userRoleId": 1,
                 "userLevelId": 5
-            }
+            },
+            {
+                "id": 420,
+                "email": "trungnt2411@gmail.com",
+                "password": "Trung@123",
+                "userRoleId": 1,
+                "userLevelId": 5,
+                "isEmailVerified": true,
+            },
         ])
     }
 }

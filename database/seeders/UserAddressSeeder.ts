@@ -11,7 +11,7 @@ export default class extends BaseSeeder {
                 recipientName: 'Nguyễn Thành Trung',
                 recipientPhone: '0334674390',
                 street: 'D1/3 đường 385',
-                userId: 1,
+                userId: 420,
                 isDefault: true,
                 wardsId: 8782
             },
