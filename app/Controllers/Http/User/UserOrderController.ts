@@ -324,6 +324,7 @@ export default class UserOrderController {
             })
             .preload('review')
             .preload('payment')
+            .preload('invoice')
             .first()
 
         if (order) {

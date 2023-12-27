@@ -40,6 +40,14 @@ const MyOrderFilterFields: CherryPick = {
                     'name',
                 ]
             }
+        },
+        'invoice': {
+            fields: {
+                pick: [
+                    'id',
+                    'pay_url',
+                ]
+            }
         }
     }
 }
