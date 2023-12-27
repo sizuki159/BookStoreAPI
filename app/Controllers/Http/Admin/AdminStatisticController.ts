@@ -81,12 +81,28 @@ export default class AdminStatisticController {
 
 
         let workbook = new Workbook()
+        workbook.company = 'Sách Việt'
+        workbook.creator = 'Sách Việt'
+        workbook.lastModifiedBy = 'Sách Việt'
+        workbook.created = new Date()
+        workbook.modified = new Date()
+        workbook.lastPrinted = new Date()
+        workbook.category = 'Doanh thu'
+        workbook.description = `Báo cáo doanh thu từ ${payload.from.toFormat('dd-MM-yyyy')} đến ${payload.to.toFormat('dd-MM-yyyy')}`
+        workbook.title = 'Báo cáo doanh thu'
+        workbook.subject = 'Báo cáo doanh thu'
+
         let worksheet = workbook.addWorksheet(`${payload.from.toFormat('dd-MM-yyyy')} to ${payload.to.toFormat('dd-MM-yyyy')}`)
         worksheet.columns = [
             {
                 header: 'Mã đơn hàng',
                 key: 'order_id',
                 width: 15,
+                style: {
+                    font: {
+                        bold: true,
+                    }
+                }
             },
             {
                 header: 'Giá sản phẩm',
@@ -107,6 +123,11 @@ export default class AdminStatisticController {
                 header: 'Thành tiền',
                 key: 'final_price',
                 width: 13,
+                style: {
+                    font: {
+                        bold: true,
+                    }
+                }
             },
             {
                 header: 'Phương thức thanh toán',
@@ -153,15 +174,18 @@ export default class AdminStatisticController {
             'payment_method': '',
             'user_email': '',
             'created_at': '',
+        })
 
+
+        await workbook.xlsx.write(response.response, {
+            useStyles: true,
         })
 
         response.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response.header('Content-Disposition', 'attachment; filename="doanhthu.csv"')
+        response.header('Content-Disposition', 'attachment; filename="doanhthu.xlsx"')
 
-        await workbook.xlsx.write(response.response)
         return response.response.end()
-    } s
+    }
 
     public async topProductBestSeller({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
