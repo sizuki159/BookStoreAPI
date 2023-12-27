@@ -316,7 +316,8 @@ export default class UserOrderController {
             })
             .preload('user')
             .preload('userAddress', (userAddress) => {
-                userAddress.preload('wards', (wards) => {
+                userAddress.withTrashed()
+                .preload('wards', (wards) => {
                     wards.preload('district', (district) => {
                         district.preload('province')
                     })
