@@ -17,19 +17,19 @@ export default class AdminBookOrderedController {
             .preload('user')
             .orderBy('created_at', 'desc')
 
-        if(order_id) {
+        if (order_id) {
             query.where('order_id', order_id)
         } else {
             // Filter status
             if (status) {
                 query.where('status', status)
             }
-    
+
             // Filter payment status
             if (payment_status) {
                 query.where('payment_status', payment_status)
             }
-    
+
             // Email text search
             if (email) {
                 query.whereHas('user', (userQuery) => {
@@ -38,18 +38,114 @@ export default class AdminBookOrderedController {
             }
         }
 
+
+        // Cả 2 phần thống kê này có thể làm theo cách
+        // Lấy tất cả đơn hàng, sau đó lọc theo điều kiện để đếm
+        // Nhưng hiện tại làm theo cách query riêng cho từng trường hợp
+
+        //#region Thống kê theo trạng thái đơn hàng
+        const statusStatisticQuery = Database
+            .from('orders')
+            .select('status')
+            .select(Database.raw('count(*) as count'))
+            .groupBy('status')
+
+        if (order_id) {
+            statusStatisticQuery.where('order_id', order_id)
+        } else {
+            // Filter status
+            if (status) {
+                statusStatisticQuery.where('status', status)
+            }
+
+            // Filter payment status
+            if (payment_status) {
+                statusStatisticQuery.where('payment_status', payment_status)
+            }
+
+            // Email text search
+            if (email) {
+                statusStatisticQuery.where('user_id',
+                    Database.from('users')
+                        .select('users.id')
+                        .whereILike('email', `%${email}%`)
+                )
+            }
+        }
+
+        const statisticOrderStatusResult = await statusStatisticQuery
+
+        // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
+        const Statusstatistic = Object.values(Order.STATUS).map(status => ({
+            status,
+            total: statisticOrderStatusResult.find(orderStatistic => orderStatistic.status === status)?.count || 0,
+        }));
+
+        //#endregion
+
+        //#region Thống kê theo trạng thái thanh toán
+        const paymentStatisticQuery = Database
+            .from('orders')
+            .select('payment_status')
+            .select(Database.raw('count(*) as count'))
+            .groupBy('payment_status')
+
+        if (order_id) {
+            paymentStatisticQuery.where('order_id', order_id)
+        } else {
+            // Filter status
+            if (status) {
+                paymentStatisticQuery.where('status', status)
+            }
+
+            // Filter payment status
+            if (payment_status) {
+                paymentStatisticQuery.where('payment_status', payment_status)
+            }
+
+            // Email text search
+            if (email) {
+                paymentStatisticQuery.where('user_id',
+                    Database.from('users')
+                        .select('users.id')
+                        .whereILike('email', `%${email}%`)
+                )
+            }
+        }
+
+        const paymentStatisticResult = await paymentStatisticQuery
+
+        // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
+        const paymentStatistic = Object.values(Order.PAYMENT_STATUS).map(paymentStatus => ({
+            status: paymentStatus,
+            total: paymentStatisticResult.find(orderStatistic => orderStatistic.payment_status === paymentStatus)?.count || 0,
+        }));
+        //#endregion
+
         // Phân trang
         const { page, limit } = PageLimitUtils(request.qs())
         const result = await query.paginate(page, limit)
 
+
+        // Xóa dòng này uncomment dòng dưới là chạy được
         return response.json(result.serialize(AdminOrderFilterFields))
+
+        const data = {
+            statistic: {
+                status: Statusstatistic,
+                payment_status: paymentStatistic
+
+            },
+            data: result.serialize(AdminOrderFilterFields),
+        }
+
+        return response.json(data)
     }
 
     public async getStatisticAllOrder({ response }: HttpContextContract) {
         const myOrderStatistics = await Database
             .from('orders')
             .select('status', Database.raw('count(*) as count'))
-            .whereIn('status', Object.values(Order.STATUS))
             .groupBy('status')
 
         // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
@@ -94,7 +190,7 @@ export default class AdminBookOrderedController {
         })
     }
 
-    // Xác nhận đơn hàng (chỉ áp dụng COD)
+    // Xác nhận đơn hàng (chỉ áp dụng COD hoặc thanh toán online mà chưa thanh toán)
     public async confirmOrder({ params, response }: HttpContextContract) {
         const orderId = params.order_id
 
@@ -185,7 +281,7 @@ export default class AdminBookOrderedController {
                         .where('order_id', order.id)
                 } catch { }
             }
-            
+
             await order.save()
 
             // Hủy đơn thì phải hoàn trả số lượng sách về kho
