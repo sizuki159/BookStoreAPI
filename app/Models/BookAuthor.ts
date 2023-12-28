@@ -13,6 +13,7 @@ export default class BookAuthor extends compose(BaseModel, SoftDeletes) {
     @slugify({
         strategy: 'shortId',
         fields: ['authorName'],
+        allowUpdates: false,
     })
     public slug: string
 

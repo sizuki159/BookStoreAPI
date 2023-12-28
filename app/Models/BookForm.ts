@@ -16,7 +16,7 @@ export default class BookForm extends compose(BaseModel, SoftDeletes) {
     @slugify({
         strategy: 'dbIncrement',
         fields: ['name'],
-        allowUpdates: true,
+        allowUpdates: false,
     })
     public slug: string
 
