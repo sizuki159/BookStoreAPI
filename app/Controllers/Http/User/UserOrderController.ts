@@ -126,7 +126,7 @@ export default class UserOrderController {
                 feePrice: price.shipFee,
                 finalPrice: price.total,
                 customerNote,
-                voucher: voucherCode,
+                voucher: voucherCode ? voucherCode : null,
                 discountPrice: price.discountPrice,
                 paymentMethod,
                 userAddressId: userAddress.id,
