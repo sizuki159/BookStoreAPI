@@ -122,9 +122,9 @@ export default class UserOrderController {
         // Tạo Order đơn hàng
         try {
             const order = await user.related('orders').create({
-                productPrice: productPrice,
+                productPrice: price.productPrice,
                 feePrice: price.shipFee,
-                finalPrice: productPrice + price.shipFee,
+                finalPrice: price.total,
                 customerNote,
                 voucher: voucherCode,
                 discountPrice: price.discountPrice,
@@ -133,6 +133,9 @@ export default class UserOrderController {
             })
             await order.refresh()
 
+            // Nếu có sử dụng voucher
+            // Thì update lịch sử sử dụng voucher
+            // Cho đơn hàng nào
             if (voucherCode) {
                 await VoucherUsageHistory.query()
                     .update('order_id', order.id)
