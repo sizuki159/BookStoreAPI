@@ -49,19 +49,6 @@ export default class AdminBookOrderedController {
 
         let { email } = request.qs()
 
-        let query = Order.query()
-            .preload('user')
-            .orderBy('created_at', 'desc')
-
-
-        // Email text search
-        if (email) {
-            query.whereHas('user', (userQuery) => {
-                userQuery.where('email', 'like', `%${email}%`)
-            })
-        }
-
-
         // Cả 2 phần thống kê này có thể làm theo cách
         // Lấy tất cả đơn hàng, sau đó lọc theo điều kiện để đếm
         // Nhưng hiện tại làm theo cách query riêng cho từng trường hợp
@@ -82,7 +69,6 @@ export default class AdminBookOrderedController {
             )
         }
 
-
         const statisticOrderStatusResult = await statusStatisticQuery
 
         // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
@@ -90,8 +76,9 @@ export default class AdminBookOrderedController {
             status,
             total: statisticOrderStatusResult.find(orderStatistic => orderStatistic.status === status)?.count || 0,
         }));
-
         //#endregion
+
+
 
         //#region Thống kê theo trạng thái thanh toán
         const paymentStatisticQuery = Database
