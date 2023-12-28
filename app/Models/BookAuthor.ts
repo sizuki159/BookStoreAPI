@@ -36,4 +36,11 @@ export default class BookAuthor extends compose(BaseModel, SoftDeletes) {
         }
     })
     public updatedAt: DateTime
+
+    @column.dateTime({
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
+    public deletedAt: DateTime
 }

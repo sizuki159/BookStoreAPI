@@ -38,6 +38,13 @@ export default class ParentCategory extends compose(BaseModel, SoftDeletes) {
     })
     public updatedAt: DateTime
 
+    @column.dateTime({
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
+    public deletedAt: DateTime
+
     //#region Relationship
     @hasMany(() => ChildCategory)
     public childrenCategory: HasMany<typeof ChildCategory>
