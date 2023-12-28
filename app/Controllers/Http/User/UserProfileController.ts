@@ -104,7 +104,6 @@ export default class UserProfileController {
                 })
 
             } catch (e) {
-                console.log(e)
                 return response.serviceUnavailable({
                     'message': 'Có lỗi hệ thống, vui lòng thử lại sau'
                 })
