@@ -62,7 +62,7 @@ export default class AdminBookOrderedController {
 
         // Email text search
         if (email) {
-            statusStatisticQuery.where('user_id',
+            statusStatisticQuery.whereIn('user_id',
                 Database.from('users')
                     .select('users.id')
                     .whereILike('email', `%${email}%`)
@@ -89,7 +89,7 @@ export default class AdminBookOrderedController {
 
         // Email text search
         if (email) {
-            paymentStatisticQuery.where('user_id',
+            paymentStatisticQuery.whereIn('user_id',
                 Database.from('users')
                     .select('users.id')
                     .whereILike('email', `%${email}%`)
