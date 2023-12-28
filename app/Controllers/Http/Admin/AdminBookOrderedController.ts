@@ -38,6 +38,42 @@ export default class AdminBookOrderedController {
             }
         }
 
+        // Phân trang
+        const { page, limit } = PageLimitUtils(request.qs())
+        const result = await query.paginate(page, limit)
+
+        return response.json(result.serialize(AdminOrderFilterFields))
+    }
+
+    public async getStatisticAllWithFilterOrder({ request, response }: HttpContextContract) {
+
+        let { order_id, email, status, payment_status } = request.qs()
+
+        let query = Order.query()
+            .preload('user')
+            .orderBy('created_at', 'desc')
+
+
+        if (order_id) {
+            query.where('order_id', order_id)
+        } else {
+            // Filter status
+            if (status) {
+                query.where('status', status)
+            }
+
+            // Filter payment status
+            if (payment_status) {
+                query.where('payment_status', payment_status)
+            }
+
+            // Email text search
+            if (email) {
+                query.whereHas('user', (userQuery) => {
+                    userQuery.where('email', 'like', `%${email}%`)
+                })
+            }
+        }
 
         // Cả 2 phần thống kê này có thể làm theo cách
         // Lấy tất cả đơn hàng, sau đó lọc theo điều kiện để đếm
@@ -122,39 +158,14 @@ export default class AdminBookOrderedController {
         }));
         //#endregion
 
-        // Phân trang
-        const { page, limit } = PageLimitUtils(request.qs())
-        const result = await query.paginate(page, limit)
-
-
-        // Xóa dòng này uncomment dòng dưới là chạy được
-        return response.json(result.serialize(AdminOrderFilterFields))
-
         const data = {
             statistic: {
                 status: Statusstatistic,
                 payment_status: paymentStatistic
-
             },
-            data: result.serialize(AdminOrderFilterFields),
         }
 
         return response.json(data)
-    }
-
-    public async getStatisticAllOrder({ response }: HttpContextContract) {
-        const myOrderStatistics = await Database
-            .from('orders')
-            .select('status', Database.raw('count(*) as count'))
-            .groupBy('status')
-
-        // Chuyển kết quả thành đối tượng có tất cả các trạng thái, với số lượng là 0 nếu không có trong kết quả
-        const result = Object.values(Order.STATUS).map(status => ({
-            status,
-            total: myOrderStatistics.find(myOrderStatistic => myOrderStatistic.status === status)?.count || 0,
-        }));
-
-        return response.json(result)
     }
 
     public async orderDetail({ params, response }: HttpContextContract) {

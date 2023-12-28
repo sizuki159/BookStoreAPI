@@ -139,7 +139,7 @@ Route.group(() => {
 
     //#region Quản lý Đơn hàng
     Route.group(() => {
-        Route.get('/statistic', 'AdminBookOrderedController.getStatisticAllOrder')
+        Route.get('/statistic', 'AdminBookOrderedController.getStatisticAllWithFilterOrder')
         Route.get('/all', 'AdminBookOrderedController.getAllOrder')
         Route.get('/detail/:order_id', 'AdminBookOrderedController.orderDetail')
 
