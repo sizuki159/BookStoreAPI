@@ -47,33 +47,20 @@ export default class AdminBookOrderedController {
 
     public async getStatisticAllWithFilterOrder({ request, response }: HttpContextContract) {
 
-        let { order_id, email, status, payment_status } = request.qs()
+        let { email } = request.qs()
 
         let query = Order.query()
             .preload('user')
             .orderBy('created_at', 'desc')
 
 
-        if (order_id) {
-            query.where('order_id', order_id)
-        } else {
-            // Filter status
-            if (status) {
-                query.where('status', status)
-            }
-
-            // Filter payment status
-            if (payment_status) {
-                query.where('payment_status', payment_status)
-            }
-
-            // Email text search
-            if (email) {
-                query.whereHas('user', (userQuery) => {
-                    userQuery.where('email', 'like', `%${email}%`)
-                })
-            }
+        // Email text search
+        if (email) {
+            query.whereHas('user', (userQuery) => {
+                userQuery.where('email', 'like', `%${email}%`)
+            })
         }
+
 
         // Cả 2 phần thống kê này có thể làm theo cách
         // Lấy tất cả đơn hàng, sau đó lọc theo điều kiện để đếm
@@ -86,28 +73,15 @@ export default class AdminBookOrderedController {
             .select(Database.raw('count(*) as count'))
             .groupBy('status')
 
-        if (order_id) {
-            statusStatisticQuery.where('order_id', order_id)
-        } else {
-            // Filter status
-            if (status) {
-                statusStatisticQuery.where('status', status)
-            }
-
-            // Filter payment status
-            if (payment_status) {
-                statusStatisticQuery.where('payment_status', payment_status)
-            }
-
-            // Email text search
-            if (email) {
-                statusStatisticQuery.where('user_id',
-                    Database.from('users')
-                        .select('users.id')
-                        .whereILike('email', `%${email}%`)
-                )
-            }
+        // Email text search
+        if (email) {
+            statusStatisticQuery.where('user_id',
+                Database.from('users')
+                    .select('users.id')
+                    .whereILike('email', `%${email}%`)
+            )
         }
+
 
         const statisticOrderStatusResult = await statusStatisticQuery
 
@@ -126,27 +100,13 @@ export default class AdminBookOrderedController {
             .select(Database.raw('count(*) as count'))
             .groupBy('payment_status')
 
-        if (order_id) {
-            paymentStatisticQuery.where('order_id', order_id)
-        } else {
-            // Filter status
-            if (status) {
-                paymentStatisticQuery.where('status', status)
-            }
-
-            // Filter payment status
-            if (payment_status) {
-                paymentStatisticQuery.where('payment_status', payment_status)
-            }
-
-            // Email text search
-            if (email) {
-                paymentStatisticQuery.where('user_id',
-                    Database.from('users')
-                        .select('users.id')
-                        .whereILike('email', `%${email}%`)
-                )
-            }
+        // Email text search
+        if (email) {
+            paymentStatisticQuery.where('user_id',
+                Database.from('users')
+                    .select('users.id')
+                    .whereILike('email', `%${email}%`)
+            )
         }
 
         const paymentStatisticResult = await paymentStatisticQuery
@@ -158,14 +118,10 @@ export default class AdminBookOrderedController {
         }));
         //#endregion
 
-        const data = {
-            statistic: {
-                status: Statusstatistic,
-                payment_status: paymentStatistic
-            },
-        }
-
-        return response.json(data)
+        return response.json({
+            status: Statusstatistic,
+            payment_status: paymentStatistic
+        })
     }
 
     public async orderDetail({ params, response }: HttpContextContract) {
