@@ -49,7 +49,11 @@ export default class Voucher extends BaseModel {
     @column.dateTime()
     public startDate: DateTime
 
-    @column.dateTime()
+    @column.dateTime({
+        serialize: (value: DateTime | null) => {
+            return value ? value.toFormat(ResponseFormat.DATETIME) : value
+        }
+    })
     public endDate: DateTime
 
     @column()
