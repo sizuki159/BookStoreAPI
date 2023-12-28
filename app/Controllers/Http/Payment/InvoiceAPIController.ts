@@ -43,6 +43,7 @@ export default class InvoiceAPIController {
             price: {
                 product_price: formatCurrency(invoice.order.productPrice),
                 fee_price: formatCurrency(invoice.order.feePrice),
+                discount_price: formatCurrency(invoice.order.discountPrice),
                 final_price: formatCurrency(invoice.order.finalPrice),
             },
             items: invoice.order.items.map((item) => {
