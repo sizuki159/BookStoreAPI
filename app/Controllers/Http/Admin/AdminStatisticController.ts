@@ -234,10 +234,12 @@ export default class AdminStatisticController {
         return response.json(this.fillMissingMonths(revenueByYear, year))
     }
 
-    public async getRevenueCurrentYear({ response }: HttpContextContract) {
+    public async getRevenueCompareYear({ request, response }: HttpContextContract) {
 
-        const currentYear = DateTime.now().get('year');
-        const previousYear = currentYear - 1;
+        const { current_year, previous_year } = request.qs()
+
+        const currentYear = current_year ? parseInt(current_year) : DateTime.now().get('year');
+        const previousYear = previous_year ? parseInt(previous_year) : currentYear - 1;
 
         // Lấy toàn bộ doanh thu của năm hiện tại và năm ngoái
         // Chỉ lấy đơn hàng hoàn thành và đã thanh toán
@@ -254,7 +256,6 @@ export default class AdminStatisticController {
             })
             .groupByRaw('extract(year from created_at)')
             .orderBy('year', 'asc')
-
 
         // Nếu mảng là rỗng thì doanh số 2 năm gần nhất là 0
         if (revenueInTheLast2Year.length === 0) {
@@ -289,14 +290,18 @@ export default class AdminStatisticController {
             }
         }
 
+
         // So sánh doanh thu của năm hiện tại và năm trước đó
-        const percentageChange = this.calculateRevenuePercentageChange(revenueInTheLast2Year);
+        const percentageChange = this.calculateRevenuePercentageChange(revenueInTheLast2Year, currentYear);
+        // return percentageChange
 
         const compareResult = {
             previous_year: previousYear,
-            previous_year_revenue: revenueInTheLast2Year[0].total_revenue,
+            previous_year_revenue: revenueInTheLast2Year[0].year === currentYear ? revenueInTheLast2Year[1].total_revenue : revenueInTheLast2Year[0].total_revenue,
+            // previous_year_revenue: revenueInTheLast2Year[0].total_revenue,
             current_year: currentYear,
-            current_year_revenue: revenueInTheLast2Year[1].total_revenue,
+            current_year_revenue: revenueInTheLast2Year[0].year === currentYear ? revenueInTheLast2Year[0].total_revenue : revenueInTheLast2Year[1].total_revenue,
+            // current_year_revenue: revenueInTheLast2Year[1].total_revenue,
             total_revenue_for_2_year: revenueInTheLast2Year[0].total_revenue + revenueInTheLast2Year[1].total_revenue,
             percentage_change: Math.abs(percentageChange).toFixed(2),
             financial_performance: percentageChange > 0 ? 'increase' : (percentageChange < 0 ? 'decrease' : 'stagnant'),
@@ -439,14 +444,19 @@ export default class AdminStatisticController {
     }
 
     // Sử dụng cho năm
-    private calculateRevenuePercentageChange(data: IRevenueYearData[]): number {
+    private calculateRevenuePercentageChange(data: IRevenueYearData[], currentYear: number): number {
         if (data.length !== 2) {
             console.error("Invalid data format. The array must have exactly 2 elements.");
             return 0;
         }
 
-        const currentYearRevenue = data[1].total_revenue; // Đổi thành phần tử của năm hiện tại
-        const previousYearRevenue = data[0].total_revenue; // Đổi thành phần tử của năm trước đó
+        const year = data[0].year
+        const isCurrentYear = year === currentYear ? true : false
+        const currentYearRevenue = isCurrentYear ? data[0].total_revenue : data[1].total_revenue
+        const previousYearRevenue = isCurrentYear ? data[1].total_revenue : data[0].total_revenue
+
+        // const currentYearRevenue = data[1].total_revenue; // Đổi thành phần tử của năm hiện tại
+        // const previousYearRevenue = data[0].total_revenue; // Đổi thành phần tử của năm trước đó
 
         const revenueChange = currentYearRevenue - previousYearRevenue;
         const percentageChange = (revenueChange / Math.abs(previousYearRevenue)) * 100;

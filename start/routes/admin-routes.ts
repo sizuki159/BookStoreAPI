@@ -154,7 +154,7 @@ Route.group(() => {
     Route.group(() => {
         Route.get('/top-product', 'AdminStatisticController.topProductBestSeller')
         Route.get('/revenue', 'AdminStatisticController.getRevenueWithYear')
-        Route.get('/revenue/current-year', 'AdminStatisticController.getRevenueCurrentYear')
+        Route.get('/revenue/compare-year', 'AdminStatisticController.getRevenueCompareYear')
         Route.get('/revenue/current-month', 'AdminStatisticController.getRevenueCurrentMonth')
         Route.get('/recent-transactions', 'AdminStatisticController.getRecentTransactions')
 
