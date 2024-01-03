@@ -73,7 +73,7 @@ export default class UserOrderController {
         let shipFee = 29000
         // Tính toán tiền vận chuyển
         try {
-            shipFee = await calculateFee(userAddress, carts.map(cart => cart.book))
+            shipFee = await calculateFee(userAddress, carts)
         } catch { }
 
         const price = {

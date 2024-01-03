@@ -1,13 +1,14 @@
-import Book from "App/Models/Book";
+import Cart from "App/Models/Cart";
 import UserAddress from "App/Models/UserAddress";
 import axios from "axios";
 
-export async function calculateFee(userAddress: UserAddress, items: Book[]): Promise<number> {
+export async function calculateFee(userAddress: UserAddress, carts: Cart[]): Promise<number> {
     try {
         await userAddress.load('wards')
 
-        const productWeight = items.reduce((sum, item) => sum + item.weight, 0)
-
+        // Tính tổng khối lượng
+        const productWeight = carts.reduce((sum, cart) => sum + (cart.book.weight * cart.quantity), 0)
+        
         const dataPost = {
             "service_id": 53320,
             "service_type_id": 2,

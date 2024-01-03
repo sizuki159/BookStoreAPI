@@ -321,7 +321,7 @@ export default class UserCartController {
         // Tính toán tiền vận chuyển
         try {
             if (userAddress) {
-                shipFee = await calculateFee(userAddress, carts.map(cart => cart.book))
+                shipFee = await calculateFee(userAddress, carts)
             }
         } catch { }
 
