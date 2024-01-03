@@ -24,9 +24,9 @@ export default class ResetPasswordEmail extends BaseMailer {
      * also be async.
      */
     public prepare(message: MessageContract) {
-        message.subject('Đặt lại mật khẩu My Book')
+        message.subject('Đặt lại mật khẩu Sách Việt')
             .to(this.user.email)
-            .from('no-reply@sachviet.top', 'My Book')
+            .from('no-reply@sachviet.top', 'Sách Việt')
             .html(`
       <!-- Change values in [brackets] in the template and pass { {variables} } with API call -->
       <!-- Feel free to adjust it to your needs and delete all these comments-->
