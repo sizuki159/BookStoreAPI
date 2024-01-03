@@ -26,7 +26,7 @@ export default class UserAddress extends compose(BaseModel, SoftDeletes) {
     public recipientPhone: string
 
     @column()
-    public wardsId: number
+    public wardsId: number | string
 
     @column.dateTime({
         autoCreate: true,

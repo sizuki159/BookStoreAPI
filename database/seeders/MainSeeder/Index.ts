@@ -9,10 +9,15 @@ export default class extends BaseSeeder {
     public async run() {
         // Write your database queries inside the run method
 
-        // Tạo địa chỉ mặc định
-        await this.runSeeder(await import('../AddressProvinceSeeder'))
-        await this.runSeeder(await import('../AddressDistrictSeeder'))
-        await this.runSeeder(await import('../AddressWardsSeeder'))
+        // // Tạo địa chỉ mặc định
+        // await this.runSeeder(await import('../AddressProvinceSeeder'))
+        // await this.runSeeder(await import('../AddressDistrictSeeder'))
+        // await this.runSeeder(await import('../AddressWardsSeeder'))
+
+        // Tạo địa chỉ mặc định theo format mới giao hàng nhanh
+        await this.runSeeder(await import('../Address/AddressProvinceNewSeeder'))
+        await this.runSeeder(await import('../Address/AddressDistrictNewSeeder'))
+        await this.runSeeder(await import('../Address/AddressWardNewSeeder'))
 
         // Tạo user và các thông tin của user
         await this.runSeeder(await import('../UserSeeder'))

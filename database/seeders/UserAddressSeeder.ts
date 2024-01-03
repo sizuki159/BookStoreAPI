@@ -6,24 +6,24 @@ import UserAddress from 'App/Models/UserAddress'
 export default class extends BaseSeeder {
     public async run() {
         // Write your database queries inside the run method
-        await UserAddress.createMany([
-            {
-                recipientName: 'Nguyễn Thành Trung',
-                recipientPhone: '0334674390',
-                street: 'D1/3 đường 385',
-                userId: 420,
-                isDefault: true,
-                wardsId: 8782
-            },
-            {
-                recipientName: 'Quách Diệu Khánh',
-                recipientPhone: '0938427896',
-                street: '12/6/8 Hoàng Hoa Thám',
-                userId: 2,
-                isDefault: true,
-                wardsId: 8714
-            },
-        ])
+        // await UserAddress.createMany([
+        //     {
+        //         recipientName: 'Nguyễn Thành Trung',
+        //         recipientPhone: '0334674390',
+        //         street: 'D1/3 đường 385',
+        //         userId: 420,
+        //         isDefault: true,
+        //         wardsId: 8782
+        //     },
+        //     {
+        //         recipientName: 'Quách Diệu Khánh',
+        //         recipientPhone: '0938427896',
+        //         street: '12/6/8 Hoàng Hoa Thám',
+        //         userId: 2,
+        //         isDefault: true,
+        //         wardsId: 8714
+        //     },
+        // ])
 
         // Data faker
         const wards = await AddressWard.all()
@@ -258,7 +258,7 @@ export default class extends BaseSeeder {
             for (const street of streetArr) {
                 const ward = getRandomObject(wards)
                 if (ward) {
-                    typeof ward.wardsId === 'string' && (ward.wardsId = parseFloat(ward.wardsId))
+                    // typeof ward.wardsId === 'string' && (ward.wardsId = parseFloat(ward.wardsId))
                     await user.related('addresses').create({
                         recipientName: user.profile.firstname + ' ' + user.profile.lastname,
                         recipientPhone: user.profile.phoneNumber,

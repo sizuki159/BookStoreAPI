@@ -11,6 +11,8 @@ import { DateTime } from 'luxon'
 import { types } from '@ioc:Adonis/Core/Helpers'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import UserNotification from 'App/Models/UserNotification'
+import { calculateFee } from 'App/Services/GHNService'
+import UserAddress from 'App/Models/UserAddress'
 
 export default class UserCartController {
     public async getMyCart({ auth, response }: HttpContextContract) {
@@ -247,7 +249,11 @@ export default class UserCartController {
 
         const user = await User.findOrFail(userAuth.id)
 
-        const { ids, voucherCode } = request.body()
+        const {
+            ids,
+            voucherCode,
+            userAddressId
+        } = request.body()
 
         if (!types.isArray(ids)) {
             return response.badRequest({
@@ -266,6 +272,24 @@ export default class UserCartController {
             return response.badRequest({
                 message: 'Yêu cầu không hợp lệ'
             })
+        }
+
+        let userAddress: UserAddress | null = null
+        if (userAddressId) {
+            userAddress = await UserAddress.query()
+                .where('user_id', userAuth.id)
+                .andWhere('id', userAddressId)
+                .first()
+            if (!userAddress) {
+                return response.badRequest({
+                    message: 'Địa chỉ không tồn tại'
+                })
+            }
+        } else {
+            userAddress = await UserAddress.query()
+                .where('user_id', userAuth.id)
+                .andWhere('default', true)
+                .first()
         }
 
         const productPrice = carts.reduce((sum, cart) => sum + (cart.book.price * cart.quantity), 0)
@@ -292,11 +316,20 @@ export default class UserCartController {
             })
 
         // Phí ship tạm thời mặc định 29k
+        // Tính toán ở dưới
+        let shipFee = 29000
+        // Tính toán tiền vận chuyển
+        try {
+            if (userAddress) {
+                shipFee = await calculateFee(userAddress, carts.map(cart => cart.book))
+            }
+        } catch { }
+
         const price = {
             productPrice,
-            shipFee: 29000,
+            shipFee: shipFee,
             discountPrice: 0,
-            total: productPrice + 29000
+            total: productPrice + shipFee
         }
 
         // Nếu có sử dụng mã giảm giá

@@ -5,10 +5,11 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('wards_id')
+      table.string('wards_id').primary()
       table.integer('district_id').unsigned().references('district_id').inTable('address_districts').onDelete('CASCADE')
       table.string('name')
 
+      table.unique(['wards_id'])
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

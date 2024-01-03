@@ -19,6 +19,7 @@ import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import Invoice from 'App/Models/Invoice'
+import { calculateFee } from 'App/Services/GHNService'
 
 export default class UserOrderController {
     public async createOrder({ auth, request, response }: HttpContextContract) {
@@ -44,7 +45,8 @@ export default class UserOrderController {
         // Kiểm tra địa chỉ người dùng
         const userAddress = await UserAddress.query()
             .where('id', userAddressId)
-            .andWhere('user_id', user.id).first()
+            .andWhere('user_id', user.id)
+            .first()
         if (!userAddress) {
             return response.badRequest({
                 message: 'Địa chỉ không hợp lệ'
@@ -67,11 +69,18 @@ export default class UserOrderController {
         const productPrice = carts.reduce((sum, cart) => sum + (cart.book.price * cart.quantity), 0)
 
         // Phí ship tạm thời mặc định 29k
+        // Tính toán ở dưới
+        let shipFee = 29000
+        // Tính toán tiền vận chuyển
+        try {
+            shipFee = await calculateFee(userAddress, carts.map(cart => cart.book))
+        } catch { }
+
         const price = {
             productPrice,
-            shipFee: 29000,
+            shipFee: shipFee,
             discountPrice: 0,
-            total: productPrice + 29000
+            total: productPrice + shipFee
         }
 
         // Xử lý voucher nếu khách sử dụng
@@ -320,11 +329,11 @@ export default class UserOrderController {
             .preload('user')
             .preload('userAddress', (userAddress) => {
                 userAddress.withTrashed()
-                .preload('wards', (wards) => {
-                    wards.preload('district', (district) => {
-                        district.preload('province')
+                    .preload('wards', (wards) => {
+                        wards.preload('district', (district) => {
+                            district.preload('province')
+                        })
                     })
-                })
             })
             .preload('review')
             .preload('payment')
@@ -376,7 +385,7 @@ export default class UserOrderController {
             // Đổi trạng thái đơn hàng thành hoàn thành
             // Đổi trạng thái thanh toán thành đã thanh toán nếu là COD
             order.status = Order.STATUS.COMPLETED
-            if(order.paymentMethod === PaymentMethod.METHOD.COD) {
+            if (order.paymentMethod === PaymentMethod.METHOD.COD) {
                 order.paymentStatus = Order.PAYMENT_STATUS.PAID
             }
             await order.save()

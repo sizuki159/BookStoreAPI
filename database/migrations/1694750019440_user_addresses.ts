@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.string('street').notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.boolean('default')
-      table.integer('wards_id').unsigned().references('wards_id').inTable('address_wards').onDelete('CASCADE')
+      table.string('wards_id').references('wards_id').inTable('address_wards').onDelete('CASCADE')
       
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
