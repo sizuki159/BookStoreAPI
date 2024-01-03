@@ -5,13 +5,14 @@ import FlashSaleHour from 'App/Models/FlashSaleHour'
 import FlashSaleProduct from 'App/Models/FlashSaleProduct'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
+import { DateTime } from 'luxon'
 
 export default class AdminFlashSaleController {
 
     public async getAllFlashSale({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
         const flashSales = await FlashSale.query()
-            .where('event_date', '>=', DatetimeUtils.DATE_NOW_WITH_OUT_TIME_SQL)
+            .where('event_date', '>=', DateTime.now().set({ hour: 0, minute: 0, second: 0 }).toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
             .orderBy('created_at', 'desc')
             .paginate(page, limit)
         return response.json(flashSales)
