@@ -88,6 +88,10 @@ Route.group(() => {
 
         // Đánh dấu đã đọc tất cả thông báo
         Route.put('/read-all', 'UserNotificationController.readAllNotification')
+
+        // Lấy thống kê thông báo
+        // Đã đọc và chưa đọc
+        Route.get('/statistics', 'UserNotificationController.getStatistics')
     }).prefix('notification')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
