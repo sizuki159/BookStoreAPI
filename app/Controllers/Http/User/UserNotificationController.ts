@@ -1,9 +1,13 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Database from '@ioc:Adonis/Lucid/Database'
 import UserNotificationFilterFields from 'App/FilterFields/User/UserNotificationFilterFields'
 import UserNotification from 'App/Models/UserNotification'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 
+type Statistics = {
+    countUnread: number,
+    countRead: number,
+    countTotal: number,
+}
 export default class UserNotificationController {
     // Lấy danh sách thông báo (phân trang)
     public async index({ auth, request, response }: HttpContextContract) {
@@ -52,5 +56,24 @@ export default class UserNotificationController {
         return response.json({
             message: 'Đánh dấu đã đọc tất cả thông báo thành công'
         })
+    }
+
+    // Lấy thống kê thông báo
+    // Đã đọc và chưa đọc
+    public async getStatistics({ auth, response }: HttpContextContract) {
+        const userAuth = await auth.use('api').authenticate()
+        const statistics = await UserNotification.query()
+            .where('user_id', userAuth.id)
+
+        // Đếm số lượng thông báo chưa đọc
+        // Từ mảng đối tượng ở trên
+        const countUnread = statistics.filter(notification => !notification.isRead).length
+
+        const result: Statistics = {
+            countUnread: countUnread,
+            countRead: statistics.length - countUnread,
+            countTotal: statistics.length,
+        }
+        return response.json(result)
     }
 }
