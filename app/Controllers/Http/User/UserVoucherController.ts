@@ -35,7 +35,7 @@ export default class UserVoucherController {
         const userAuth = await auth.use('api').authenticate()
 
         const { page, limit } = PageLimitUtils(request.qs())
-        
+
         try {
             const vouchers = await Voucher.query()
                 .where('voucherType', Voucher.TYPE.PERSONALIZED)

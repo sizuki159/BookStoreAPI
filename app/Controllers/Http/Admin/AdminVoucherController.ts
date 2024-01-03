@@ -2,36 +2,49 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import AdminVoucherFilterFields from 'App/FilterFields/Admin/AdminVoucherFilterFields'
 import User from 'App/Models/User'
 import Voucher from 'App/Models/Voucher'
+import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import PageLimitUtils from 'App/Utils/PageLimitUtils'
 import AddVoucherValidator from 'App/Validators/AddVoucherValidator'
+import { DateTime } from 'luxon'
 
 export default class AdminVoucherController {
     public async getAll({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
-        const vouchers = await Voucher.query().paginate(page, limit)
+        const vouchers = await Voucher.query()
+            .where('end_date', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .paginate(page, limit)
         return response.json(vouchers.serialize(AdminVoucherFilterFields))
     }
 
     public async getVoucherGeneral({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
-        const vouchers = await Voucher.query().where('voucherType', Voucher.TYPE.GENERAL).paginate(page, limit)
+        const vouchers = await Voucher.query()
+            .where('voucherType', Voucher.TYPE.GENERAL)
+            .andWhere('end_date', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .paginate(page, limit)
         return response.json(vouchers.serialize(AdminVoucherFilterFields))
     }
 
     public async getVoucherPersonalized({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
-        const vouchers = await Voucher.query().where('voucherType', Voucher.TYPE.PERSONALIZED).paginate(page, limit)
+        const vouchers = await Voucher.query()
+            .where('voucherType', Voucher.TYPE.PERSONALIZED)
+            .andWhere('end_date', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .paginate(page, limit)
         return response.json(vouchers.serialize(AdminVoucherFilterFields))
     }
 
     public async getVoucherMemberExclusive({ request, response }: HttpContextContract) {
         const { page, limit } = PageLimitUtils(request.qs())
-        const vouchers = await Voucher.query().where('voucherType', Voucher.TYPE.MEMBER_EXCLUSIVE).paginate(page, limit)
+        const vouchers = await Voucher.query()
+            .where('voucherType', Voucher.TYPE.MEMBER_EXCLUSIVE)
+            .andWhere('end_date', '>=', DateTime.now().toFormat(DatetimeUtils.FORMAT_DATETIME_WITH_SQL))
+            .paginate(page, limit)
         return response.json(vouchers.serialize(AdminVoucherFilterFields))
     }
 
     public async getVoucherDetail({ params, response }: HttpContextContract) {
-        const voucherId  = params.voucher_id
+        const voucherId = params.voucher_id
         const voucher = await Voucher.findBy('id', voucherId)
         if (!voucher) {
             return response.notFound({
