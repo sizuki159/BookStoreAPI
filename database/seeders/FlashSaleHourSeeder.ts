@@ -1,6 +1,5 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import FlashSale from 'App/Models/FlashSale'
-import FlashSaleHour from 'App/Models/FlashSaleHour'
 import { DateTime } from 'luxon'
 
 export default class extends BaseSeeder {
