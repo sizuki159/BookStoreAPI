@@ -7,6 +7,8 @@ import Invoice from 'App/Models/Invoice'
 import PaymentMethod from 'App/Models/PaymentMethod'
 import SettingUtils from 'App/Utils/SettingUtils'
 import Order from 'App/Models/Order'
+import UserNotification from 'App/Models/UserNotification'
+import { formatCurrency } from 'App/Utils/FormatCurrency'
 
 export default class VNPayController {
     public async process({ request, view }: HttpContextContract) {
@@ -83,7 +85,7 @@ export default class VNPayController {
                         })
                     }
 
-                    if(invoice.status === Invoice.STATUS.PAID) {
+                    if (invoice.status === Invoice.STATUS.PAID) {
                         return view.render('payment_result', {
                             image: '/img/shopping.jpg',
                             width: '300px',
@@ -116,6 +118,16 @@ export default class VNPayController {
                         .related('order').query()
                         .update('status', Order.STATUS.CONFIRMED)
                         .update('payment_status', Order.PAYMENT_STATUS.PAID)
+
+                    // Thông báo cho người dùng là bạn thanh toán thành công cho đơn hàng
+                    try {
+                        await invoice.load('order')
+                        await UserNotification.create({
+                            title: 'Thanh toán thành công',
+                            message: `Bạn vừa thanh toán ${formatCurrency(invoice.order.finalPrice)} cho đơn hàng #${invoice.orderId} thành công.}`,
+                            userId: invoice.order.userId,
+                        })
+                    } catch { }
 
                     return view.render('payment_result', {
                         image: '/img/payment_success.jpg',

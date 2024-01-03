@@ -10,6 +10,7 @@ import Voucher from 'App/Models/Voucher'
 import { DateTime } from 'luxon'
 import { types } from '@ioc:Adonis/Core/Helpers'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
+import UserNotification from 'App/Models/UserNotification'
 
 export default class UserCartController {
     public async getMyCart({ auth, response }: HttpContextContract) {
@@ -28,12 +29,30 @@ export default class UserCartController {
                     // Nếu không còn hàng thì xóa luôn
                     if (myCart.book.quantity === 0) {
                         await myCart.forceDelete()
+
+                        // Thông báo cho người dùng
+                        try {
+                            await UserNotification.create({
+                                title: 'Sản phẩm đã hết hàng',
+                                message: `Sản phẩm ${myCart.book.name} đã hết hàng`,
+                                userId: userAuth.id
+                            })
+                        } catch { }
                     }
                     // Nếu số lượng trong giỏ hàng lớn hơn số lượng hiện tại
                     // Thì giảm số lượng trong giỏ hàng xuống
                     else if (myCart.quantity > myCart.book.quantity) {
                         myCart.quantity = myCart.book.quantity
                         await myCart.save()
+
+                        // Thông báo cho người dùng
+                        try {
+                            await UserNotification.create({
+                                title: 'Sản phẩm không còn đủ số lượng',
+                                message: `Đã cập nhật số lượng giỏi hàng với sản phẩm ${myCart.book.name} với lý do không đủ hàng`,
+                                userId: userAuth.id
+                            })
+                        } catch { }
                     }
                 } catch { }
             }

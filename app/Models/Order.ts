@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, HasMany, HasOne, ModelQueryBuilderContract, beforeFetch, belongsTo, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, HasOne, ModelQueryBuilderContract, afterCreate, afterUpdate, beforeFetch, belongsTo, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import OrderItem from './OrderItem'
 import UserAddress from './UserAddress'
@@ -7,6 +7,7 @@ import OrderReview from './OrderReview'
 import ResponseFormat from 'App/Utils/ResponseFormat'
 import Invoice from './Invoice'
 import PaymentMethod from './PaymentMethod'
+import UserNotification from './UserNotification'
 
 export default class Order extends BaseModel {
 
@@ -118,5 +119,71 @@ export default class Order extends BaseModel {
     @beforeFetch()
     public static autoOrderByCreatedAt(query: ModelQueryBuilderContract<typeof Order>) {
         query.orderBy('created_at', 'desc')
+    }
+
+
+    @afterCreate()
+    public static async createNotification(order: Order) {
+        // Tạo thông báo cho người dùng
+        try {
+            await UserNotification.create({
+                title: 'Có đơn hàng mới',
+                message: `Bạn vừa có một đơn hàng mới #${order.id}`,
+                userId: order.userId
+            })
+        } catch { }
+    }
+
+    // Khi cập nhật trạng thái đơn hàng
+    // Tiến hành thông báo cho người dùng (Thông báo đẩy)
+    @afterUpdate()
+    public static async pushNotification(order: Order) {
+
+        console.log(order.$dirty.status)
+        console.log(order.$dirty.paymentStatus)
+
+        // Dựa vào trạng thái mà thông báo khác nhau
+        switch (order.status) {
+            case Order.STATUS.CONFIRMED:
+                // Đơn hàng đã được xác nhận
+                try {
+                    await UserNotification.create({
+                        title: 'Đơn hàng đã được xác nhận',
+                        message: `Đơn hàng #${order.id} của bạn đã được xác nhận`,
+                        userId: order.userId
+                    })
+                } catch { }
+                break
+            case Order.STATUS.DELIVERING:
+                // Đơn hàng đang được giao
+                try {
+                    await UserNotification.create({
+                        title: 'Đơn hàng đang được giao',
+                        message: `Đơn hàng #${order.id} của bạn đã được gửi cho đơn vị vận chuyển`,
+                        userId: order.userId
+                    })
+                } catch { }
+                break
+            case Order.STATUS.COMPLETED:
+                try {
+                    await UserNotification.create({
+                        title: 'Đơn hàng đã hoàn thành',
+                        message: `Đơn hàng #${order.id} của bạn đã hoàn thành`,
+                        userId: order.userId
+                    })
+                } catch { }
+                // Đơn hàng đã hoàn thành
+                break
+            case Order.STATUS.CANCELED:
+                // Đơn hàng đã bị hủy
+                try {
+                    await UserNotification.create({
+                        title: 'Đơn hàng đã bị hủy',
+                        message: `Đơn hàng #${order.id} của bạn đã bị hủy`,
+                        userId: order.userId
+                    })
+                } catch { }
+                break
+        }
     }
 }

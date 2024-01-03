@@ -8,6 +8,7 @@ import Token from 'App/Models/Token'
 import EmailValidator from 'App/Validators/EmailValidator'
 import UserFilterFields from 'App/FilterFields/User/UserFilterFields'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
+import UserNotification from 'App/Models/UserNotification'
 
 export default class AuthController {
     public async register({ auth, request, response }: HttpContextContract) {
@@ -51,7 +52,7 @@ export default class AuthController {
             const token = await auth.use('api').attempt(email, password, { expiresIn: '7d' })
             const user = await User.findByOrFail('email', email)
 
-            if(user.status === User.STATUS.LOCKED) {
+            if (user.status === User.STATUS.LOCKED) {
                 await user.load('apiTokens', apiTokens => apiTokens.delete())
                 return response.badRequest({
                     message: "Tài khoản của bạn đã bị khóa!",
@@ -67,12 +68,35 @@ export default class AuthController {
             const refreshToken = await User.generateRefreshToken(token.tokenHash)
             await Promise.all([user.load('profile'), user.load('userLevel'), user.load('userRole')])
 
+            // Gửi thông báo đẩy cho user là có người đăng nhập vào tài khoản của mình
+            try {
+                await UserNotification.create({
+                    title: 'Đăng nhập thành công',
+                    message: `Bạn đã đăng nhập vào tài khoản này với địa chỉ ip ${request.ip()} vào lúc ${DateTime.now().toFormat('dd-MM-yyyy HH:mm:ss')}`,
+                    userId: user.id
+                })
+            } catch { }
+
             return {
                 "jwtToken": token.token,
                 "refreshToken": refreshToken,
                 "userInfo": user.serialize(UserFilterFields)
             }
         } catch (ex) {
+            try {
+                const user = await User.findByOrFail('email', email)
+                if (user) {
+                    // Thông báo có ai đó cố gắng đăng nhập
+                    try {
+                        await UserNotification.create({
+                            title: 'Đăng nhập thất bại',
+                            message: `Có người nào đó cố gắng đăng nhập vào tài khoản này với địa chỉ ip ${request.ip()} vào lúc ${DateTime.now().toFormat('dd-MM-yyyy HH:mm:ss')}`,
+                            userId: user.id
+                        })
+                    } catch { }
+                }
+            } catch { }
+
             return response.badRequest({
                 message: 'Đăng nhập thất bại!'
             })

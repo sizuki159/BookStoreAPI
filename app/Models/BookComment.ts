@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, afterCreate, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Book from './Book'
 import ResponseFormat from 'App/Utils/ResponseFormat'
+import UserNotification from './UserNotification'
 
 export default class BookComment extends BaseModel {
     @column({ isPrimary: true })
@@ -46,4 +47,19 @@ export default class BookComment extends BaseModel {
         foreignKey: 'isbnCode'
     })
     public product: BelongsTo<typeof Book>
+
+    // Người dùng bình luận xong
+    // Tiến hành thông báo cho người dùng (Thông báo đẩy)
+    @afterCreate()
+    public static async pushNotification(comment: BookComment) {
+        try {
+            await comment.load('product')
+            await UserNotification.create({
+                title: 'Bình luận sách thành công',
+                message: `Bạn vừa bình luận sách ${comment.product.name}`,
+                userId: comment.userId
+            })
+        } catch { }
+    }
+
 }

@@ -55,15 +55,39 @@ Route.group(() => {
 
     }).prefix('order')
 
+    // Mã giảm giá
     Route.group(() => {
+
+        // Lấy danh sách mã giảm giá của đối tác
         Route.get('/voucher-partner', 'UserVoucherController.getVoucherPartner')
+
+        // Lấy danh sách mã giảm giá cá nhân
         Route.get('/voucher-personalized', 'UserVoucherController.getVoucherPersonalized')
     }).prefix('voucher')
 
+    // Bình luận sách
     Route.group(() => {
+
+        // Viêt bình luận
         Route.post('/write', 'UserBookCommentController.writeComment')
+
+        // Sửa bình luận
         Route.put('/edit', 'UserBookCommentController.editComment')
+
+        // Xóa bình luận
         Route.delete('/delete/:comment_id', 'UserBookCommentController.deleteComment')
     }).prefix('comment')
+
+    // Thông báo
+    Route.group(() => {
+        // Lấy danh sách thông báo (phân trang)
+        Route.get('', 'UserNotificationController.index')
+
+        // Đánh dấu đã đọc thông báo
+        Route.put('/read/:notification_id', 'UserNotificationController.readNotification')
+
+        // Đánh dấu đã đọc tất cả thông báo
+        Route.put('/read-all', 'UserNotificationController.readAllNotification')
+    }).prefix('notification')
 
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')

@@ -5,6 +5,8 @@ import Invoice from 'App/Models/Invoice';
 import PaymentMethod from 'App/Models/PaymentMethod';
 import Order from 'App/Models/Order';
 import SettingUtils from 'App/Utils/SettingUtils';
+import UserNotification from 'App/Models/UserNotification';
+import { formatCurrency } from 'App/Utils/FormatCurrency';
 
 export default class PaypalController {
 
@@ -98,6 +100,16 @@ export default class PaypalController {
                     .related('order').query()
                     .update('status', Order.STATUS.CONFIRMED)
                     .update('payment_status', Order.PAYMENT_STATUS.PAID)
+
+                // Thông báo cho người dùng là bạn thanh toán thành công cho đơn hàng
+                try {
+                    await invoice.load('order')
+                    await UserNotification.create({
+                        title: 'Thanh toán thành công',
+                        message: `Bạn vừa thanh toán ${formatCurrency(invoice.order.finalPrice)} cho đơn hàng #${invoice.orderId} thành công.`,
+                        userId: invoice.order.userId,
+                    })
+                } catch { }
 
                 return view.render('payment_result', {
                     image: '/img/payment_success.jpg',
