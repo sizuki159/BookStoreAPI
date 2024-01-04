@@ -69,8 +69,9 @@ export default class UserRecommendationController {
             }
         }
 
-        // return bookRecommendIsbnCodeArray
-
+        if(bookRecommendIsbnCodeArray.length === 0) {
+            return response.json([])
+        }
 
         const bookRecommend = await Book.query()
             .whereIn('isbn_code', bookRecommendIsbnCodeArray)
