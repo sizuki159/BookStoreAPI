@@ -107,26 +107,26 @@ export default class extends BaseSeeder {
         return formattedDateTime;
     }
 
-    // Hàm tạo ngày tháng ngẫu nhiên từ tháng 1/2020 đến tháng 12/2023
-    private getRandomDate() {
-        const startYear = 2020;
-        const endYear = 2023;
-        const startMonth = 0; // Tháng 1
-        const endMonth = 11; // Tháng 12
+    // // Hàm tạo ngày tháng ngẫu nhiên từ tháng 1/2020 đến tháng 12/2023
+    // private getRandomDate() {
+    //     const startYear = 2020;
+    //     const endYear = 2023;
+    //     const startMonth = 0; // Tháng 1
+    //     const endMonth = 11; // Tháng 12
 
-        // Tính toán số mili giây tương ứng với ngày bắt đầu và ngày kết thúc
-        const startDate = new Date(startYear, startMonth, 1).getTime();
-        const endDate = new Date(endYear, endMonth + 1, 0).getTime();
+    //     // Tính toán số mili giây tương ứng với ngày bắt đầu và ngày kết thúc
+    //     const startDate = new Date(startYear, startMonth, 1).getTime();
+    //     const endDate = new Date(endYear, endMonth + 1, 0).getTime();
 
-        // Tạo một số ngẫu nhiên trong khoảng từ startDate đến endDate
-        const randomTime = startDate + Math.random() * (endDate - startDate);
+    //     // Tạo một số ngẫu nhiên trong khoảng từ startDate đến endDate
+    //     const randomTime = startDate + Math.random() * (endDate - startDate);
 
-        // Tạo đối tượng Date từ số mili giây ngẫu nhiên
-        const randomDate = new Date(randomTime);
+    //     // Tạo đối tượng Date từ số mili giây ngẫu nhiên
+    //     const randomDate = new Date(randomTime);
 
-        // Định dạng ngày tháng theo ý muốn
-        const formattedDate = `${randomDate.getFullYear()}-${String(randomDate.getMonth() + 1).padStart(2, '0')}-${String(randomDate.getDate()).padStart(2, '0')}`;
+    //     // Định dạng ngày tháng theo ý muốn
+    //     const formattedDate = `${randomDate.getFullYear()}-${String(randomDate.getMonth() + 1).padStart(2, '0')}-${String(randomDate.getDate()).padStart(2, '0')}`;
 
-        return formattedDate;
-    }
+    //     return formattedDate;
+    // }
 }

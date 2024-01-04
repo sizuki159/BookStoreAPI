@@ -1,10 +1,9 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Token from 'App/Models/Token'
-import User from 'App/Models/User'
 import SettingUtils from 'App/Utils/SettingUtils'
 
 export default class VerifyEmailController {
-    public async verify({ response, params, view }: HttpContextContract) {
+    public async verify({ params, view }: HttpContextContract) {
 
         const home_url = await SettingUtils.getSettingByKey(SettingUtils.KEY.FRONTEND_URL)
 

@@ -3,7 +3,6 @@ import User from 'App/Models/User'
 import UserProfile from 'App/Models/UserProfile'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
-import UserProfileFilterFields from 'App/FilterFields/User/UserProfileFilterFields'
 import RandomNumber from 'App/Utils/RandomNumber'
 import UserMyInformationFilterFields from 'App/FilterFields/User/UserMyInformationFilterFields'
 

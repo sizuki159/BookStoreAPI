@@ -12,7 +12,7 @@ import UserNotification from 'App/Models/UserNotification'
 import Voucher from 'App/Models/Voucher'
 
 export default class AuthController {
-    public async register({ auth, request, response }: HttpContextContract) {
+    public async register({ request, response }: HttpContextContract) {
         const { email, password } = await request.validate(RegisterValidator)
 
         const user = await User.create({

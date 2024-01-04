@@ -1,6 +1,6 @@
 import { compose } from '@ioc:Adonis/Core/Helpers'
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, afterCreate, afterUpdate, beforeCreate, beforeUpdate, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, beforeCreate, beforeUpdate, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import AddressWard from './AddressWard'
 import { SoftDeletes } from '@ioc:Adonis/Addons/LucidSoftDeletes'

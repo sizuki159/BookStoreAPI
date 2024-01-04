@@ -1,7 +1,6 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import AddressWard from 'App/Models/AddressWard'
 import User from 'App/Models/User'
-import UserAddress from 'App/Models/UserAddress'
 
 export default class extends BaseSeeder {
     public async run() {
