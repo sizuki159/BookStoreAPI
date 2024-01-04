@@ -94,4 +94,10 @@ Route.group(() => {
         Route.get('/statistics', 'UserNotificationController.getStatistics')
     }).prefix('notification')
 
+    // Khuyến nghị sách
+    Route.group(() => {
+        // Lấy sách khuyến nghị
+        Route.get('', 'UserRecommendationController.index')
+    }).prefix('recommendation')
+    
 }).prefix('user').namespace('App/Controllers/Http/User').middleware('auth')
