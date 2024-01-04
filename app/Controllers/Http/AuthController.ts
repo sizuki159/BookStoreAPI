@@ -20,7 +20,7 @@ export default class AuthController {
             password
         })
         await user.refresh()
-        // await user.sendVerifyEmail()
+        await user.sendVerifyEmail()
 
         // Gửi lời chào đến user
         try {
