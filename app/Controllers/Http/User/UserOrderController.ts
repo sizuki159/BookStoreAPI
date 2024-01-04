@@ -118,7 +118,7 @@ export default class UserOrderController {
 
             voucherId = voucher.id
 
-            price.discountPrice = price.total * (voucher.discountPercentage / 100)
+            price.discountPrice = price.productPrice * (voucher.discountPercentage / 100)
             if (voucher.discountMaxPrice) {
                 if (price.discountPrice > voucher.discountMaxPrice) {
                     price.discountPrice = voucher.discountMaxPrice

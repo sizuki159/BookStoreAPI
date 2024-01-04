@@ -338,7 +338,7 @@ export default class UserCartController {
                 // Mã giảm giá phải hợp lệ
                 // Thì mới tính toán giảm giá tiền
                 if (voucherAvailable.voucherCode === voucherCode) {
-                    price.discountPrice = price.total * (voucherAvailable.discountPercentage / 100)
+                    price.discountPrice = price.productPrice * (voucherAvailable.discountPercentage / 100)
                     if (voucherAvailable.discountMaxPrice) {
                         if (price.discountPrice > voucherAvailable.discountMaxPrice) {
                             price.discountPrice = voucherAvailable.discountMaxPrice
