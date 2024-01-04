@@ -138,10 +138,6 @@ export default class Order extends BaseModel {
     // Tiến hành thông báo cho người dùng (Thông báo đẩy)
     @afterUpdate()
     public static async pushNotification(order: Order) {
-
-        console.log(order.$dirty.status)
-        console.log(order.$dirty.paymentStatus)
-
         // Dựa vào trạng thái mà thông báo khác nhau
         switch (order.status) {
             case Order.STATUS.CONFIRMED:
