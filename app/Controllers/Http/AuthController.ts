@@ -9,6 +9,7 @@ import EmailValidator from 'App/Validators/EmailValidator'
 import UserFilterFields from 'App/FilterFields/User/UserFilterFields'
 import DatetimeUtils from 'App/Utils/DatetimeUtils'
 import UserNotification from 'App/Models/UserNotification'
+import Voucher from 'App/Models/Voucher'
 
 export default class AuthController {
     public async register({ auth, request, response }: HttpContextContract) {
@@ -19,30 +20,33 @@ export default class AuthController {
             password
         })
         await user.refresh()
-        await user.sendVerifyEmail()
+        // await user.sendVerifyEmail()
+
+        // Gửi lời chào đến user
+        try {
+            await Voucher.create({
+                voucherName: 'Chào mừng thành viên mới',
+                voucherType: 'Personalized',
+                voucherCode: `WELCOME-${user.id}`,
+                requireOrderMinPrice: 0,
+                discountPercentage: 10,
+                discountMaxPrice: null,
+                desc: `Mã giảm giá cho khách hàng mới. Chào mừng ${user.email} đến với Sách Việt`,
+                startDate: DateTime.now(),
+                endDate: DateTime.now().plus({ days: 7 }),
+                userId: user.id,
+            })
+            await UserNotification.create({
+                title: 'Chào mừng bạn đến với Sách Việt',
+                message: `Chào mừng bạn đến Sách Việt. Chúng tôi vừa tặng cho bạn mã giảm giá 10% cho lần mua hàng đầu tiên. Mã giảm giá: WELCOME-${user.id}. Chúc bạn có những trải nghiệm tuyệt vời tại Sách Việt!`,
+                userId: user.id
+            })
+        } catch { }
 
         return response.created({
             message: 'Đăng ký thành công!, vui lòng xác thực mail hộp thư',
             data: user
         })
-
-        // await user.refresh()
-
-        // const token = await auth.use('api').generate(user, {expiresIn: '20s'})
-        // const apiToken = await ApiToken.findBy('token', token.tokenHash)
-        // if(apiToken) {
-        //     apiToken.jwt = token.token
-        //     await apiToken.save()
-        // }
-        // const refreshToken = await User.generateRefreshToken(token.tokenHash)
-        // await user.load('userLevel')
-        // await user.load('userRole')
-
-        // return response.created({
-        //     "jwtToken": token.token,
-        //     "refreshToken": refreshToken,
-        //     "userInfo": user,
-        // })
     }
 
     public async login({ auth, request, response }: HttpContextContract) {
