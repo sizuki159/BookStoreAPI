@@ -23,6 +23,10 @@ Route.group(() => {
             Route.get('/:isbn_code', 'BookCommentAPIController.getCommentByISBNCode')
         }).prefix('comment')
 
+        Route.group(() => {
+            Route.get('/audio/:isbn_code', 'BookPreviewAudioController.getAudioDesc')
+        }).prefix('preview')
+
     }).prefix('book')
     //#endregion
 
@@ -97,6 +101,13 @@ Route.group(() => {
 
     // Xuất doanh thu ra excel [Admin private API]
     Route.get('/statistic/revenue/export', 'AdminStatisticController.exportRevenueFromTo').namespace('App/Controllers/Http/Admin')
+
+
+    // Khuyến nghị sách [User API]
+    Route.group(() => {
+        // Lấy sách khuyến nghị
+        Route.get('', 'UserRecommendationController.index')
+    }).prefix('recommendation')
 
 
 }).prefix('api').namespace('App/Controllers/Http/API')

@@ -12,7 +12,12 @@ export default class UserRecommendationController {
 
         const SHOW_MAX = 8
 
-        const userAuth = await auth.use('api').authenticate()
+        let userAuth
+        try {
+            userAuth = await auth.use('api').authenticate()
+        } catch {
+            return response.json([])
+        }
 
         // Lấy thời gian hiện tại
         const now = DateTime.now()
