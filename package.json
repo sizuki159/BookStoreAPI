@@ -5,6 +5,7 @@
   "scripts": {
     "fresh": "node ace migration:fresh --seed",
     "dev": "node ace serve --watch",
+    "audio": "cd server-api && node stream-audio.js",
     "build": "node ace build --production --ignore-ts-errors",
     "start": "pm2 start server.js",
     "env": "cp .env_deployment build/.env",

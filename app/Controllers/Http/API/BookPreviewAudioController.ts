@@ -36,7 +36,7 @@ export default class BookPreviewAudioController {
     }
 
     private catChuoi(input: string): string[] {
-        const doDaiToiDa = 200;
+        const doDaiToiDa = 180;
         const mangKetQua: string[] = [];
 
         for (let i = 0; i < input.length; i += doDaiToiDa) {
