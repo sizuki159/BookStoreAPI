@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .book-container {
+            text-align: center;
+        }
+
+        .book-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            margin: 0 50px;
+            /* Thêm lề 20px ở cả hai bên trái và phải */
+        }
+
+        .book-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            transform: rotate(45deg);
+            margin-bottom: 10px;
+        }
+
+        .book-description {
+            font-size: 16px;
+            color: #555;
+            text-align: center;
+            margin: 0 50px;
+            /* Thêm lề 20px ở cả hai bên trái và phải */
+        }
+
+        .book-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .play-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        @keyframes rotateImage {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .rotate-animation {
+            animation: rotateImage 10s linear infinite;
+        }
+    </style>
+    <title>{{bookName}}</title>
+</head>
+
+<body>
+    <div class="book-container">
+        <div class="book-title">{{bookName}}</div>
+        <div>
+            <img src="{{bookImg}}" alt="Book Cover" class="book-image" id="bookImage">
+        </div>
+        <button id="playButton" class="play-button" onclick="rotateBook()">Play</button>
+        <div class="book-description">
+            {{bookDesc.substring(0, 2000)}}
+        </div>
+    </div>
+</body>
+
+{{{`
+<script>
+    function previewAdio() {
+        const audioStrings = ${ JSON.stringify(descArr)}
+        
+        // Bắt đầu phát âm thanh từ mảng
+        playAudioFromArray(audioStrings, 0);
+    }
+</script>
+`}}}
+
+<script>
+    const playAudioFromArray = (audioArray, currentIndex) => {
+        if (currentIndex >= audioArray.length) {
+            // Kết thúc khi đã phát hết mảng
+
+            var playButton = document.getElementById('playButton');
+            playButton.disabled = false;
+            // Remove the existing animation class
+            bookImage.classList.remove('rotate-animation');
+            // Trigger reflow before adding the class to restart the animation
+            void bookImage.offsetWidth;
+            return;
+        }
+
+        fetch(`http://localhost:2001/audio?text=${encodeURIComponent(audioArray[currentIndex])}`)
+            .then(res => res.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+
+                audio.addEventListener('ended', () => {
+                    // Gọi đệ quy để phát âm thanh tiếp theo trong mảng
+                    playAudioFromArray(audioArray, currentIndex + 1);
+                });
+
+                audio.play();
+            });
+    };
+
+    function rotateBook() {
+        var playButton = document.getElementById('playButton');
+        playButton.disabled = true;
+
+        var bookImage = document.getElementById('bookImage');
+
+        // Remove the existing animation class
+        bookImage.classList.remove('rotate-animation');
+
+        // Trigger reflow before adding the class to restart the animation
+        void bookImage.offsetWidth;
+
+        // Add the animation class
+        bookImage.classList.add('rotate-animation');
+
+        previewAdio();
+    }
+</script>
+
+</html>

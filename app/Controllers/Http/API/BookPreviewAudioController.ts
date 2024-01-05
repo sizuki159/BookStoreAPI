@@ -3,28 +3,36 @@ import Book from 'App/Models/Book'
 
 export default class BookPreviewAudioController {
     // Hàm tạo link audio mô tả sách
-    public async getAudioDesc({ params, response }: HttpContextContract) {
-        const isbn_code = params.isbn_code
+    public async getAudioDesc({ params, view }: HttpContextContract) {
+        const slug = params.slug
 
         const book = await Book.query()
-            .where('isbn_code', isbn_code)
+            .where('slug', slug)
+            .preload('images', (imgQuery) => {
+                imgQuery.groupLimit(1)
+            })
             .first()
 
         if (!book) {
-            return response.status(404).json({
-                message: 'Không tìm thấy sách này'
+
+            return view.render('book_preview_audio', {
+                bookName: 'Sách không tồn tại trên hệ thống',
+                bookImg: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png',
+                descArr: ['Hệ thống không tìm thấy sách này theo yêu cầu của bạn'],
+                bookDesc: 'Hệ thống không tìm thấy sách này theo yêu cầu của bạn'
             })
         }
 
         const desc = book.desc
-
         const descArr = this.catChuoi(desc)
+        const bookImg = book.images.length > 0 ? book.images[0].imageSource : 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png'
 
-        return response.json(
-            descArr.map(desc => {
-                return `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=vi&q=${encodeURIComponent(desc.trim())}`
-            })
-        )
+        return view.render('book_preview_audio', {
+            bookName: book.name,
+            bookDesc: book.desc,
+            bookImg,
+            descArr
+        })
     }
 
     private catChuoi(input: string): string[] {

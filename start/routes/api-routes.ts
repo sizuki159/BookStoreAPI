@@ -24,7 +24,7 @@ Route.group(() => {
         }).prefix('comment')
 
         Route.group(() => {
-            Route.get('/audio/:isbn_code', 'BookPreviewAudioController.getAudioDesc')
+            Route.get('/audio/:slug', 'BookPreviewAudioController.getAudioDesc')
         }).prefix('preview')
 
     }).prefix('book')
