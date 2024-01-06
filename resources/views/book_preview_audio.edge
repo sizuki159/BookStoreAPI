@@ -116,7 +116,7 @@
             return;
         }
 
-        fetch(`http://143.198.206.105:2001/audio?text=${encodeURIComponent(audioArray[currentIndex])}`)
+        fetch(`http://localhost:2001/audio?text=${encodeURIComponent(audioArray[currentIndex])}`)
             .then(res => res.blob())
             .then(blob => {
                 const url = URL.createObjectURL(blob);
