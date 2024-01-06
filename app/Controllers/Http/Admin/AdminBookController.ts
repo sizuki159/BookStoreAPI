@@ -165,7 +165,7 @@ export default class AdminBookController {
             }
 
             await bookImage.delete()
-            await Drive.use('s3').delete(bookImage.imageSource)
+            // await Drive.use('s3').delete(bookImage.imageSource)
             return response.ok({
                 message: 'Xóa ảnh thành công.'
             })
